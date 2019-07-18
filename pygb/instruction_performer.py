@@ -371,6 +371,151 @@ class InstructionPerformer:
         if instruction == 0x7f:
             print('{}: LD A, A'.format(hex(self.cpu.registers.pc-1)))
             return 4
+        if instruction == 0x80:
+            byte = self.cpu.registers.a + self.cpu.registers.b
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.b ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.b ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, B'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x81:
+            byte = self.cpu.registers.a + self.cpu.registers.c
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.c ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.c ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, C'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x82:
+            byte = self.cpu.registers.a + self.cpu.registers.d
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.d ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.d ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, D'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x83:
+            byte = self.cpu.registers.a + self.cpu.registers.e
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.e ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.e ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, E'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x84:
+            byte = self.cpu.registers.a + self.cpu.registers.h
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.h ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.h ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, H'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x85:
+            byte = self.cpu.registers.a + self.cpu.registers.l
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.l ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.l ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, L'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x86:
+            byte = self.cpu.mmu.read_byte(self.cpu.registers.get_hl())
+            result = self.cpu.registers.a + byte
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ byte ^ result) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ byte ^ result) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xff
+            print('{}: ADD A, (HL)'.format(hex(self.cpu.registers.pc-1)))
+            return 8
+        if instruction == 0x87:
+            byte = self.cpu.registers.a + self.cpu.registers.a
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.a ^ byte) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ self.cpu.registers.a ^ byte) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = byte & 0xff
+            print('{}: ADD A, A'.format(hex(self.cpu.registers.pc-1)))
+            return 4
         if instruction == 0xc1:
             self.cpu.registers.set_bc(self.cpu.stackManager.pop_word())
             print('{}: POP BC'.format(hex(self.cpu.registers.pc-1)))
@@ -379,6 +524,25 @@ class InstructionPerformer:
             self.cpu.stackManager.push_word(self.cpu.registers.get_bc())
             print('{}: PUSH BC'.format(hex(self.cpu.registers.pc-1)))
             return 16
+        if instruction == 0xc6:
+            byte = self.cpu.mmu.read_byte(self.cpu.registers.pc)
+            result = self.cpu.registers.a + byte
+            if (byte & 0xff) == 0x00:
+                self.cpu.registers.set_z_flag
+            else:
+                 self.cpu.registers.reset_z_flag
+            if (self.cpu.registers.a ^ byte ^ result) & 0x100 == 0x100:
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a ^ byte ^ result) & 0x10 == 0x10: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xff
+            print('{}: ADD A, {}'.format(hex(self.cpu.registers.pc-2), hex(byte)))
+            return 8
         if instruction == 0xd1:
             self.cpu.registers.set_de(self.cpu.stackManager.pop_word())
             print('{}: POP DE'.format(hex(self.cpu.registers.pc-1)))
