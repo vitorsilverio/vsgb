@@ -3,6 +3,11 @@
 
 class Registers:
 
+    Z_FLAG = 0x80
+    N_FLAG = 0x40
+    H_FLAG = 0x20
+    C_FLAG = 0x10
+
     def __init__(self):
         self.a = 0x00
         self.b = 0x00
@@ -42,3 +47,27 @@ class Registers:
 
     def get_hl(self):
         return (self.h << 8) + self.l
+
+    def set_z_flag(self):
+        self.f |= Registers.Z_FLAG
+
+    def reset_z_flag(self):
+        self.f &= Registers.Z_FLAG ^ 0xff
+
+    def set_n_flag(self):
+        self.f |= Registers.N_FLAG
+
+    def reset_n_flag(self):
+        self.f &= Registers.N_FLAG ^ 0xff
+
+    def set_c_flag(self):
+        self.f |= Registers.C_FLAG
+
+    def reset_c_flag(self):
+        self.f &= Registers.C_FLAG ^ 0xff
+
+    def set_h_flag(self):
+        self.f |= Registers.H_FLAG
+
+    def reset_h_flag(self):
+        self.f &= Registers.H_FLAG ^ 0xff
