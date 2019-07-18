@@ -25,7 +25,7 @@ class CPU:
     def step(self):
         self.ticks = 0
         if self.halted:
-            if self.pre_halt_interrupt <> self.mmu.read_byte(IO_Registers.IF):
+            if self.pre_halt_interrupt != self.mmu.read_byte(IO_Registers.IF):
                 self.halted = False
         if self.ime:
             self.serve_interrupt()

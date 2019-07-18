@@ -17,7 +17,7 @@ class StackManager:
         self.push_byte(word)
 
     def pop_byte(self):
-        byte = self.mmu.write_byte(self.registers.sp)
+        byte = self.mmu.read_byte(self.registers.sp)
         self.registers.sp += 1
         return byte
 

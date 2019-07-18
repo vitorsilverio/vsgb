@@ -337,7 +337,7 @@ class InstructionPerformer:
             print('{}: LD (HL), L'.format(hex(self.cpu.registers.pc-1)))
             return 8
         if instruction == 0x77:
-            self.cpu.mmu.write_byte(self.cpu.registers.get_hl, self.cpu.registers.a)
+            self.cpu.mmu.write_byte(self.cpu.registers.get_hl(), self.cpu.registers.a)
             print('{}: LD (HL), A'.format(hex(self.cpu.registers.pc-1)))
             return 8
         if instruction == 0x78:
@@ -447,7 +447,7 @@ class InstructionPerformer:
             print('{}: LDHL SP, {}'.format(hex(self.cpu.registers.pc-2), hex(byte)))
             return 12
         if instruction == 0xf9:
-            self.cpu.registers.sp = self.cpu.registers.get_hl
+            self.cpu.registers.sp = self.cpu.registers.get_hl()
             print('{}: LD SP, HL'.format(hex(self.cpu.registers.pc-1)))
             return 8
         if instruction == 0xfa:
