@@ -97,3 +97,10 @@ class MMU:
             for i in range(0,0x9f):
                 self.write_byte((0xFE00 + i), self.read_byte(address + 1))
 
+    def read_word(self, address):
+        return self.read_byte(address) + (self.read_byte(address + 1) << 8)
+
+    def write_word(self, address, value):
+        value = value & 0xffff
+        self.write_byte(address, (value & 0xff))
+        self.write_byte((address + 1), (value >> 8))

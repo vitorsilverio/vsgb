@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pygb.interrupt_manager import InterruptManager, Interrupt
+from pygb.instruction_performer import InstructionPerformer
 from pygb.io_registers import IO_Registers
 from pygb.registers import Registers
 from pygb.stack_manager import StackManager
@@ -15,15 +16,17 @@ class CPU:
         self.interruptManager = InterruptManager(mmu)
         self.timer = Timer(mmu, self.interruptManager)
         self.stackManager = StackManager(self.registers, self.mmu)
+        self.instructionPerformer = InstructionPerformer(self)
         self.ticks = 0
         self.ime = False
         self.halted = False
+        self.pre_halt_interrupt = 0x00
         
-        
-
     def step(self):
         self.ticks = 0
-        # TODO must check halt 
+        if self.halted:
+            if self.pre_halt_interrupt <> self.mmu.read_byte(IO_Registers.IF):
+                self.halted = False
         if self.ime:
             self.serve_interrupt()
         if self.halted:
@@ -65,5 +68,7 @@ class CPU:
         return instruction
 
     def perform_instruction(self, instruction):
-        print('{}: Instruction {}'.format(hex(self.registers.pc),hex(instruction)))
+        self.ticks = self.instructionPerformer.perform_instruction(instruction) * 4
+
+
 
