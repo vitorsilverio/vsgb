@@ -371,6 +371,30 @@ class InstructionPerformer:
         if instruction == 0x7f:
             print('{}: LD A, A'.format(hex(self.cpu.registers.pc-1)))
             return 4
+        if instruction == 0xc1:
+            self.cpu.registers.set_bc(self.cpu.stackManager.pop_word())
+            print('{}: POP BC'.format(hex(self.cpu.registers.pc-1)))
+            return 12
+        if instruction == 0xc5:
+            self.cpu.stackManager.push_word(self.cpu.registers.get_bc())
+            print('{}: PUSH BC'.format(hex(self.cpu.registers.pc-1)))
+            return 16
+        if instruction == 0xd1:
+            self.cpu.registers.set_de(self.cpu.stackManager.pop_word())
+            print('{}: POP DE'.format(hex(self.cpu.registers.pc-1)))
+            return 12
+        if instruction == 0xd5:
+            self.cpu.stackManager.push_word(self.cpu.registers.get_de())
+            print('{}: PUSH DE'.format(hex(self.cpu.registers.pc-1)))
+            return 16
+        if instruction == 0xe1:
+            self.cpu.registers.set_hl(self.cpu.stackManager.pop_word())
+            print('{}: POP HL'.format(hex(self.cpu.registers.pc-1)))
+            return 12
+        if instruction == 0xe5:
+            self.cpu.stackManager.push_word(self.cpu.registers.get_hl())
+            print('{}: PUSH HL'.format(hex(self.cpu.registers.pc-1)))
+            return 16
         if instruction == 0xe0:
             byte = self.cpu.mmu.read_byte(self.cpu.registers.pc)
             self.cpu.registers.pc += 1
@@ -393,10 +417,18 @@ class InstructionPerformer:
             self.cpu.registers.a = self.cpu.mmu.read_byte((byte + 0xff00))
             print('{}: LDH A, ({})'.format(hex(self.cpu.registers.pc-2),hex(byte)))
             return 12
+        if instruction == 0xf1:
+            self.cpu.registers.set_af(self.cpu.stackManager.pop_word())
+            print('{}: POP AF'.format(hex(self.cpu.registers.pc-1)))
+            return 12
         if instruction == 0xf2:
             self.cpu.registers.a = self.cpu.mmu.read_byte(self.cpu.registers.c + 0xff00)
             print('{}: LD A, (0xff00+C)'.format(hex(self.cpu.registers.pc-1)))
             return 8
+        if instruction == 0xf5:
+            self.cpu.stackManager.push_word(self.cpu.registers.get_af())
+            print('{}: PUSH AF'.format(hex(self.cpu.registers.pc-1)))
+            return 16
         if instruction == 0xf8:
             byte = self.cpu.mmu.read_byte(self.cpu.registers.pc)
             self.cpu.registers.pc += 1
