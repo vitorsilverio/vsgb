@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from enum import Enum
+from enum import IntEnum
 
-class IO_Registers(Enum):
+class IO_Registers(IntEnum):
 
     P1 = 0xff00 # Register for reading joy pad info and determining system type. (R/W)
     SB = 0xff01 # Serial transfer data (R/W)

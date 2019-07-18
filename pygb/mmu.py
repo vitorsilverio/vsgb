@@ -31,15 +31,15 @@ class MMU:
         0x3E, 0x01, 0xE0, 0x50
         ]
         self.rom = None
-        self.video_ram = [None]*0x2000
-        self.internal_ram = [None]*0x2000
-        self.oam = [None]*0xa0
-        self.io_ports = [None]*0x4c
-        self.high_internal_ram = [None]*0x80
+        self.video_ram = [0x00]*0x2000
+        self.internal_ram = [0x00]*0x2000
+        self.oam = [0x00]*0xa0
+        self.io_ports = [0x00]*0x4c
+        self.high_internal_ram = [0x00]*0x80
         self.bootstrap_enabled = True
         
     def read_byte(self, address):
-        if address < 0x100 and self.bootstrap_enabled:
+        if ( address < 0x100 ) and self.bootstrap_enabled:
             return self.boot_rom[address]
         if address < 0x8000:
             return 0x00 #TODO implement rom
@@ -64,9 +64,7 @@ class MMU:
 
     def write_byte(self, address, value, hardware_operation = False):
         value = value & 0xff
-        if address < 0x100 and self.bootstrap_enabled:
-            self.boot_rom[address] = value
-        elif address < 0x8000:
+        if address < 0x8000:
             print('') #TODO implement rom
         elif address < 0xa000:
             self.video_ram[address - 0x8000] = value

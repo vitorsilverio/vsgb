@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from enum import Enum
+from enum import IntEnum
 
 from pygb.io_registers import IO_Registers
 
@@ -30,7 +30,7 @@ class InterruptManager:
             return Interrupt.INTERRUPT_JOYPAD
         return Interrupt.INTERRUPT_NONE
 
-class Interrupt(Enum):
+class Interrupt(IntEnum):
     
     INTERRUPT_NONE    = 0x00
     INTERRUPT_VBLANK  = 0x01

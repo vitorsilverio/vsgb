@@ -14,9 +14,11 @@ class CPU:
         self.registers = Registers()
         self.interruptManager = InterruptManager(mmu)
         self.timer = Timer(mmu, self.interruptManager)
+        self.stackManager = StackManager(self.registers, self.mmu)
         self.ticks = 0
         self.ime = False
-        self.stackManager = StackManager(self.registers, self.mmu)
+        self.halted = False
+        
         
 
     def step(self):
@@ -24,6 +26,12 @@ class CPU:
         # TODO must check halt 
         if self.ime:
             self.serve_interrupt()
+        if self.halted:
+            self.ticks = 4
+        else:
+            instruction = self.fetch_instruction()
+            self.perform_instruction(instruction)
+        self.timer.tick(self.ticks)
         
     def serve_interrupt(self):
         interrupt = self.interruptManager.pending_interrupt()
@@ -49,5 +57,13 @@ class CPU:
             self.mmu.write_byte(IO_Registers.IF, if_register & 0xEF)
         self.ticks = 20
 
+    def fetch_instruction(self):
+        instruction = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        if instruction == 0xcb:
+            return 0xcb00 + self.fetch_instruction()
+        return instruction
 
+    def perform_instruction(self, instruction):
+        print('{}: Instruction {}'.format(hex(self.registers.pc),hex(instruction)))
 
