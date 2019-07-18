@@ -28,7 +28,7 @@ class Timer:
             self.tima_cycles += cycles
             frequency = self.tima.frequency
             if self.tima_cycles >= frequency:
-                inc_tima_register()
+                self.inc_tima_register()
                 self.tima_cycles -= frequency
 
     def inc_tima_register(self):
@@ -38,12 +38,12 @@ class Timer:
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
         else:
             tima += 1
-        self.mmu.write_byte(IO_Registers.TIMA, tima)
+        self.mmu.write_byte(IO_Registers.TIMA, tima, True)
 
     def inc_div_register(self):
         div = self.mmu.read_byte(IO_Registers.DIV)
         div = ( div + 1 ) & 0xff
-        self.mmu.write_byte(IO_Registers.DIV, div)
+        self.mmu.write_byte(IO_Registers.DIV, div, True)
         self.div_cycles -= DIV_INC_TIME
 
 class Tima:
@@ -64,4 +64,4 @@ class Tima:
             0x1 : 16,
             0x2 : 64,
             0x3 : 256
-        }.get(register & 0x3)
+        }.get(self.register & 0x3)
