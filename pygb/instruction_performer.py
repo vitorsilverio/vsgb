@@ -516,6 +516,159 @@ class InstructionPerformer:
             self.cpu.registers.a = byte & 0xff
             print('{}: ADD A, A'.format(hex(self.cpu.registers.pc-1)))
             return 4
+        if instruction == 0x88:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.b + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.b & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, B'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x89:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.c + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.c & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, C'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x8a:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.d + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.d & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, D'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x8b:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.e + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.e & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, E'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x8c:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.h + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.h & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, H'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x8d:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.l + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.l & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, L'.format(hex(self.cpu.registers.pc-1)))
+            return 4
+        if instruction == 0x8e:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            byte = self.cpu.mmu.read_byte(self.cpu.registers.get_hl())
+            result = self.cpu.registers.a + byte + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (byte & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, (HL)'.format(hex(self.cpu.registers.pc-1)))
+            return 8
+        if instruction == 0x8f:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            result = self.cpu.registers.a + self.cpu.registers.a + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (self.cpu.registers.a & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, A'.format(hex(self.cpu.registers.pc-1)))
+            return 4
         if instruction == 0xc1:
             self.cpu.registers.set_bc(self.cpu.stackManager.pop_word())
             print('{}: POP BC'.format(hex(self.cpu.registers.pc-1)))
@@ -526,6 +679,7 @@ class InstructionPerformer:
             return 16
         if instruction == 0xc6:
             byte = self.cpu.mmu.read_byte(self.cpu.registers.pc)
+            self.cpu.registers.pc += 1
             result = self.cpu.registers.a + byte
             if (byte & 0xff) == 0x00:
                 self.cpu.registers.set_z_flag
@@ -542,6 +696,27 @@ class InstructionPerformer:
             self.cpu.registers.reset_n_flag
             self.cpu.registers.a = result & 0xff
             print('{}: ADD A, {}'.format(hex(self.cpu.registers.pc-2), hex(byte)))
+            return 8
+        if instruction == 0xce:
+            carry = 1 if self.cpu.registers.is_c_flag() else 0
+            byte = self.cpu.mmu.read_byte(self.cpu.registers.pc)
+            self.cpu.registers.pc += 1
+            result = self.cpu.registers.a + byte + carry
+            if result & 0xff == 0x0: 
+                self.cpu.registers.set_z_flag 
+            else: 
+                self.cpu.registers.reset_z_flag
+            if result > 0xff: 
+                self.cpu.registers.set_c_flag 
+            else: 
+                self.cpu.registers.reset_c_flag
+            if (self.cpu.registers.a & 0xf) + (byte & 0xf) + carry > 0xf: 
+                self.cpu.registers.set_h_flag 
+            else: 
+                self.cpu.registers.reset_h_flag
+            self.cpu.registers.reset_n_flag
+            self.cpu.registers.a = result & 0xFF
+            print('{}: ADC A, {}'.format(hex(self.cpu.registers.pc-2), hex(byte)))
             return 8
         if instruction == 0xd1:
             self.cpu.registers.set_de(self.cpu.stackManager.pop_word())

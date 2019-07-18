@@ -71,3 +71,15 @@ class Registers:
 
     def reset_h_flag(self):
         self.f &= Registers.H_FLAG ^ 0xff
+
+    def is_z_flag(self):
+        return self.f & Registers.Z_FLAG == Registers.Z_FLAG
+
+    def is_n_flag(self):
+        return self.f & Registers.N_FLAG == Registers.N_FLAG
+
+    def is_c_flag(self):
+        return self.f & Registers.C_FLAG == Registers.C_FLAG
+
+    def is_h_flag(self):
+        return self.f & Registers.H_FLAG == Registers.H_FLAG
