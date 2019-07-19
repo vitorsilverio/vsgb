@@ -779,6 +779,46 @@ class InstructionPerformer:
         self.registers.a = result & 0xFF
         print('{}: ADC A, A'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x90(self):
+        self.sub(self.registers.b)
+        print('{}: SUB A, B'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x91(self):
+        self.sub(self.registers.c)
+        print('{}: SUB A, C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x92(self):
+        self.sub(self.registers.d)
+        print('{}: SUB A, D'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x93(self):
+        self.sub(self.registers.e)
+        print('{}: SUB A, E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x94(self):
+        self.sub(self.registers.h)
+        print('{}: SUB A, H'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x95(self):
+        self.sub(self.registers.l)
+        print('{}: SUB A, L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x96(self):
+        self.sub(self.mmu.read_byte(self.registers.get_hl))
+        print('{}: SUB A, (HL)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0x97(self):
+        self.sub(self.registers.a)
+        print('{}: SUB A, A'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xc1(self):
         self.registers.set_bc(self.cpu.stackManager.pop_word())
@@ -842,6 +882,13 @@ class InstructionPerformer:
         self.cpu.stackManager.push_word(self.registers.get_de())
         print('{}: PUSH DE'.format(hex(self.registers.pc-1)))
         return 16
+
+    def instruction_0xd6(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc -= 1
+        self.sub(byte)
+        print('{}: SUB A, {}'.format(hex(self.registers.pc-2),hex(byte)))
+        return 8
     
     def instruction_0xe1(self):
         self.registers.set_hl(self.cpu.stackManager.pop_word())
@@ -928,6 +975,21 @@ class InstructionPerformer:
         print('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
         return 0
         
-
+    def sub(self, value):
+        result = self.registers.a - value
+        if result & 0xFF == 0x0:
+            self.registers.set_z_flag()
+        else: 
+            self.registers.reset_z_flag()
+        if (self.registers.a ^ value ^ result) & 0x100 == 0x100:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        if (self.registers.a ^ value ^ result) & 0x10 == 0x10:
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.set_n_flag()
+        self.registers.a = result & 0xFF
 
 
