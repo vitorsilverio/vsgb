@@ -947,6 +947,11 @@ class InstructionPerformer:
         self.debug('{}: ADD A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
+    def instruction_0xc9(self):
+        self.registers.pc = self.cpu.stackManager.pop_word()
+        self.debug('{}: RET'.format(hex(self.registers.pc-1)))
+        return 16
+
     def instruction_0xcd(self):
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
