@@ -467,316 +467,84 @@ class InstructionPerformer:
         return 4
     
     def instruction_0x80(self):
-        byte = self.registers.a + self.registers.b
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.b ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.b ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.b)
         print('{}: ADD A, B'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x81(self):
-        byte = self.registers.a + self.registers.c
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.c ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.c ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.c)
         print('{}: ADD A, C'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x82(self):
-        byte = self.registers.a + self.registers.d
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.d ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.d ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.d)
         print('{}: ADD A, D'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x83(self):
-        byte = self.registers.a + self.registers.e
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.e ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.e ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.e)
         print('{}: ADD A, E'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x84(self):
-        byte = self.registers.a + self.registers.h
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.h ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.h ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.h)
         print('{}: ADD A, H'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x85(self):
-        byte = self.registers.a + self.registers.l
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.l ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.l ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.l)
         print('{}: ADD A, L'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x86(self):
         byte = self.mmu.read_byte(self.registers.get_hl())
-        result = self.registers.a + byte
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ byte ^ result) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ byte ^ result) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xff
+        self.add(byte)
         print('{}: ADD A, (HL)'.format(hex(self.registers.pc-1)))
         return 8
     
     def instruction_0x87(self):
-        byte = self.registers.a + self.registers.a
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ self.registers.a ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ self.registers.a ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = byte & 0xff
+        self.add(self.registers.a)
         print('{}: ADD A, A'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x88(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.b + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.b & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.b)
         print('{}: ADC A, B'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x89(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.c + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.c & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.c)
         print('{}: ADC A, C'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x8a(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.d + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.d & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.d)
         print('{}: ADC A, D'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x8b(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.e + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.e & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.e)
         print('{}: ADC A, E'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x8c(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.h + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.h & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.h)
         print('{}: ADC A, H'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x8d(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.l + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.l & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.l)
         print('{}: ADC A, L'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x8e(self):
-        carry = 1 if self.registers.is_c_flag() else 0
         byte = self.mmu.read_byte(self.registers.get_hl())
-        result = self.registers.a + byte + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (byte & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(byte)
         print('{}: ADC A, (HL)'.format(hex(self.registers.pc-1)))
         return 8
     
     def instruction_0x8f(self):
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + self.registers.a + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (self.registers.a & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(self.registers.a)
         print('{}: ADC A, A'.format(hex(self.registers.pc-1)))
         return 4
 
@@ -833,43 +601,14 @@ class InstructionPerformer:
     def instruction_0xc6(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        result = self.registers.a + byte
-        if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag
-        else:
-                self.registers.reset_z_flag
-        if (self.registers.a ^ byte ^ result) & 0x100 == 0x100:
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a ^ byte ^ result) & 0x10 == 0x10: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xff
+        self.add(byte)
         print('{}: ADD A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
     
     def instruction_0xce(self):
-        carry = 1 if self.registers.is_c_flag() else 0
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        result = self.registers.a + byte + carry
-        if result & 0xff == 0x0: 
-            self.registers.set_z_flag 
-        else: 
-            self.registers.reset_z_flag
-        if result > 0xff: 
-            self.registers.set_c_flag 
-        else: 
-            self.registers.reset_c_flag
-        if (self.registers.a & 0xf) + (byte & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag 
-        else: 
-            self.registers.reset_h_flag
-        self.registers.reset_n_flag
-        self.registers.a = result & 0xFF
+        self.adc(byte)
         print('{}: ADC A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
     
@@ -885,7 +624,7 @@ class InstructionPerformer:
 
     def instruction_0xd6(self):
         byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc -= 1
+        self.registers.pc += 1
         self.sub(byte)
         print('{}: SUB A, {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 8
@@ -974,6 +713,41 @@ class InstructionPerformer:
     def unimplemented(self, opcode):
         print('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
         return 0
+
+    def add(self, value):
+        byte = self.registers.a + value
+        if (byte & 0xff) == 0x00:
+            self.registers.set_z_flag()
+        else:
+                self.registers.reset_z_flag()
+        if (self.registers.a ^ value ^ byte) & 0x100 == 0x100:
+            self.registers.set_c_flag()
+        else: 
+            self.registers.reset_c_flag()
+        if (self.registers.a ^ value ^ byte) & 0x10 == 0x10: 
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.reset_n_flag()
+        self.registers.a = byte & 0xff
+
+    def adc(self, value):
+        carry = 1 if self.registers.is_c_flag() else 0
+        result = self.registers.a + value + carry
+        if result & 0xff == 0x0: 
+            self.registers.set_z_flag()
+        else: 
+            self.registers.reset_z_flag()
+        if result > 0xff: 
+            self.registers.set_c_flag()
+        else: 
+            self.registers.reset_c_flag()
+        if (self.registers.a & 0xf) + (value & 0xf) + carry > 0xf: 
+            self.registers.set_h_flag()
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.reset_n_flag()
+        self.registers.a = result & 0xFF
         
     def sub(self, value):
         result = self.registers.a - value
