@@ -587,6 +587,47 @@ class InstructionPerformer:
         self.sub(self.registers.a)
         print('{}: SUB A, A'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x98(self):
+        self.sbc(self.registers.b)
+        print('{}: SBC A, B'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x99(self):
+        self.sbc(self.registers.c)
+        print('{}: SBC A, C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9a(self):
+        self.sbc(self.registers.d)
+        print('{}: SBC A, D'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9b(self):
+        self.sbc(self.registers.e)
+        print('{}: SBC A, E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9c(self):
+        self.sbc(self.registers.h)
+        print('{}: SBC A, H'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9d(self):
+        self.sbc(self.registers.l)
+        print('{}: SBC A, L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9e(self):
+        byte = self.mmu.read_byte(self.registers.get_hl())
+        self.sbc(byte)
+        print('{}: SBC A, (HL)'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x9f(self):
+        self.sbc(self.registers.a)
+        print('{}: SBC A, A'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xc1(self):
         self.registers.set_bc(self.cpu.stackManager.pop_word())
@@ -765,5 +806,23 @@ class InstructionPerformer:
             self.registers.reset_h_flag()
         self.registers.set_n_flag()
         self.registers.a = result & 0xff
+
+    def sbc(self, value):
+        carry = 1 if self.registers.is_c_flag() else 0
+        result = self.registers.a - value - carry
+        if result & 0xFF == 0x0:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        if result < 0x0:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        if (self.registersa & 0xF) - (value & 0xF) - carry < 0: 
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.set_n_flag()
+        self.registersa = result & 0xFF
 
 
