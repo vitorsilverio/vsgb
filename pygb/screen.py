@@ -14,9 +14,9 @@ class Screen:
     def __init__(self):
         sdl2.SDL_InitSubSystem(sdl2.SDL_INIT_VIDEO)
         self.buffer = [0]*(Screen.SCREEN_WIDTH * Screen.SCREEN_HEIGHT)
-        self.window = sdl2.SDL_CreateWindow("pygb!", 0, 0, Screen.WINDOW_WIDTH, Screen.WINDOW_HEIGHT, sdl2.SDL_WINDOW_RESIZABLE)
+        self.window = sdl2.SDL_CreateWindow('pygb'.encode(), 0, 0, Screen.WINDOW_WIDTH, Screen.WINDOW_HEIGHT, sdl2.SDL_WINDOW_RESIZABLE)
         self.renderer = sdl2.SDL_CreateRenderer(self.window, -1, 0)
-        sdl2.SDL_SetHint('SDL_HINT_RENDER_SCALE_QUALITY','2')
+        sdl2.SDL_SetHint('SDL_HINT_RENDER_SCALE_QUALITY'.encode(),'2'.encode())
         sdl2.SDL_RenderSetLogicalSize(self.renderer, Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT)
         self.texture = sdl2.SDL_CreateTexture(self.renderer, sdl2.SDL_PIXELFORMAT_ABGR8888,1, Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT)
 
