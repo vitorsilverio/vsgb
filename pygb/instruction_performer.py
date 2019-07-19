@@ -131,6 +131,13 @@ class InstructionPerformer:
         self.registers.reset_z_flag()
         self.debug('{}: RLA'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x18(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.debug('{}: JR {}'.format(hex(self.registers.pc-2), hex(byte)))
+        self.registers.pc += signed_value(byte)
+        return 12
     
     def instruction_0x1a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
@@ -203,6 +210,16 @@ class InstructionPerformer:
         self.registers.h = byte 
         self.debug('{}: LD H, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x28(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.debug('{}: JR Z, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        if self.registers.is_z_flag():
+            self.registers.pc += signed_value(byte)
+            return 12
+        else:
+            return 8
     
     def instruction_0x2a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
