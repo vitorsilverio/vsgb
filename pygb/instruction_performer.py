@@ -747,11 +747,11 @@ class InstructionPerformer:
         else: 
             self.registers.reset_h_flag()
         self.registers.reset_n_flag()
-        self.registers.a = result & 0xFF
+        self.registers.a = result & 0xff
         
     def sub(self, value):
         result = self.registers.a - value
-        if result & 0xFF == 0x0:
+        if result & 0xff == 0x0:
             self.registers.set_z_flag()
         else: 
             self.registers.reset_z_flag()
@@ -764,6 +764,6 @@ class InstructionPerformer:
         else: 
             self.registers.reset_h_flag()
         self.registers.set_n_flag()
-        self.registers.a = result & 0xFF
+        self.registers.a = result & 0xff
 
 
