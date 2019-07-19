@@ -20,7 +20,7 @@ class InstructionPerformer:
             return self.unimplemented(opcode)
 
     
-    def instruction_0x00(self):
+    def instruction_0x0(self):
         self.debug('{}: NOP'.format(hex(self.registers.pc -1)))
         return 4
     
@@ -35,6 +35,11 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_bc, self.registers.a)
         self.debug('{}: LD (BC), A'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x4(self):
+        self.registers.b = self.inc_byte(self.registers.b)
+        self.debug('{}: INC B'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x6(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -54,6 +59,11 @@ class InstructionPerformer:
         self.registers.a = self.mmu.read_byte(self.registers.get_bc())
         self.debug('{}: LD A, (BC)'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0xc(self):
+        self.registers.c = self.inc_byte(self.registers.c)
+        self.debug('{}: INC C'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xe(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -73,6 +83,11 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_de, self.registers.a)
         self.debug('{}: LD (DE), A'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x14(self):
+        self.registers.d = self.inc_byte(self.registers.d)
+        self.debug('{}: INC D'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x16(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -85,6 +100,11 @@ class InstructionPerformer:
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
         self.debug('{}: LD A, (DE)'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x1c(self):
+        self.registers.e = self.inc_byte(self.registers.e)
+        self.debug('{}: INC E'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x1e(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -115,6 +135,11 @@ class InstructionPerformer:
         self.registers.set_hl(self.registers.get_hl()+1)
         self.debug('{}: LD (HL+), A'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x24(self):
+        self.registers.h = self.inc_byte(self.registers.h)
+        self.debug('{}: INC H'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x26(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -128,6 +153,11 @@ class InstructionPerformer:
         self.registers.set_hl(self.registers.get_hl()+1)
         self.debug('{}: LD A, (HL+)'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x2c(self):
+        self.registers.l = self.inc_byte(self.registers.l)
+        self.debug('{}: INC L'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x2e(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -148,6 +178,11 @@ class InstructionPerformer:
         self.registers.set_hl(self.registers.get_hl()-1)
         self.debug('{}: LD (HL-), A'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x34(self):
+        self.mmu.write_byte(self.registers.get_hl(),self.inc_byte(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: INC C'.format(hex(self.registers.pc-1)))
+        return 12
     
     def instruction_0x36(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -161,6 +196,11 @@ class InstructionPerformer:
         self.registers.set_hl(self.registers.get_hl()-1)
         self.debug('{}: LD A, (HL-)'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x3c(self):
+        self.registers.a = self.inc_byte(self.registers.a)
+        self.debug('{}: INC A'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x3e(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -965,8 +1005,8 @@ class InstructionPerformer:
         return 8
     
     def unimplemented(self, opcode):
-        self.debug('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
-        return 0
+        logging.error('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
+        raise NotImplementedError()
 
     def add(self, value):
         byte = self.registers.a + value
@@ -1095,6 +1135,19 @@ class InstructionPerformer:
             self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         self.registers.set_h_flag()
+
+    def inc_byte(self, value):
+        result = value + 1
+        if result & 0xff == 0x0:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        if result & 0xf == 0x0:
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.reset_n_flag()
+        return result & 0xff
 
     def debug(self, text):
         logging.debug(text)
