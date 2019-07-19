@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.byte_operations import signed_value
+from pygb.byte_operations import signed_value, set_bit, bit_mask
 
 class InstructionPerformer:
 
@@ -23,38 +23,38 @@ class InstructionPerformer:
         print('{}: NOP'.format(hex(self.registers.pc -1)))
         return 4
     
-    def instruction_0x01(self):
+    def instruction_0x1(self):
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.registers.set_bc(word) 
         print('{}: LD BC, {}'.format(hex(self.registers.pc-3), hex(word)))
         return 12
     
-    def instruction_0x02(self):
+    def instruction_0x2(self):
         self.mmu.write_byte(self.registers.get_bc, self.registers.a)
         print('{}: LD (BC), A'.format(hex(self.registers.pc-1)))
         return 8
     
-    def instruction_0x06(self):
+    def instruction_0x6(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.b = byte 
         print('{}: LD B, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
     
-    def instruction_0x08(self):
+    def instruction_0x8(self):
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.mmu.write_word(word, self.registers.sp)
         print('{}: LD ({}), SP'.format(hex(self.registers.pc-2), hex(word)))
         return 20
     
-    def instruction_0x0a(self):
+    def instruction_0xa(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_bc())
         print('{}: LD A, (BC)'.format(hex(self.registers.pc-1)))
         return 8
     
-    def instruction_0x0e(self):
+    def instruction_0xe(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.c = byte 
@@ -91,6 +91,16 @@ class InstructionPerformer:
         self.registers.e = byte 
         print('{}: LD E, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x20(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        print('{}: JR NZ, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        if not self.registers.is_z_flag():
+            self.registers.pc += signed_value(byte)
+            return 12
+        else:
+            return 8
     
     def instruction_0x21(self):
         word = self.mmu.read_word(self.registers.pc)
@@ -942,6 +952,16 @@ class InstructionPerformer:
         self.cp(byte)
         print('{}: CP {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0xcb7c(self):
+        self.bit(7, self.registers.h)
+        print('{}: BIT 7, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbc7(self):
+        self.registers.a = set_bit(0, self.registers.a)
+        print('{}: SET 0, A'.format(hex(self.registers.pc-2)))
+        return 8
     
     def unimplemented(self, opcode):
         print('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
@@ -1010,12 +1030,12 @@ class InstructionPerformer:
             self.registers.set_c_flag() 
         else: 
             self.registers.reset_c_flag()
-        if (self.registersa & 0xF) - (value & 0xF) - carry < 0: 
+        if (self.registers.a & 0xF) - (value & 0xF) - carry < 0: 
             self.registers.set_h_flag() 
         else: 
             self.registers.reset_h_flag()
         self.registers.set_n_flag()
-        self.registersa = result & 0xff
+        self.registers.a = result & 0xff
 
     def _and(self, value):
         result = self.registers.a & value
@@ -1053,15 +1073,24 @@ class InstructionPerformer:
     def cp(self, value):
         result = self.registers.a - value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag 
+            self.registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag
+            self.registers.reset_z_flag()
         if self.registers.a < value:
             self.registers.set_c_flag()
         else: 
             self.registers.reset_c_flag()
-        if (result & 0xF) > (self.registers.a & 0xF):
+        if (result & 0xf) > (self.registers.a & 0xf):
             self.registers.set_h_flag()
         else: 
             self.registers.reset_h_flag()
         self.registers.set_n_flag()
+
+    def bit(self, pos, value):
+        bit = 1 if value & bit_mask[pos] == bit_mask[pos] else 0
+        if bit & 0xff == 0x0:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.set_h_flag()

@@ -1,1 +1,4 @@
 # pygb
+
+# Requirements
+- PySDL2

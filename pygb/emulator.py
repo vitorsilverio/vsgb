@@ -4,6 +4,7 @@
 from pygb.cpu import CPU
 from pygb.mmu import MMU
 from pygb.ppu import PPU
+from pygb.screen import Screen
 
 class Emulator:
 
@@ -11,11 +12,12 @@ class Emulator:
         self.mmu = MMU() 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu)
+        self.screen = Screen()
 
     def run(self):
         while True:
             self.cpu.step()
             self.ppu.step()
-            if self.ppu.is_vblank():
-                print('Must render')
+            if self.ppu.vblank:
+                self.screen.render(self.ppu.framebuffer)
 
