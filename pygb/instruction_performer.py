@@ -669,6 +669,47 @@ class InstructionPerformer:
         self._and(self.registers.a)
         print('{}: AND A'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0xb0(self):
+        self._or(self.registers.b)
+        print('{}: OR B'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb1(self):
+        self._or(self.registers.c)
+        print('{}: OR C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb2(self):
+        self._or(self.registers.d)
+        print('{}: OR D'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb3(self):
+        self._or(self.registers.e)
+        print('{}: OR E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb4(self):
+        self._or(self.registers.h)
+        print('{}: OR H'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb5(self):
+        self._or(self.registers.l)
+        print('{}: OR L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xb6(self):
+        byte = self.mmu.read_byte(self.registers.get_hl())
+        self._or(self.byte)
+        print('{}: OR (HL)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0xb7(self):
+        self._or(self.registers.a)
+        print('{}: OR A'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xc1(self):
         self.registers.set_bc(self.cpu.stackManager.pop_word())
@@ -768,6 +809,13 @@ class InstructionPerformer:
         self.cpu.stackManager.push_word(self.registers.get_af())
         print('{}: PUSH AF'.format(hex(self.registers.pc-1)))
         return 16
+
+    def instruction_0xf6(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self._or(self.byte)
+        print('{}: OR {}'.format(hex(self.registers.pc-2), hex(byte)))
+        return 8
     
     def instruction_0xf8(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -882,4 +930,26 @@ class InstructionPerformer:
         self.registers.reset_c_flag()
         self.registers.reset_n_flag()
         self.registers.set_h_flag()
+        self.registers.a = result & 0xff
+
+    def _or(self, value):
+        result = self.registers.a | value
+        if result & 0xff == 0x0:
+            self.registers.set_z_flag 
+        else: 
+            self.registers.reset_z_flag
+        self.registers.reset_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        self.registers.a = result & 0xff
+
+    def xor(self, value):
+        result = self.registers.a ^ value
+        if result & 0xff == 0x0:
+            self.registers.set_z_flag 
+        else: 
+            self.registers.reset_z_flag
+        self.registers.reset_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
         self.registers.a = result & 0xff
