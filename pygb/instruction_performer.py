@@ -40,6 +40,11 @@ class InstructionPerformer:
         self.registers.b = self.inc_byte(self.registers.b)
         self.debug('{}: INC B'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x5(self):
+        self.registers.b = self.dec_byte(self.registers.b)
+        self.debug('{}: DEC B'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x6(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -63,6 +68,11 @@ class InstructionPerformer:
     def instruction_0xc(self):
         self.registers.c = self.inc_byte(self.registers.c)
         self.debug('{}: INC C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xd(self):
+        self.registers.c = self.dec_byte(self.registers.c)
+        self.debug('{}: DEC C'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0xe(self):
@@ -88,6 +98,11 @@ class InstructionPerformer:
         self.registers.d = self.inc_byte(self.registers.d)
         self.debug('{}: INC D'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x15(self):
+        self.registers.d = self.dec_byte(self.registers.d)
+        self.debug('{}: DEC D'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x16(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -110,6 +125,11 @@ class InstructionPerformer:
     def instruction_0x1c(self):
         self.registers.e = self.inc_byte(self.registers.e)
         self.debug('{}: INC E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x1d(self):
+        self.registers.e = self.dec_byte(self.registers.e)
+        self.debug('{}: DEC E'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x1e(self):
@@ -146,6 +166,11 @@ class InstructionPerformer:
         self.registers.h = self.inc_byte(self.registers.h)
         self.debug('{}: INC H'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x25(self):
+        self.registers.h = self.dec_byte(self.registers.h)
+        self.debug('{}: DEC H'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x26(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -163,6 +188,11 @@ class InstructionPerformer:
     def instruction_0x2c(self):
         self.registers.l = self.inc_byte(self.registers.l)
         self.debug('{}: INC L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x2d(self):
+        self.registers.l = self.dec_byte(self.registers.l)
+        self.debug('{}: DEC L'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x2e(self):
@@ -189,6 +219,11 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_hl(),self.inc_byte(self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: INC C'.format(hex(self.registers.pc-1)))
         return 12
+
+    def instruction_0x35(self):
+        self.mmu.write_byte(self.registers.get_hl(), self.dec_byte(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: DEC (HL)'.format(hex(self.registers.pc-1)))
+        return 12
     
     def instruction_0x36(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -206,6 +241,11 @@ class InstructionPerformer:
     def instruction_0x3c(self):
         self.registers.a = self.inc_byte(self.registers.a)
         self.debug('{}: INC A'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0x3d(self):
+        self.registers.a = self.dec_byte(self.registers.a)
+        self.debug('{}: DEC A'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x3e(self):
@@ -1166,6 +1206,19 @@ class InstructionPerformer:
         else: 
             self.registers.reset_h_flag()
         self.registers.reset_n_flag()
+        return result & 0xff
+
+    def dec_byte(self, value):
+        result = value - 1
+        if result & 0xff == 0x0:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        if result & 0xf == 0x0:
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+        self.registers.set_n_flag()
         return result & 0xff
 
     def rl(self, value):
