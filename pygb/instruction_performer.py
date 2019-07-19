@@ -670,6 +670,47 @@ class InstructionPerformer:
         print('{}: AND A'.format(hex(self.registers.pc-1)))
         return 4
 
+    def instruction_0xa8(self):
+        self.xor(self.registers.b)
+        print('{}: XOR B'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa9(self):
+        self.xor(self.registers.c)
+        print('{}: XOR C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xaa(self):
+        self.xor(self.registers.d)
+        print('{}: XOR D'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xab(self):
+        self.xor(self.registers.e)
+        print('{}: XOR E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xac(self):
+        self.xor(self.registers.h)
+        print('{}: XOR H'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xad(self):
+        self.xor(self.registers.l)
+        print('{}: XOR L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xae(self):
+        byte = self.mmu.read_byte(self.registers.get_hl())
+        self.xor(byte)
+        print('{}: XOR (HL)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0xaf(self):
+        self.xor(self.registers.a)
+        print('{}: XOR A'.format(hex(self.registers.pc-1)))
+        return 4
+
     def instruction_0xb0(self):
         self._or(self.registers.b)
         print('{}: OR B'.format(hex(self.registers.pc-1)))
@@ -786,6 +827,13 @@ class InstructionPerformer:
         self.registers.pc += 2
         self.mmu.write_byte(word, self.registers.a)
         print('{}: LD ({}), A'.format(hex(self.registers.pc-3),hex(word)))
+        return 8
+
+    def instruction_0xee(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.xor(byte)
+        print('{}: XOR {}'.format(hex(self.registers.pc-1), hex(byte)))
         return 8
     
     def instruction_0xf0(self):
