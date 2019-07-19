@@ -36,6 +36,11 @@ class InstructionPerformer:
         self.debug('{}: LD (BC), A'.format(hex(self.registers.pc-1)))
         return 8
 
+    def instruction_0x3(self):
+        self.registers.set_bc((self.registers.get_bc() + 1) & 0xffff )
+        self.debug('{}: INC BC'.format(hex(self.registers.pc-1)))
+        return 8
+
     def instruction_0x4(self):
         self.registers.b = self.inc_byte(self.registers.b)
         self.debug('{}: INC B'.format(hex(self.registers.pc-1)))
@@ -63,6 +68,11 @@ class InstructionPerformer:
     def instruction_0xa(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_bc())
         self.debug('{}: LD A, (BC)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0xb(self):
+        self.registers.set_bc((self.registers.get_bc() - 1) & 0xffff )
+        self.debug('{}: DEC BC'.format(hex(self.registers.pc-1)))
         return 8
 
     def instruction_0xc(self):
@@ -94,6 +104,11 @@ class InstructionPerformer:
         self.debug('{}: LD (DE), A'.format(hex(self.registers.pc-1)))
         return 8
 
+    def instruction_0x13(self):
+        self.registers.set_de((self.registers.get_de() + 1) & 0xffff )
+        self.debug('{}: INC DE'.format(hex(self.registers.pc-1)))
+        return 8
+
     def instruction_0x14(self):
         self.registers.d = self.inc_byte(self.registers.d)
         self.debug('{}: INC D'.format(hex(self.registers.pc-1)))
@@ -120,6 +135,11 @@ class InstructionPerformer:
     def instruction_0x1a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
         self.debug('{}: LD A, (DE)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0x1b(self):
+        self.registers.set_de((self.registers.get_de() - 1) & 0xffff )
+        self.debug('{}: DEC DE'.format(hex(self.registers.pc-1)))
         return 8
 
     def instruction_0x1c(self):
@@ -162,6 +182,11 @@ class InstructionPerformer:
         self.debug('{}: LD (HL+), A'.format(hex(self.registers.pc-1)))
         return 8
 
+    def instruction_0x23(self):
+        self.registers.set_hl((self.registers.get_hl() + 1) & 0xffff )
+        self.debug('{}: INC HL'.format(hex(self.registers.pc-1)))
+        return 8
+
     def instruction_0x24(self):
         self.registers.h = self.inc_byte(self.registers.h)
         self.debug('{}: INC H'.format(hex(self.registers.pc-1)))
@@ -183,6 +208,11 @@ class InstructionPerformer:
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
         self.registers.set_hl(self.registers.get_hl()+1)
         self.debug('{}: LD A, (HL+)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0x2b(self):
+        self.registers.set_hl((self.registers.get_hl() - 1) & 0xffff )
+        self.debug('{}: DEC HL'.format(hex(self.registers.pc-1)))
         return 8
 
     def instruction_0x2c(self):
@@ -215,6 +245,11 @@ class InstructionPerformer:
         self.debug('{}: LD (HL-), A'.format(hex(self.registers.pc-1)))
         return 8
 
+    def instruction_0x33(self):
+        self.registers.sp = ((self.registers.sp + 1) & 0xffff )
+        self.debug('{}: INC SP'.format(hex(self.registers.pc-1)))
+        return 8
+
     def instruction_0x34(self):
         self.mmu.write_byte(self.registers.get_hl(),self.inc_byte(self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: INC C'.format(hex(self.registers.pc-1)))
@@ -236,6 +271,11 @@ class InstructionPerformer:
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
         self.registers.set_hl(self.registers.get_hl()-1)
         self.debug('{}: LD A, (HL-)'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0x3b(self):
+        self.registers.sp = ((self.registers.sp - 1) & 0xffff )
+        self.debug('{}: DEC SP'.format(hex(self.registers.pc-1)))
         return 8
 
     def instruction_0x3c(self):
