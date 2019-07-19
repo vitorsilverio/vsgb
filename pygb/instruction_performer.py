@@ -95,6 +95,12 @@ class InstructionPerformer:
         self.registers.d = byte 
         self.debug('{}: LD D, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x17(self):
+        self.registers.a = self.rl(self.registers.a)
+        self.registers.reset_z_flag()
+        self.debug('{}: RLA'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x1a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
@@ -860,6 +866,14 @@ class InstructionPerformer:
         self.add(byte)
         self.debug('{}: ADD A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0xcd(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: CALL {}'.format(hex(self.registers.pc-3), hex(word)))
+        self.cpu.stackManager.push_word(self.registers.pc)
+        self.registers.pc = word
+        return 12
     
     def instruction_0xce(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -992,6 +1006,11 @@ class InstructionPerformer:
         self.registers.pc += 1
         self.cp(byte)
         self.debug('{}: CP {}'.format(hex(self.registers.pc-2), hex(byte)))
+        return 8
+
+    def instruction_0xcb11(self):
+        self.registers.c = self.rl(self.registers.c)
+        self.debug('{}: RL C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcb7c(self):
@@ -1148,6 +1167,21 @@ class InstructionPerformer:
             self.registers.reset_h_flag()
         self.registers.reset_n_flag()
         return result & 0xff
+
+    def rl(self, value):
+        carry = 1 if self.registers.is_c_flag() else 0
+        if value & 0x80 == 0x80:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        result = ((value << 1) & 0xff) + carry
+        if result & 0xFF == 0x0:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        return result
 
     def debug(self, text):
         logging.debug(text)
