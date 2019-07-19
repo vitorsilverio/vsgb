@@ -11,7 +11,7 @@ class Emulator:
     def __init__(self, file):
         self.mmu = MMU() 
         self.cpu = CPU(self.mmu)
-        self.ppu = PPU(self.mmu)
+        self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.screen = Screen()
 
     def run(self):
