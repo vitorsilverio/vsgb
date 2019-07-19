@@ -622,11 +622,52 @@ class InstructionPerformer:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.sbc(byte)
         print('{}: SBC A, (HL)'.format(hex(self.registers.pc-1)))
-        return 4
+        return 8
 
     def instruction_0x9f(self):
         self.sbc(self.registers.a)
         print('{}: SBC A, A'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa0(self):
+        self._and(self.registers.b)
+        print('{}: AND B'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa1(self):
+        self._and(self.registers.c)
+        print('{}: AND C'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa2(self):
+        self._and(self.registers.d)
+        print('{}: AND D'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa3(self):
+        self._and(self.registers.e)
+        print('{}: AND E'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa4(self):
+        self._and(self.registers.h)
+        print('{}: AND H'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa5(self):
+        self._and(self.registers.l)
+        print('{}: AND L'.format(hex(self.registers.pc-1)))
+        return 4
+
+    def instruction_0xa6(self):
+        byte = self.mmu.read_byte(self.registers.get_hl())
+        self._and(byte)
+        print('{}: AND A'.format(hex(self.registers.pc-1)))
+        return 8
+
+    def instruction_0xa7(self):
+        self._and(self.registers.a)
+        print('{}: AND A'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0xc1(self):
@@ -669,17 +710,7 @@ class InstructionPerformer:
         self.sub(byte)
         print('{}: SUB A, {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 8
-    
-    def instruction_0xe1(self):
-        self.registers.set_hl(self.cpu.stackManager.pop_word())
-        print('{}: POP HL'.format(hex(self.registers.pc-1)))
-        return 12
-    
-    def instruction_0xe5(self):
-        self.cpu.stackManager.push_word(self.registers.get_hl())
-        print('{}: PUSH HL'.format(hex(self.registers.pc-1)))
-        return 16
-    
+
     def instruction_0xe0(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
@@ -687,9 +718,26 @@ class InstructionPerformer:
         print('{}: LDH ({}), A'.format(hex(self.registers.pc-2),hex(byte)))
         return 12
     
+    def instruction_0xe1(self):
+        self.registers.set_hl(self.cpu.stackManager.pop_word())
+        print('{}: POP HL'.format(hex(self.registers.pc-1)))
+        return 12
+
     def instruction_0xe2(self):
         self.mmu.write_byte((self.registers.c + 0xff00), self.registers.a)
         print('{}: LD (0xff00+C), A'.format(hex(self.registers.pc-1)))
+        return 8
+    
+    def instruction_0xe5(self):
+        self.cpu.stackManager.push_word(self.registers.get_hl())
+        print('{}: PUSH HL'.format(hex(self.registers.pc-1)))
+        return 16
+
+    def instruction_0xe6(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self._and(byte)
+        print('{}: AND {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
     
     def instruction_0xea(self):
@@ -810,7 +858,7 @@ class InstructionPerformer:
     def sbc(self, value):
         carry = 1 if self.registers.is_c_flag() else 0
         result = self.registers.a - value - carry
-        if result & 0xFF == 0x0:
+        if result & 0xff == 0x0:
             self.registers.set_z_flag() 
         else: 
             self.registers.reset_z_flag()
@@ -823,6 +871,15 @@ class InstructionPerformer:
         else: 
             self.registers.reset_h_flag()
         self.registers.set_n_flag()
-        self.registersa = result & 0xFF
+        self.registersa = result & 0xff
 
-
+    def _and(self, value):
+        result = self.registers.a & value
+        if result & 0xff == 0x0:
+            self.registers.set_z_flag 
+        else: 
+            self.registers.reset_z_flag
+        self.registers.reset_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.set_h_flag()
+        self.registers.a = result & 0xff
