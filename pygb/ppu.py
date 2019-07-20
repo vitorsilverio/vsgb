@@ -79,7 +79,7 @@ class PPU:
         self.next_line()
         self.compare_lylc()
 
-        if self.current_line == 144:
+        if self.current_line() == 144:
             self.mode = PPU.V_BLANK_STATE
             self.auxillary_modeclock = self.modeclock
             self.vblank = True
