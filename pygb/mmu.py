@@ -80,10 +80,12 @@ class MMU:
             if not hardware_operation:
                 if address == IO_Registers.P1:
                     self.io_ports[address - 0xff00] = value | 0xf
-                if address == IO_Registers.DIV: # Reset div register
+                elif address == IO_Registers.DIV: # Reset div register
                     self.io_ports[address - 0xff00] = 0x00
-                if address == IO_Registers.DMA: # Start dma transfer
+                elif address == IO_Registers.DMA: # Start dma transfer
                     self.dma_transfer(value)
+                else:
+                    self.io_ports[address - 0xff00] = value
             elif address == 0xff50:
                 self.bootstrap_enabled = False
             else:     

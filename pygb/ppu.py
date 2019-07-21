@@ -30,7 +30,7 @@ class PPU:
         self.vblank_line = 0
         self.auxiliary_modeclock = 0
         self.screen_enabled = True
-        self.window_line = 0
+        self.window_line = 0   
 
     def step(self, cycles=1):
         self.vblank = False
@@ -84,7 +84,7 @@ class PPU:
             self.auxillary_modeclock = self.modeclock
             self.vblank = True
             self.window_line = 0
-            interruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
+            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
 
         self.update_stat_mode()
 
@@ -148,8 +148,8 @@ class PPU:
 
         if self.lcdController.is_background_enabled:
             # tile and map select
-            tiles_select = self.lcdController.select_background_window_map_tile_data
-            map_select = self.lcdController.select_background_map_tile_data
+            tiles_select = self.lcdController.select_background_window_map_tile_data()
+            map_select = self.lcdController.select_background_map_tile_data()
             # x pixel offset
             scx = self.mmu.read_byte(IO_Registers.SCX)
             # y pixel offset
@@ -157,7 +157,7 @@ class PPU:
             # line with y offset
             line_adjusted = (line + scy) & 0xff
             # get position of tile row to read
-            y_offset = (line_adjusted / 8) * 32
+            y_offset = int(line_adjusted / 8) * 32
             # relative line number in tile
             tile_line = line_adjusted % 8
             # relative line number offset
@@ -184,7 +184,7 @@ class PPU:
                     pixel |= 2 if (byte_2 & shift > 0) else 0
                     position = line_width + buffer_addr
                     color = (palette >> (pixel * 2)) & 0x3
-                    self.framebuffer[position] = rgb(color)
+                    self.framebuffer[position] = self.rgb(color)
                     pixelx += 1
                     buffer_addr = line_pixel_offset + pixelx - scx
                 x += 1
