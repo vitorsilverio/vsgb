@@ -1,4 +1,5 @@
 # pygb
 
 # Requirements
-- PySDL2
+- PyOpenGL
+
