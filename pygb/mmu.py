@@ -42,6 +42,8 @@ class MMU:
         if ( address < 0x100 ) and self.bootstrap_enabled:
             return self.boot_rom[address]
         if address < 0x8000:
+            if 0x104 <= address and address <= 0x133:
+                return  self.boot_rom[address - 0x104 + 0xa8]
             return 0x00 #TODO implement rom
         if address < 0xa000:
             return self.video_ram[address - 0x8000]
