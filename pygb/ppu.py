@@ -24,7 +24,7 @@ class PPU:
         self.mmu = mmu
         self.interruptManager = interruptManager
         self.lcdController = LCDController(self.mmu)
-        self.framebuffer = [0]*PPU.FRAMEBUFFER_SIZE
+        self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
         self.modeclock = 0
         self.vblank_line = 0

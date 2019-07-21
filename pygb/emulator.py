@@ -13,6 +13,7 @@ class Emulator:
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.screen = Screen()
+        self.screen.start()
 
     def run(self):
         while True:
