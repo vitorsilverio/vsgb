@@ -5,7 +5,7 @@ from pygb.io_registers import IO_Registers
 
 class MMU:
 
-    def __init__(self):
+    def __init__(self, rom):
         self.boot_rom = [
         0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB,
         0x21, 0x26, 0xFF, 0x0E, 0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3,
@@ -30,7 +30,7 @@ class MMU:
         0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE,
         0x3E, 0x01, 0xE0, 0x50
         ]
-        self.rom = None
+        self.rom = rom
         self.video_ram = [0x00]*0x2000
         self.internal_ram = [0x00]*0x2000
         self.oam = [0x00]*0xa0
@@ -42,13 +42,11 @@ class MMU:
         if ( address < 0x100 ) and self.bootstrap_enabled:
             return self.boot_rom[address]
         if address < 0x8000:
-            if 0x104 <= address and address <= 0x133:
-                return  self.boot_rom[address - 0x104 + 0xa8]
-            return 0x00 #TODO implement rom
+            return self.rom.read_rom_byte(address)
         if address < 0xa000:
             return self.video_ram[address - 0x8000]
         if address < 0xc000:
-            return 0x00 #TODO implement external ram
+            return self.rom.read_external_ram_byte(address)
         if address < 0xe000:
             return self.internal_ram[address - 0xc000]
         if address < 0xfe00:
