@@ -951,6 +951,12 @@ class InstructionPerformer:
         self.registers.set_bc(self.cpu.stackManager.pop_word())
         self.debug('{}: POP BC'.format(hex(self.registers.pc-1)))
         return 12
+
+    def instruction_0xc3(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: JP {}'.format(hex(self.registers.pc-3), hex(word)))
+        return 16
     
     def instruction_0xc5(self):
         self.cpu.stackManager.push_word(self.registers.get_bc())
