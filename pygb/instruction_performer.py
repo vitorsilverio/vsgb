@@ -248,6 +248,13 @@ class InstructionPerformer:
         self.registers.l = byte 
         self.debug('{}: LD L, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x2f(self):
+        self.registers.a = self.registers.a ^ 0xff
+        self.registers.set_n_flag()
+        self.registers.set_h_flag()
+        self.debug('{}: CPL'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x31(self):
         word = self.mmu.read_word(self.registers.pc)
