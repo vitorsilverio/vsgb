@@ -1077,6 +1077,11 @@ class InstructionPerformer:
         self.registers.a = self.mmu.read_byte(self.registers.c + 0xff00)
         self.debug('{}: LD A, (0xff00+C)'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0xf3(self):
+        self.cpu.ime = False
+        self.debug('{}: DI'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xf5(self):
         self.cpu.stackManager.push_word(self.registers.get_af())
@@ -1119,6 +1124,11 @@ class InstructionPerformer:
         self.registers.a = byte
         self.debug('{}: LD A, ({})'.format(hex(self.registers.pc-3),hex(byte)))
         return 16
+
+    def instruction_0xfb(self):
+        self.cpu.ime = True
+        self.debug('{}: EI'.format(hex(self.registers.pc-1)))
+        return 4
 
     def instruction_0xfe(self):
         byte = self.mmu.read_byte(self.registers.pc)
