@@ -105,7 +105,7 @@ class InstructionPerformer:
         return 12
     
     def instruction_0x12(self):
-        self.mmu.write_byte(self.registers.get_de, self.registers.a)
+        self.mmu.write_byte(self.registers.get_de(), self.registers.a)
         self.debug('{}: LD (DE), A'.format(hex(self.registers.pc-1)))
         return 8
 
