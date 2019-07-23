@@ -954,7 +954,7 @@ class InstructionPerformer:
 
     def instruction_0xc3(self):
         word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
+        self.registers.pc = word
         self.debug('{}: JP {}'.format(hex(self.registers.pc-3), hex(word)))
         return 16
     
@@ -974,6 +974,17 @@ class InstructionPerformer:
         self.registers.pc = self.cpu.stackManager.pop_word()
         self.debug('{}: RET'.format(hex(self.registers.pc-1)))
         return 16
+
+    def instruction_0xcc(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: CALL Z, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if self.registers.is_z_flag():
+            self.cpu.stackManager.push_word(self.registers.pc)
+            self.registers.pc = word
+            return 24
+        else:
+            return 12
 
     def instruction_0xcd(self):
         word = self.mmu.read_word(self.registers.pc)
