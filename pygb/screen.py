@@ -7,7 +7,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from threading import Thread
-
+import time
 
 
 class Screen(Thread):
@@ -26,6 +26,7 @@ class Screen(Thread):
         super(Screen, self). __init__()
         self.framebuffer = [0xffffffff]*(Screen.WINDOW_WIDTH * Screen.WINDOW_HEIGHT)
         self.updated = False
+        self.last = time.monotonic()
         
 
     def run(self):
@@ -44,6 +45,10 @@ class Screen(Thread):
             for y in range(0, Screen.SCREEN_HEIGHT):
                 self.framebuffer[x + Screen.SCREEN_WIDTH * y] = framebuffer[x + Screen.SCREEN_WIDTH * (Screen.SCREEN_HEIGHT - y -1)]
 
+        t = time.monotonic()
+        fps = 1.0 / (t - self.last)
+        self.last = t
+        glutSetWindowTitle('pygb ({} fps)'.format(str(int(fps))).encode())
         self.updated = False
 
     def draw(self):
