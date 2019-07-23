@@ -760,7 +760,7 @@ class InstructionPerformer:
         return 4
 
     def instruction_0x96(self):
-        self.sub(self.mmu.read_byte(self.registers.get_hl))
+        self.sub(self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: SUB A, (HL)'.format(hex(self.registers.pc-1)))
         return 8
 
