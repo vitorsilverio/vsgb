@@ -64,6 +64,11 @@ class InstructionPerformer:
         self.mmu.write_word(word, self.registers.sp)
         self.debug('{}: LD ({}), SP'.format(hex(self.registers.pc-2), hex(word)))
         return 20
+
+    def instruction_0x9(self):
+        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_bc()))
+        self.debug('{}: ADD HL, BC'.format(hex(self.registers.pc-1)))
+        return 8
     
     def instruction_0xa(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_bc())
@@ -138,6 +143,11 @@ class InstructionPerformer:
         self.debug('{}: JR {}'.format(hex(self.registers.pc-2), hex(byte)))
         self.registers.pc += signed_value(byte)
         return 12
+
+    def instruction_0x19(self):
+        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_de()))
+        self.debug('{}: ADD HL, DE'.format(hex(self.registers.pc-1)))
+        return 8
     
     def instruction_0x1a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
@@ -220,6 +230,11 @@ class InstructionPerformer:
             return 12
         else:
             return 8
+
+    def instruction_0x29(self):
+        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_hl()))
+        self.debug('{}: ADD HL, HL'.format(hex(self.registers.pc-1)))
+        return 8
     
     def instruction_0x2a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
@@ -290,6 +305,11 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_hl(),byte)
         self.debug('{}: LD (HL), {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 12
+
+    def instruction_0x39(self):
+        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.sp))
+        self.debug('{}: ADD HL, SP'.format(hex(self.registers.pc-1)))
+        return 8
     
     def instruction_0x3a(self):
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
@@ -628,43 +648,43 @@ class InstructionPerformer:
         return 4
     
     def instruction_0x80(self):
-        self.add(self.registers.b)
+        self.add_byte(self.registers.b)
         self.debug('{}: ADD A, B'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x81(self):
-        self.add(self.registers.c)
+        self.add_byte(self.registers.c)
         self.debug('{}: ADD A, C'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x82(self):
-        self.add(self.registers.d)
+        self.add_byte(self.registers.d)
         self.debug('{}: ADD A, D'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x83(self):
-        self.add(self.registers.e)
+        self.add_byte(self.registers.e)
         self.debug('{}: ADD A, E'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x84(self):
-        self.add(self.registers.h)
+        self.add_byte(self.registers.h)
         self.debug('{}: ADD A, H'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x85(self):
-        self.add(self.registers.l)
+        self.add_byte(self.registers.l)
         self.debug('{}: ADD A, L'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0x86(self):
         byte = self.mmu.read_byte(self.registers.get_hl())
-        self.add(byte)
+        self.add_byte(byte)
         self.debug('{}: ADD A, (HL)'.format(hex(self.registers.pc-1)))
         return 8
     
     def instruction_0x87(self):
-        self.add(self.registers.a)
+        self.add_byte(self.registers.a)
         self.debug('{}: ADD A, A'.format(hex(self.registers.pc-1)))
         return 4
     
@@ -980,7 +1000,7 @@ class InstructionPerformer:
     def instruction_0xc6(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        self.add(byte)
+        self.add_byte(byte)
         self.debug('{}: ADD A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
@@ -1117,6 +1137,12 @@ class InstructionPerformer:
         self.cpu.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x20
         return 16
+
+    def instruction_0xe9(self):
+        word = self.mmu.read_word(self.registers.get_hl())
+        self.registers.pc = word
+        self.debug('{}: JP (HL)'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0xea(self):
         word = self.mmu.read_word(self.registers.pc)
@@ -1285,7 +1311,7 @@ class InstructionPerformer:
         logging.error('{}: Unknow Opcode {}'.format(hex(self.registers.pc-1), hex(opcode)))
         raise NotImplementedError()
 
-    def add(self, value):
+    def add_byte(self, value):
         byte = self.registers.a + value
         if (byte & 0xff) == 0x00:
             self.registers.set_z_flag()
@@ -1301,6 +1327,21 @@ class InstructionPerformer:
             self.registers.reset_h_flag()
         self.registers.reset_n_flag()
         self.registers.a = byte & 0xff
+
+    def add_word(self, value1, value2):
+        result = value1 + value2
+
+        self.registers.reset_n_flag()
+        if result & 0x10000 == 0x10000: 
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        if (value1 ^ value2 ^ (result & 0xFFFF)) & 0x1000 == 0x1000: 
+            self.registers.set_h_flag() 
+        else: 
+            self.registers.reset_h_flag()
+
+        return result & 0xFFFF
 
     def adc(self, value):
         carry = 1 if self.registers.is_c_flag() else 0
