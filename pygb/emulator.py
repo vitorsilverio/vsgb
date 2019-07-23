@@ -3,6 +3,7 @@
 
 from pygb.cartridge import Cartridge
 from pygb.cpu import CPU
+from pygb.input import Input
 from pygb.mmu import MMU
 from pygb.ppu import PPU
 from pygb.screen import Screen
@@ -12,11 +13,12 @@ class Emulator:
 
     def __init__(self, file):
         self.cartridge = Cartridge(file)
-        self.mmu = MMU(self.cartridge.rom()) 
+        self.input = Input()
+        self.mmu = MMU(self.cartridge.rom(), self.input) 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.sound = Sound(self.mmu, self.cpu.interruptManager)
-        self.screen = Screen()
+        self.screen = Screen(self.input)
         self.screen.start()
 
     def run(self):

@@ -7,7 +7,7 @@ from pygb.io_registers import IO_Registers
 
 class MMU:
 
-    def __init__(self, rom):
+    def __init__(self, rom, _input):
         self.boot_rom = [
         0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB,
         0x21, 0x26, 0xFF, 0x0E, 0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3,
@@ -33,6 +33,7 @@ class MMU:
         0x3E, 0x01, 0xE0, 0x50
         ]
         self.rom = rom
+        self.input = _input
         self.video_ram = [0x00]*0x2000
         self.internal_ram = [0x00]*0x2000
         self.oam = [0x00]*0xa0
@@ -59,6 +60,8 @@ class MMU:
         if address < 0xff00:
             return self.something[address - 0xfea0]
         if address < 0xff4c:
+            if address == 0xff00:
+                return self.input.read_input(self.io_ports[0])
             return self.io_ports[address - 0xff00]
         if address < 0xff80:
             return 0x00 # Empty area

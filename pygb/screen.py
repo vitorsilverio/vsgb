@@ -22,11 +22,12 @@ class Screen(Thread):
 
      
 
-    def __init__(self):
+    def __init__(self, _input):
         super(Screen, self). __init__()
         self.framebuffer = [0xffffffff]*(Screen.WINDOW_WIDTH * Screen.WINDOW_HEIGHT)
         self.updated = False
         self.last = time.monotonic()
+        self.input = _input
         
 
     def run(self):
@@ -38,12 +39,10 @@ class Screen(Thread):
         glPixelZoom(Screen.SCALE,Screen.SCALE)
         glutDisplayFunc(self.draw)
         glutIdleFunc(self.draw)
+        glutKeyboardFunc(self.keyboard)
         glutMainLoop()
 
     def render(self, framebuffer):
-        #for x in range(0, Screen.SCREEN_WIDTH):
-        #    for y in range(0, Screen.SCREEN_HEIGHT):
-        #        self.framebuffer[x + Screen.SCREEN_WIDTH * y] = framebuffer[x + Screen.SCREEN_WIDTH * (Screen.SCREEN_HEIGHT - y -1)]
         self.framebuffer = framebuffer
         t = time.monotonic()
         fps = 1.0 / (t - self.last)
@@ -59,6 +58,27 @@ class Screen(Thread):
             glFlush()
             glutSwapBuffers()
         self.updated = True
+
+    def keyboard(self, key, x, y):
+        for button in self.input.buttons:
+            self.input.buttons[button] = False
+
+        if key == GLUT_KEY_UP:
+            self.input.buttons['UP'] = True
+        elif key == GLUT_KEY_DOWN:
+            self.input.buttons['DOWN'] = True
+        elif key == GLUT_KEY_LEFT:
+            self.input.buttons['LEFT'] = True
+        elif key == GLUT_KEY_RIGHT:
+            self.input.buttons['RIGHT'] = True
+        elif key == 'x':
+            self.input.buttons['A'] = True
+        elif key == 'z':
+            self.input.buttons['B'] = True
+        elif key == 'v':
+            self.input.buttons['START'] = True
+        elif key == 'c':
+            self.input.buttons['SELCT'] = True
 
 
          
