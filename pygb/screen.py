@@ -41,10 +41,10 @@ class Screen(Thread):
         glutMainLoop()
 
     def render(self, framebuffer):
-        for x in range(0, Screen.SCREEN_WIDTH):
-            for y in range(0, Screen.SCREEN_HEIGHT):
-                self.framebuffer[x + Screen.SCREEN_WIDTH * y] = framebuffer[x + Screen.SCREEN_WIDTH * (Screen.SCREEN_HEIGHT - y -1)]
-
+        #for x in range(0, Screen.SCREEN_WIDTH):
+        #    for y in range(0, Screen.SCREEN_HEIGHT):
+        #        self.framebuffer[x + Screen.SCREEN_WIDTH * y] = framebuffer[x + Screen.SCREEN_WIDTH * (Screen.SCREEN_HEIGHT - y -1)]
+        self.framebuffer = framebuffer
         t = time.monotonic()
         fps = 1.0 / (t - self.last)
         self.last = t

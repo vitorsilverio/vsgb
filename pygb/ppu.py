@@ -144,7 +144,7 @@ class PPU:
 
     def render_background(self):
         line = self.current_line()
-        line_width = line * Screen.SCREEN_WIDTH
+        line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
 
         if self.lcdController.is_background_enabled:
             # tile and map select
