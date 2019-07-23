@@ -1374,6 +1374,7 @@ class InstructionPerformer:
         self.registers.reset_n_flag()
         self.registers.reset_h_flag()
         self.registers.reset_c_flag()
+        return value
 
 
     def inc_byte(self, value):
