@@ -1183,6 +1183,46 @@ class InstructionPerformer:
         self.debug('{}: RL C'.format(hex(self.registers.pc-2)))
         return 8
 
+    def instruction_0xcb30(self):
+        self.registers.b = self.swap(self.registers.b)
+        self.debug('{}: SWAP B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb31(self):
+        self.registers.c = self.swap(self.registers.c)
+        self.debug('{}: SWAP C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb32(self):
+        self.registers.d = self.swap(self.registers.d)
+        self.debug('{}: SWAP D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb33(self):
+        self.registers.e = self.swap(self.registers.e)
+        self.debug('{}: SWAP E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb34(self):
+        self.registers.h = self.swap(self.registers.h)
+        self.debug('{}: SWAP H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb35(self):
+        self.registers.l = self.swap(self.registers.l)
+        self.debug('{}: SWAP L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb36(self):
+        self.mmu.write_byte(self.registers.get_hl(), self.swap(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: SWAP (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb37(self):
+        self.registers.a = self.swap(self.registers.a)
+        self.debug('{}: SWAP A'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcb7c(self):
         self.bit(7, self.registers.h)
         self.debug('{}: BIT 7, H'.format(hex(self.registers.pc-2)))
@@ -1324,6 +1364,17 @@ class InstructionPerformer:
             self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         self.registers.set_h_flag()
+
+    def swap(self, value):
+        value = ((value << 4) & 0xff) | (value >> 4)
+        if value & 0xff == 0x00:
+            self.registers.set_z_flag() 
+        else: 
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        self.registers.reset_c_flag()
+
 
     def inc_byte(self, value):
         result = value + 1
