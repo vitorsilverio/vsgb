@@ -20,7 +20,7 @@ class Emulator:
     def run(self):
         while True:
             self.cpu.step()
-            self.ppu.step()
+            self.ppu.step(self.cpu.ticks)
             if self.ppu.vblank:
                 self.screen.render(self.ppu.framebuffer)
             self.sound.step()
