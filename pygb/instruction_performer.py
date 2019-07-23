@@ -946,6 +946,13 @@ class InstructionPerformer:
         self.cp(self.registers.a)
         self.debug('{}: CP A'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0xc0(self):
+        self.debug('{}: RET NZ'.format(hex(self.registers.pc-1)))
+        if not self.registers.is_z_flag():
+            self.registers.pc = self.cpu.stackManager.pop_word()
+            return 20
+        return 8
     
     def instruction_0xc1(self):
         self.registers.set_bc(self.cpu.stackManager.pop_word())
@@ -968,6 +975,13 @@ class InstructionPerformer:
         self.registers.pc += 1
         self.add(byte)
         self.debug('{}: ADD A, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        return 8
+
+    def instruction_0xc8(self):
+        self.debug('{}: RET Z'.format(hex(self.registers.pc-1)))
+        if self.registers.is_z_flag():
+            self.registers.pc = self.cpu.stackManager.pop_word()
+            return 20
         return 8
 
     def instruction_0xc9(self):
@@ -1000,6 +1014,13 @@ class InstructionPerformer:
         self.adc(byte)
         self.debug('{}: ADC A, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0xd0(self):
+        self.debug('{}: RET NC'.format(hex(self.registers.pc-1)))
+        if not self.registers.is_c_flag():
+            self.registers.pc = self.cpu.stackManager.pop_word()
+            return 20
+        return 8
     
     def instruction_0xd1(self):
         self.registers.set_de(self.cpu.stackManager.pop_word())
@@ -1017,6 +1038,19 @@ class InstructionPerformer:
         self.sub(byte)
         self.debug('{}: SUB A, {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 8
+
+    def instruction_0xd8(self):
+        self.debug('{}: RET C'.format(hex(self.registers.pc-1)))
+        if self.registers.is_c_flag():
+            self.registers.pc = self.cpu.stackManager.pop_word()
+            return 20
+        return 8
+
+    def instruction_0xd9(self):
+        self.registers.pc = self.cpu.stackManager.pop_word()
+        self.cpu.ime = True
+        self.debug('{}: RETI'.format(hex(self.registers.pc-1)))
+        return 16
 
     def instruction_0xe0(self):
         byte = self.mmu.read_byte(self.registers.pc)
