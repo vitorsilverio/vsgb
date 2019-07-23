@@ -99,16 +99,16 @@ class PPU:
 
         if self.modeclock >= PPU.V_BLANK_TIME:
             self.modeclock -= PPU.V_BLANK_TIME
-            self.mode = PPU.OAM_READ_STATE
+            self.mode = PPU.OAM_READ_STATE    
             self.update_stat_mode()
-            if self.current_line() > 0xff:
-                self.reset_current_line()
             self.vblank_line = 0
 
     def scanline(self):
-        self.render_background()
-        self.render_window()
-        self.render_sprite()
+        line = self.current_line()
+        if line <= 144:
+            self.render_background(line)
+            self.render_window(line)
+            self.render_sprite(line)
 
     def update_stat_mode(self):
         stat = self.mmu.read_byte(IO_Registers.STAT)
@@ -143,8 +143,7 @@ class PPU:
                 stat = stat & 0xfb
             self.mmu.write_byte(IO_Registers.STAT, stat)
 
-    def render_background(self):
-        line = self.current_line()
+    def render_background(self, line):
         line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
 
         if self.lcdController.is_background_enabled:
@@ -194,11 +193,11 @@ class PPU:
                 self.framebuffer[line_width + i] = 0
 
 
-    def render_window(self):
-        to_do = True
+    def render_window(self, line):
+        pass
 
-    def render_sprite(self):
-        to_do = True
+    def render_sprite(self, line):
+        pass
 
 
 class LCDController:

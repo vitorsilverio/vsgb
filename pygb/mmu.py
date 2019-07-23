@@ -91,12 +91,13 @@ class MMU:
                     self.dma_transfer(value)
                 else:
                     self.io_ports[address - 0xff00] = value
-            elif address == 0xff50:
-                self.bootstrap_enabled = False
             else:     
                 self.io_ports[address - 0xff00] = value
         elif address < 0x10000:
-            self.internal_ram[address - 0xff80] = value
+            if address == 0xff50:
+                self.bootstrap_enabled = False
+            else:
+                self.internal_ram[address - 0xff80] = value
 
     def dma_transfer(self, start):
         address = start << 8
