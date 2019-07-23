@@ -16,7 +16,7 @@ class Cartridge:
 
     def rom(self):
         rom_type = self.data[0x147]
-        logging.info('ROM TYPE: {}'.format(rom_type))
+        logging.debug('ROM TYPE: {}'.format(rom_type))
         if rom_type in [0x00, 0x08, 0x09]:
             return ROM(self.data)
         if rom_type in [0x01, 0x02, 0x03]:
@@ -46,7 +46,8 @@ class CartridgeType:
         return self.select_data()[address]
 
     def write_rom_byte(self, address, value):
-        pass
+        value = value & 0xff
+        self.select_data()[address] = value
 
     def read_external_ram_byte(self, address):
         return self.select_external_ram()[address - 0xa000]

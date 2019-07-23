@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+
 from pygb.io_registers import IO_Registers
 
 class MMU:
@@ -34,6 +36,7 @@ class MMU:
         self.video_ram = [0x00]*0x2000
         self.internal_ram = [0x00]*0x2000
         self.oam = [0x00]*0xa0
+        self.something = [0x00]*0x60
         self.io_ports = [0x00]*0x4c
         self.high_internal_ram = [0x00]*0x80
         self.bootstrap_enabled = True
@@ -54,7 +57,7 @@ class MMU:
         if address < 0xfea0:
             return self.oam[address - 0xfe00]
         if address < 0xff00:
-            return 0x00 # Empty area
+            return self.something[address - 0xfea0]
         if address < 0xff4c:
             return self.io_ports[address - 0xff00]
         if address < 0xff80:
@@ -65,17 +68,19 @@ class MMU:
     def write_byte(self, address, value, hardware_operation = False):
         value = value & 0xff
         if address < 0x8000:
-            print('') #TODO implement rom
+            self.rom.write_rom_byte(address, value)
         elif address < 0xa000:
             self.video_ram[address - 0x8000] = value
         elif address < 0xc000:
-            print('') #TODO implement external ram
+            self.rom.write_external_ram_byte(address, value)
         elif address < 0xe000:
             self.internal_ram[address - 0xc000] = value
         elif address < 0xfe00:
             self.internal_ram[address - 0xe000] = value # Shadow
         elif address < 0xfea0:
             self.oam[address - 0xfe00] = value
+        elif address < 0xff00:
+            self.something[address - 0xfea0] = value
         elif address < 0xff4c:
             if not hardware_operation:
                 if address == IO_Registers.P1:

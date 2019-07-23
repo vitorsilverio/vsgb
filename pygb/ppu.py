@@ -101,7 +101,8 @@ class PPU:
             self.modeclock -= PPU.V_BLANK_TIME
             self.mode = PPU.OAM_READ_STATE
             self.update_stat_mode()
-            self.reset_current_line()
+            if self.current_line() > 0xff:
+                self.reset_current_line()
             self.vblank_line = 0
 
     def scanline(self):
