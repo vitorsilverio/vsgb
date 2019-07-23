@@ -57,6 +57,14 @@ class InstructionPerformer:
         self.registers.b = byte 
         self.debug('{}: LD B, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x7(self):
+        self.registers.a = self.rlc(self.registers.a)
+        self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        self.debug('{}: RLCA'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x8(self):
         word = self.mmu.read_word(self.registers.pc)
@@ -134,6 +142,8 @@ class InstructionPerformer:
     def instruction_0x17(self):
         self.registers.a = self.rl(self.registers.a)
         self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
         self.debug('{}: RLA'.format(hex(self.registers.pc-1)))
         return 4
 
@@ -1022,6 +1032,16 @@ class InstructionPerformer:
         self.debug('{}: RET'.format(hex(self.registers.pc-1)))
         return 16
 
+    def instruction_0xca(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: JP Z, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if self.registers.is_z_flag():
+            self.registers.pc = word
+            return 16
+        else:
+            return 12
+
     def instruction_0xcc(self):
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
@@ -1297,9 +1317,324 @@ class InstructionPerformer:
         self.debug('{}: SWAP A'.format(hex(self.registers.pc-2)))
         return 8
 
+    def instruction_0xcb40(self):
+        self.bit(0, self.registers.b)
+        self.debug('{}: BIT 0, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb41(self):
+        self.bit(0, self.registers.c)
+        self.debug('{}: BIT 0, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb42(self):
+        self.bit(0, self.registers.d)
+        self.debug('{}: BIT 0, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb43(self):
+        self.bit(0, self.registers.e)
+        self.debug('{}: BIT 0, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb44(self):
+        self.bit(0, self.registers.h)
+        self.debug('{}: BIT 0, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb45(self):
+        self.bit(0, self.registers.l)
+        self.debug('{}: BIT 0, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb46(self):
+        self.bit(0, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 0, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb47(self):
+        self.bit(0, self.registers.a)
+        self.debug('{}: BIT 0, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb48(self):
+        self.bit(1, self.registers.b)
+        self.debug('{}: BIT 1, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb49(self):
+        self.bit(1, self.registers.c)
+        self.debug('{}: BIT 1, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb4a(self):
+        self.bit(1, self.registers.d)
+        self.debug('{}: BIT 1, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb4b(self):
+        self.bit(1, self.registers.e)
+        self.debug('{}: BIT 1, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb4c(self):
+        self.bit(1, self.registers.h)
+        self.debug('{}: BIT 1, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb4d(self):
+        self.bit(1, self.registers.l)
+        self.debug('{}: BIT 1, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb4e(self):
+        self.bit(1, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 1, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb4f(self):
+        self.bit(1, self.registers.a)
+        self.debug('{}: BIT 1, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb50(self):
+        self.bit(2, self.registers.b)
+        self.debug('{}: BIT 2, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb51(self):
+        self.bit(2, self.registers.c)
+        self.debug('{}: BIT 2, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb52(self):
+        self.bit(2, self.registers.d)
+        self.debug('{}: BIT 2, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb53(self):
+        self.bit(2, self.registers.e)
+        self.debug('{}: BIT 2, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb54(self):
+        self.bit(2, self.registers.h)
+        self.debug('{}: BIT 2, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb55(self):
+        self.bit(2, self.registers.l)
+        self.debug('{}: BIT 2, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb56(self):
+        self.bit(2, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 2, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb57(self):
+        self.bit(2, self.registers.a)
+        self.debug('{}: BIT 2, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb58(self):
+        self.bit(3, self.registers.b)
+        self.debug('{}: BIT 3, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb59(self):
+        self.bit(3, self.registers.c)
+        self.debug('{}: BIT 3, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb5a(self):
+        self.bit(3, self.registers.d)
+        self.debug('{}: BIT 3, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb5b(self):
+        self.bit(3, self.registers.e)
+        self.debug('{}: BIT 3, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb5c(self):
+        self.bit(3, self.registers.h)
+        self.debug('{}: BIT 3, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb5d(self):
+        self.bit(3, self.registers.l)
+        self.debug('{}: BIT 3, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb5e(self):
+        self.bit(3, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 3, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb5f(self):
+        self.bit(3, self.registers.a)
+        self.debug('{}: BIT 3, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb60(self):
+        self.bit(4, self.registers.b)
+        self.debug('{}: BIT 4, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb61(self):
+        self.bit(4, self.registers.c)
+        self.debug('{}: BIT 4, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb62(self):
+        self.bit(4, self.registers.d)
+        self.debug('{}: BIT 4, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb63(self):
+        self.bit(4, self.registers.e)
+        self.debug('{}: BIT 4, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb64(self):
+        self.bit(4, self.registers.h)
+        self.debug('{}: BIT 4, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb65(self):
+        self.bit(4, self.registers.l)
+        self.debug('{}: BIT 4, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb66(self):
+        self.bit(4, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 4, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb67(self):
+        self.bit(4, self.registers.a)
+        self.debug('{}: BIT 4, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb68(self):
+        self.bit(5, self.registers.b)
+        self.debug('{}: BIT 5, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb69(self):
+        self.bit(5, self.registers.c)
+        self.debug('{}: BIT 5, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb6a(self):
+        self.bit(5, self.registers.d)
+        self.debug('{}: BIT 5, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb6b(self):
+        self.bit(5, self.registers.e)
+        self.debug('{}: BIT 5, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb6c(self):
+        self.bit(5, self.registers.h)
+        self.debug('{}: BIT 5, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb6d(self):
+        self.bit(5, self.registers.l)
+        self.debug('{}: BIT 5, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb6e(self):
+        self.bit(5, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 5, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb6f(self):
+        self.bit(5, self.registers.a)
+        self.debug('{}: BIT 5, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb70(self):
+        self.bit(6, self.registers.b)
+        self.debug('{}: BIT 6, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb71(self):
+        self.bit(6, self.registers.c)
+        self.debug('{}: BIT 6, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb72(self):
+        self.bit(6, self.registers.d)
+        self.debug('{}: BIT 6, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb73(self):
+        self.bit(6, self.registers.e)
+        self.debug('{}: BIT 6, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb74(self):
+        self.bit(6, self.registers.h)
+        self.debug('{}: BIT 6, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb75(self):
+        self.bit(6, self.registers.l)
+        self.debug('{}: BIT 6, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb76(self):
+        self.bit(6, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 6, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb77(self):
+        self.bit(6, self.registers.a)
+        self.debug('{}: BIT 6, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb78(self):
+        self.bit(7, self.registers.b)
+        self.debug('{}: BIT 7, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb79(self):
+        self.bit(7, self.registers.c)
+        self.debug('{}: BIT 7, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb7a(self):
+        self.bit(7, self.registers.d)
+        self.debug('{}: BIT 7, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb7b(self):
+        self.bit(7, self.registers.e)
+        self.debug('{}: BIT 7, E'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcb7c(self):
         self.bit(7, self.registers.h)
         self.debug('{}: BIT 7, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb7d(self):
+        self.bit(7, self.registers.l)
+        self.debug('{}: BIT 7, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb7e(self):
+        self.bit(7, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: BIT 7, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb7f(self):
+        self.bit(7, self.registers.a)
+        self.debug('{}: BIT 7, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc7(self):
@@ -1506,6 +1841,14 @@ class InstructionPerformer:
         self.registers.reset_n_flag()
         self.registers.reset_h_flag()
         return result
+
+    def rlc(self, value):
+        bit_out = 0x1 if value & 0x80 == 0x80 else 0x0
+        if bit_out == 0x1:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        return ((value << 1) & 0xff) + bit_out
 
     def debug(self, text):
         logging.debug(text)

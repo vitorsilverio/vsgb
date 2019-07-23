@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pyaudio
-
 from pygb.interrupt_manager import Interrupt
 from pygb.io_registers import IO_Registers
 
