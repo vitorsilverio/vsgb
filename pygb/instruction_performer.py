@@ -33,7 +33,7 @@ class InstructionPerformer:
         return 12
     
     def instruction_0x2(self):
-        self.mmu.write_byte(self.registers.get_bc, self.registers.a)
+        self.mmu.write_byte(self.registers.get_bc(), self.registers.a)
         self.debug('{}: LD (BC), A'.format(hex(self.registers.pc-1)))
         return 8
 

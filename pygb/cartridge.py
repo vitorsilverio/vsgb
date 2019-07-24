@@ -65,6 +65,35 @@ class MB1(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
+        self.rom_bank = 1
+        self.ram_bank = 0
+        self.mode = 0
+        self.ram_enabled = False
+
+    def read_rom_byte(self, address):
+        if address < 0x4000:
+            return super().read_rom_byte(address)
+        point_address = address - 0x4000
+        offset = self.rom_bank * 0x4000
+        return self.data[offset + point_address]
+
+    def write_rom_byte(self, address, value):
+        if address < 0x2000:
+            self.ram_enabled = (value & 0xA == 0xA)
+        elif address < 0x4000:
+            if self.mode == 1:
+                self.rom_bank = (value & 0x1f) | (self.rom_bank & 0xe0)
+            else:
+                self.rom_bank = (value & 0x1f)
+        elif address < 0x6000:
+            value = value & 0x03
+            if self.mode == 1:
+                self.ram_bank = value
+            else:
+                self.rom_bank = (self.rom_bank & 0x1F) | (value << 5)
+                self.rom_bank += 1 if self.rom_bank in [0x0, 0x20, 0x40, 0x60] else 0
+        elif address < 0x8000:
+            self.mode = value & 0x01
 
 class MB2(CartridgeType):
 
