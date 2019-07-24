@@ -870,7 +870,7 @@ class InstructionPerformer:
     def instruction_0xa6(self):
         byte = self.mmu.read_byte(self.registers.get_hl())
         self._and(byte)
-        self.debug('{}: AND A'.format(hex(self.registers.pc-1)))
+        self.debug('{}: AND (HL)'.format(hex(self.registers.pc-1)))
         return 8
 
     def instruction_0xa7(self):
