@@ -349,6 +349,16 @@ class InstructionPerformer:
         self.registers.a = byte
         self.debug('{}: LD A, {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 8
+
+    def instruction_0x3f(self):
+        if self.registers.is_c_flag():
+            self.registers.reset_c_flag()
+        else:
+            self.registers.set_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        self.debug('{}: CCF'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x40(self):
         self.debug('{}: LD B, B'.format(hex(self.registers.pc-1)))
