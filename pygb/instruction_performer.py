@@ -3,6 +3,7 @@
 
 import logging
 from pygb.byte_operations import signed_value, set_bit, bit_mask
+from pygb.io_registers import IO_Registers
 
 class InstructionPerformer:
 
@@ -612,6 +613,12 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.l)
         self.debug('{}: LD (HL), L'.format(hex(self.registers.pc-1)))
         return 8
+
+    def instruction_0x76(self):
+        self.cpu.pre_halt_interrupt = self.mmu.read_byte(IO_Registers.IF)
+        self.cpu.halted = True
+        self.debug('{}: HALT'.format(hex(self.registers.pc-1)))
+        return 4
     
     def instruction_0x77(self):
         self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
