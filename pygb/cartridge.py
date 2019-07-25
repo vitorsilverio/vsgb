@@ -20,15 +20,15 @@ class Cartridge:
         if rom_type in [0x00, 0x08, 0x09]:
             return ROM(self.data)
         if rom_type in [0x01, 0x02, 0x03]:
-            return MB1(self.data)
+            return MBC1(self.data)
         if rom_type in [0x05, 0x06]:
-            return MB2(self.data)
+            return MBC2(self.data)
         if rom_type in [0xF, 0x10, 0x11, 0x12, 0x13]:
-            return MB3(self.data)
+            return MBC3(self.data)
         if rom_type in [0x15, 0x16, 0x17]:
-            return MB4(self.data)
+            return MBC4(self.data)
         if rom_type in [0x19, 0x1b, 0x1c, 0x1d, 0x1e]:
-            return MB5(self.data)
+            return MBC5(self.data)
 
 class CartridgeType:
 
@@ -61,7 +61,7 @@ class ROM(CartridgeType):
     def __init__(self, data):
         super().__init__(data)
 
-class MB1(CartridgeType):
+class MBC1(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
@@ -95,22 +95,22 @@ class MB1(CartridgeType):
         elif address < 0x8000:
             self.mode = value & 0x01
 
-class MB2(CartridgeType):
+class MBC2(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
 
-class MB3(CartridgeType):
+class MBC3(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
 
-class MB4(CartridgeType):
+class MBC4(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
 
-class MB5(CartridgeType):
+class MBC5(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
