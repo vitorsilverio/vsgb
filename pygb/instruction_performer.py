@@ -1270,6 +1270,13 @@ class InstructionPerformer:
         else:
             return 12
 
+    def instruction_0xde(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.sbc(byte)
+        self.debug('{}: SBC A, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        return 8
+
     def instruction_0xdf(self):
         self.debug('{}: RST 0x18'.format(hex(self.registers.pc-1)))
         self.stackManager.push_word(self.registers.pc)
