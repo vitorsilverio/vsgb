@@ -71,7 +71,7 @@ class InstructionPerformer:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.mmu.write_word(word, self.registers.sp)
-        self.debug('{}: LD ({}), SP'.format(hex(self.registers.pc-2), hex(word)))
+        self.debug('{}: LD ({}), SP'.format(hex(self.registers.pc-3), hex(word)))
         return 20
 
     def instruction_0x9(self):
