@@ -200,7 +200,7 @@ class PPU:
         if self.window_line > 143 or not self.lcdController.is_window_enabled():
             return
         window_pos_x = self.mmu.read_byte(IO_Registers.WX) - 7
-        window_pos_y = self.mmu.read_memory_byte(IO_Registers.WY)
+        window_pos_y = self.mmu.read_byte(IO_Registers.WY)
 
         # don't render if the window is outside the bounds of the screen
         if window_pos_x > 159 or window_pos_y > 143 or window_pos_y > line:

@@ -281,6 +281,16 @@ class InstructionPerformer:
         self.registers.set_h_flag()
         self.debug('{}: CPL'.format(hex(self.registers.pc-1)))
         return 4
+
+    def instruction_0x30(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.debug('{}: JR NC, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        if not self.registers.is_c_flag():
+            self.registers.pc += signed_value(byte)
+            return 12
+        else:
+            return 8
     
     def instruction_0x31(self):
         word = self.mmu.read_word(self.registers.pc)
@@ -316,6 +326,16 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_hl(),byte)
         self.debug('{}: LD (HL), {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 12
+
+    def instruction_0x38(self):
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.debug('{}: JR C, {}'.format(hex(self.registers.pc-2), hex(byte)))
+        if self.registers.is_c_flag():
+            self.registers.pc += signed_value(byte)
+            return 12
+        else:
+            return 8
 
     def instruction_0x39(self):
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.sp))
@@ -1654,6 +1674,326 @@ class InstructionPerformer:
         self.debug('{}: BIT 7, A'.format(hex(self.registers.pc-2)))
         return 8
 
+    def instruction_0xcb80(self):
+        self.res(0, self.registers.b)
+        self.debug('{}: RES 0, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb81(self):
+        self.res(0, self.registers.c)
+        self.debug('{}: RES 0, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb82(self):
+        self.res(0, self.registers.d)
+        self.debug('{}: RES 0, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb83(self):
+        self.res(0, self.registers.e)
+        self.debug('{}: RES 0, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb84(self):
+        self.res(0, self.registers.h)
+        self.debug('{}: RES 0, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb85(self):
+        self.res(0, self.registers.l)
+        self.debug('{}: RES 0, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb86(self):
+        self.res(0, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 0, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb87(self):
+        self.res(0, self.registers.a)
+        self.debug('{}: RES 0, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb88(self):
+        self.res(1, self.registers.b)
+        self.debug('{}: RES 1, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb89(self):
+        self.res(1, self.registers.c)
+        self.debug('{}: RES 1, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb8a(self):
+        self.res(1, self.registers.d)
+        self.debug('{}: RES 1, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb8b(self):
+        self.res(1, self.registers.e)
+        self.debug('{}: RES 1, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb8c(self):
+        self.res(1, self.registers.h)
+        self.debug('{}: RES 1, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb8d(self):
+        self.res(1, self.registers.l)
+        self.debug('{}: RES 1, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb8e(self):
+        self.res(1, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 1, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb8f(self):
+        self.res(1, self.registers.a)
+        self.debug('{}: RES 1, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb90(self):
+        self.res(2, self.registers.b)
+        self.debug('{}: RES 2, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb91(self):
+        self.res(2, self.registers.c)
+        self.debug('{}: RES 2, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb92(self):
+        self.res(2, self.registers.d)
+        self.debug('{}: RES 2, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb93(self):
+        self.res(2, self.registers.e)
+        self.debug('{}: RES 2, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb94(self):
+        self.res(2, self.registers.h)
+        self.debug('{}: RES 2, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb95(self):
+        self.res(2, self.registers.l)
+        self.debug('{}: RES 2, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb96(self):
+        self.res(2, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 2, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb97(self):
+        self.res(2, self.registers.a)
+        self.debug('{}: RES 2, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb98(self):
+        self.res(3, self.registers.b)
+        self.debug('{}: RES 3, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb99(self):
+        self.res(3, self.registers.c)
+        self.debug('{}: RES 3, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb9a(self):
+        self.res(3, self.registers.d)
+        self.debug('{}: RES 3, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb9b(self):
+        self.res(3, self.registers.e)
+        self.debug('{}: RES 3, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb9c(self):
+        self.res(3, self.registers.h)
+        self.debug('{}: RES 3, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb9d(self):
+        self.res(3, self.registers.l)
+        self.debug('{}: RES 3, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb9e(self):
+        self.res(3, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 3, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb9f(self):
+        self.res(3, self.registers.a)
+        self.debug('{}: RES 3, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba0(self):
+        self.res(4, self.registers.b)
+        self.debug('{}: RES 4, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba1(self):
+        self.res(4, self.registers.c)
+        self.debug('{}: RES 4, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba2(self):
+        self.res(4, self.registers.d)
+        self.debug('{}: RES 4, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba3(self):
+        self.res(4, self.registers.e)
+        self.debug('{}: RES 4, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba4(self):
+        self.res(4, self.registers.h)
+        self.debug('{}: RES 4, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba5(self):
+        self.res(4, self.registers.l)
+        self.debug('{}: RES 4, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba6(self):
+        self.res(4, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 4, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcba7(self):
+        self.res(4, self.registers.a)
+        self.debug('{}: RES 4, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba8(self):
+        self.res(5, self.registers.b)
+        self.debug('{}: RES 5, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcba9(self):
+        self.res(5, self.registers.c)
+        self.debug('{}: RES 5, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbaa(self):
+        self.res(5, self.registers.d)
+        self.debug('{}: RES 5, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbab(self):
+        self.res(5, self.registers.e)
+        self.debug('{}: RES 5, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbac(self):
+        self.res(5, self.registers.h)
+        self.debug('{}: RES 5, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbad(self):
+        self.res(5, self.registers.l)
+        self.debug('{}: RES 5, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbae(self):
+        self.res(5, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 5, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcbaf(self):
+        self.res(5, self.registers.a)
+        self.debug('{}: RES 5, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb0(self):
+        self.res(6, self.registers.b)
+        self.debug('{}: RES 6, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb1(self):
+        self.res(6, self.registers.c)
+        self.debug('{}: RES 6, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb2(self):
+        self.res(6, self.registers.d)
+        self.debug('{}: RES 6, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb3(self):
+        self.res(6, self.registers.e)
+        self.debug('{}: RES 6, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb4(self):
+        self.res(6, self.registers.h)
+        self.debug('{}: RES 6, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb5(self):
+        self.res(6, self.registers.l)
+        self.debug('{}: RES 6, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb6(self):
+        self.res(6, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 6, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcbb7(self):
+        self.res(6, self.registers.a)
+        self.debug('{}: RES 6, A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb8(self):
+        self.res(7, self.registers.b)
+        self.debug('{}: RES 7, B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbb9(self):
+        self.res(7, self.registers.c)
+        self.debug('{}: RES 7, C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbba(self):
+        self.res(7, self.registers.d)
+        self.debug('{}: RES 7, D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbbb(self):
+        self.res(7, self.registers.e)
+        self.debug('{}: RES 7, E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbbc(self):
+        self.res(7, self.registers.h)
+        self.debug('{}: RES 7, H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbbd(self):
+        self.res(7, self.registers.l)
+        self.debug('{}: RES 7, L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcbbe(self):
+        self.res(7, self.mmu.read_byte(self.registers.get_hl()))
+        self.debug('{}: RES 7, (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcbbf(self):
+        self.res(7, self.registers.a)
+        self.debug('{}: RES 7, A'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcbc7(self):
         self.registers.a = set_bit(0, self.registers.a)
         self.debug('{}: SET 0, A'.format(hex(self.registers.pc-2)))
@@ -1805,6 +2145,9 @@ class InstructionPerformer:
             self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         self.registers.set_h_flag()
+
+    def res(self, pos, value):
+        return value & (bit_mask[pos] ^ 0xff)
 
     def swap(self, value):
         value = ((value << 4) & 0xff) | (value >> 4)
