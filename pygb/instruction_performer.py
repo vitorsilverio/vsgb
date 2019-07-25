@@ -1086,11 +1086,32 @@ class InstructionPerformer:
         self.debug('{}: POP BC'.format(hex(self.registers.pc-1)))
         return 12
 
+    def instruction_0xc2(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: JP NZ, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if not self.registers.is_z_flag():
+            self.registers.pc = word
+            return 16
+        else:
+            return 12
+
     def instruction_0xc3(self):
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc = word
         self.debug('{}: JP {}'.format(hex(self.registers.pc-3), hex(word)))
         return 16
+
+    def instruction_0xc4(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: CALL NZ, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if not self.registers.is_z_flag():
+            self.stackManager.push_word(self.registers.pc)
+            self.registers.pc = word
+            return 24
+        else:
+            return 12
     
     def instruction_0xc5(self):
         self.stackManager.push_word(self.registers.get_bc())
@@ -1175,6 +1196,27 @@ class InstructionPerformer:
         self.registers.set_de(self.stackManager.pop_word())
         self.debug('{}: POP DE'.format(hex(self.registers.pc-1)))
         return 12
+
+    def instruction_0xd2(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: JP NC, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if not self.registers.is_c_flag():
+            self.registers.pc = word
+            return 16
+        else:
+            return 12
+
+    def instruction_0xd4(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: CALL NC, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if not self.registers.is_c_flag():
+            self.stackManager.push_word(self.registers.pc)
+            self.registers.pc = word
+            return 24
+        else:
+            return 12
     
     def instruction_0xd5(self):
         self.stackManager.push_word(self.registers.get_de())
@@ -1206,6 +1248,27 @@ class InstructionPerformer:
         self.cpu.ime = True
         self.debug('{}: RETI'.format(hex(self.registers.pc-1)))
         return 16
+
+    def instruction_0xda(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: JP C, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if self.registers.is_c_flag():
+            self.registers.pc = word
+            return 16
+        else:
+            return 12
+
+    def instruction_0xdc(self):
+        word = self.mmu.read_word(self.registers.pc)
+        self.registers.pc += 2
+        self.debug('{}: CALL C, {}'.format(hex(self.registers.pc-3), hex(word)))
+        if self.registers.is_c_flag():
+            self.stackManager.push_word(self.registers.pc)
+            self.registers.pc = word
+            return 24
+        else:
+            return 12
 
     def instruction_0xdf(self):
         self.debug('{}: RST 0x18'.format(hex(self.registers.pc-1)))
