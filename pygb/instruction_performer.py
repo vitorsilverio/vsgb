@@ -17,7 +17,7 @@ class InstructionPerformer:
         try:
             instruction = getattr(self, 'instruction_' + hex(opcode))
             return instruction()
-        except:
+        except AttributeError:
             return self.unimplemented(opcode)
 
     
