@@ -21,6 +21,7 @@ class CPU:
         self.ime = False
         self.halted = False
         self.pre_halt_interrupt = 0x00
+        self.stop = False
         
     def step(self):
         self.ticks = 0

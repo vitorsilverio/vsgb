@@ -11,7 +11,7 @@ class InstructionPerformer:
         self.cpu = cpu
         self.mmu = cpu.mmu
         self.registers = cpu.registers
-
+        self.stackManager = cpu.stackManager
 
     def perform_instruction(self, opcode):
         try:
@@ -105,6 +105,20 @@ class InstructionPerformer:
         self.registers.c = byte 
         self.debug('{}: LD C, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0xf(self):
+        self.registers.a = self.rrc(self.registers.a)
+        self.registers.reset_h_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_z_flag()
+        self.debug('{}: RRCA'.format(hex(self.registers.pc-1)))
+        return 4  
+
+    def instruction_0x10(self):
+        self.cpu.stop = True
+        self.registers.pc += 1
+        self.debug('{}: STOP 0'.format(hex(self.registers.pc-2)))
+        return 4       
     
     def instruction_0x11(self):
         word = self.mmu.read_word(self.registers.pc)
@@ -187,6 +201,14 @@ class InstructionPerformer:
         self.debug('{}: LD E, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
+    def instruction_0x1f(self):
+        self.registers.a = self.rr(self.registers.a)
+        self.registers.reset_h_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_z_flag()
+        self.debug('{}: RRA'.format(hex(self.registers.pc-1)))
+        return 4  
+
     def instruction_0x20(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
@@ -231,6 +253,30 @@ class InstructionPerformer:
         self.registers.h = byte 
         self.debug('{}: LD H, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
+
+    def instruction_0x27(self):
+        temp_a = self.registers.a
+        if not self.registers.is_n_flag():
+            if self.registers.is_h_flag() or (temp_a & 0xf) > 0x9:
+                temp_a = temp_a + 0x06
+            if self.registers.is_c_flag() or (temp_a > 0x9f):
+                temp_a = temp_a + 0x60
+        else:
+            if self.registers.is_h_flag():
+                temp_a = (temp_a - 0x06) & 0xff
+            if self.registers.is_c_flag():
+                temp_a = temp_a - 0x60
+        self.registers.reset_h_flag()
+        self.registers.reset_z_flag()
+
+        if temp_a & 0x100 == 0x100:
+            self.registers.set_c_flag()
+        temp_a = temp_a & 0xff
+        if temp_a == 0x0:
+            self.registers.set_z_flag()
+        self.registers.a = temp_a
+        self.debug('{}: DAA'.format(hex(self.registers.pc-1)))
+        return 4
 
     def instruction_0x28(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -326,6 +372,13 @@ class InstructionPerformer:
         self.mmu.write_byte(self.registers.get_hl(),byte)
         self.debug('{}: LD (HL), {}'.format(hex(self.registers.pc-2),hex(byte)))
         return 12
+
+    def instruction_0x37(self):
+        self.registers.set_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        self.debug('{}: SCF'.format(hex(self.registers.pc-1)))
+        return 4
 
     def instruction_0x38(self):
         byte = self.mmu.read_byte(self.registers.pc)
@@ -971,7 +1024,7 @@ class InstructionPerformer:
 
     def instruction_0xb6(self):
         byte = self.mmu.read_byte(self.registers.get_hl())
-        self._or(self.byte)
+        self._or(byte)
         self.debug('{}: OR (HL)'.format(hex(self.registers.pc-1)))
         return 8
 
@@ -1024,12 +1077,12 @@ class InstructionPerformer:
     def instruction_0xc0(self):
         self.debug('{}: RET NZ'.format(hex(self.registers.pc-1)))
         if not self.registers.is_z_flag():
-            self.registers.pc = self.cpu.stackManager.pop_word()
+            self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
     def instruction_0xc1(self):
-        self.registers.set_bc(self.cpu.stackManager.pop_word())
+        self.registers.set_bc(self.stackManager.pop_word())
         self.debug('{}: POP BC'.format(hex(self.registers.pc-1)))
         return 12
 
@@ -1040,7 +1093,7 @@ class InstructionPerformer:
         return 16
     
     def instruction_0xc5(self):
-        self.cpu.stackManager.push_word(self.registers.get_bc())
+        self.stackManager.push_word(self.registers.get_bc())
         self.debug('{}: PUSH BC'.format(hex(self.registers.pc-1)))
         return 16
     
@@ -1053,19 +1106,19 @@ class InstructionPerformer:
 
     def instruction_0xc7(self):
         self.debug('{}: RST 0x00'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x00
         return 16
 
     def instruction_0xc8(self):
         self.debug('{}: RET Z'.format(hex(self.registers.pc-1)))
         if self.registers.is_z_flag():
-            self.registers.pc = self.cpu.stackManager.pop_word()
+            self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
     def instruction_0xc9(self):
-        self.registers.pc = self.cpu.stackManager.pop_word()
+        self.registers.pc = self.stackManager.pop_word()
         self.debug('{}: RET'.format(hex(self.registers.pc-1)))
         return 16
 
@@ -1084,7 +1137,7 @@ class InstructionPerformer:
         self.registers.pc += 2
         self.debug('{}: CALL Z, {}'.format(hex(self.registers.pc-3), hex(word)))
         if self.registers.is_z_flag():
-            self.cpu.stackManager.push_word(self.registers.pc)
+            self.stackManager.push_word(self.registers.pc)
             self.registers.pc = word
             return 24
         else:
@@ -1094,7 +1147,7 @@ class InstructionPerformer:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.debug('{}: CALL {}'.format(hex(self.registers.pc-3), hex(word)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = word
         return 12
     
@@ -1107,24 +1160,24 @@ class InstructionPerformer:
 
     def instruction_0xcf(self):
         self.debug('{}: RST 0x08'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x08
         return 16
 
     def instruction_0xd0(self):
         self.debug('{}: RET NC'.format(hex(self.registers.pc-1)))
         if not self.registers.is_c_flag():
-            self.registers.pc = self.cpu.stackManager.pop_word()
+            self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
     def instruction_0xd1(self):
-        self.registers.set_de(self.cpu.stackManager.pop_word())
+        self.registers.set_de(self.stackManager.pop_word())
         self.debug('{}: POP DE'.format(hex(self.registers.pc-1)))
         return 12
     
     def instruction_0xd5(self):
-        self.cpu.stackManager.push_word(self.registers.get_de())
+        self.stackManager.push_word(self.registers.get_de())
         self.debug('{}: PUSH DE'.format(hex(self.registers.pc-1)))
         return 16
 
@@ -1137,26 +1190,26 @@ class InstructionPerformer:
 
     def instruction_0xd7(self):
         self.debug('{}: RST 0x10'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x10
         return 16
 
     def instruction_0xd8(self):
         self.debug('{}: RET C'.format(hex(self.registers.pc-1)))
         if self.registers.is_c_flag():
-            self.registers.pc = self.cpu.stackManager.pop_word()
+            self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
     def instruction_0xd9(self):
-        self.registers.pc = self.cpu.stackManager.pop_word()
+        self.registers.pc = self.stackManager.pop_word()
         self.cpu.ime = True
         self.debug('{}: RETI'.format(hex(self.registers.pc-1)))
         return 16
 
     def instruction_0xdf(self):
         self.debug('{}: RST 0x18'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x18
         return 16
 
@@ -1168,7 +1221,7 @@ class InstructionPerformer:
         return 12
     
     def instruction_0xe1(self):
-        self.registers.set_hl(self.cpu.stackManager.pop_word())
+        self.registers.set_hl(self.stackManager.pop_word())
         self.debug('{}: POP HL'.format(hex(self.registers.pc-1)))
         return 12
 
@@ -1178,7 +1231,7 @@ class InstructionPerformer:
         return 8
     
     def instruction_0xe5(self):
-        self.cpu.stackManager.push_word(self.registers.get_hl())
+        self.stackManager.push_word(self.registers.get_hl())
         self.debug('{}: PUSH HL'.format(hex(self.registers.pc-1)))
         return 16
 
@@ -1191,7 +1244,7 @@ class InstructionPerformer:
 
     def instruction_0xe7(self):
         self.debug('{}: RST 0x20'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x20
         return 16
 
@@ -1217,7 +1270,7 @@ class InstructionPerformer:
 
     def instruction_0xef(self):
         self.debug('{}: RST 0x28'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x28
         return 16
     
@@ -1229,7 +1282,7 @@ class InstructionPerformer:
         return 12
     
     def instruction_0xf1(self):
-        self.registers.set_af(self.cpu.stackManager.pop_word())
+        self.registers.set_af(self.stackManager.pop_word())
         self.debug('{}: POP AF'.format(hex(self.registers.pc-1)))
         return 12
     
@@ -1244,7 +1297,7 @@ class InstructionPerformer:
         return 4
     
     def instruction_0xf5(self):
-        self.cpu.stackManager.push_word(self.registers.get_af())
+        self.stackManager.push_word(self.registers.get_af())
         self.debug('{}: PUSH AF'.format(hex(self.registers.pc-1)))
         return 16
 
@@ -1257,7 +1310,7 @@ class InstructionPerformer:
 
     def instruction_0xf7(self):
         self.debug('{}: RST 0x30'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x30
         return 16
     
@@ -1305,7 +1358,7 @@ class InstructionPerformer:
 
     def instruction_0xff(self):
         self.debug('{}: RST 0x38'.format(hex(self.registers.pc-1)))
-        self.cpu.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x38
         return 16
 
@@ -2209,6 +2262,22 @@ class InstructionPerformer:
         else: 
             self.registers.reset_c_flag()
         return ((value << 1) & 0xff) + bit_out
+
+    def rr(self, value):
+        carry = 0x80 if self.registers.is_c_flag() else 0x0
+        if value & 0x1 == 0x1:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        return (value >> 1) + carry
+
+    def rrc(self, value):
+        bit_out = 0x80 if value & 0x1 == 0x1 else 0x0
+        if bit_out == 0x80:
+            self.registers.set_c_flag() 
+        else: 
+            self.registers.reset_c_flag()
+        return (value >> 1) + bit_out
 
     def debug(self, text):
         logging.debug(text)

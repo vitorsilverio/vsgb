@@ -22,4 +22,4 @@ class StackManager:
         return byte
 
     def pop_word(self):
-        return self.pop_byte() + ( self.pop_byte() << 8 )
+        return self.pop_byte() | ( self.pop_byte() << 8 )
