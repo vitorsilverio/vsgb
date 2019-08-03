@@ -2,4 +2,5 @@
 
 # Requirements
 - PyOpenGL
+- FreeGLUT
 
