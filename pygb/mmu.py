@@ -60,7 +60,7 @@ class MMU:
             return self.oam[address - 0xfe00]
         if address >= 0xfea0 and address < 0xff00:
             logging.warning('Invalid memory address: {}'.format(hex(address)))
-            return 0xff
+            return 0x00
         if address >= 0xff00 and address < 0xff80:
             if address == 0xff00:
                 return self.input.read_input(self.io_ports[0])
