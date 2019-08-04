@@ -61,14 +61,17 @@ class ROM(CartridgeType):
     def __init__(self, data):
         super().__init__(data)
 
+    def write_rom_byte(self, address, value):
+        logging.warning('Changing ROM Bank or RAM Bank is not possible in this cartridge type')
+
 class MBC1(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
         self.rom_bank = 1
         self.ram_bank = 0
-        self.mode = 0
         self.ram_enabled = False
+        self.memory_model = 0
 
     def read_rom_byte(self, address):
         if address < 0x4000:
@@ -78,39 +81,45 @@ class MBC1(CartridgeType):
         return self.data[offset + point_address]
 
     def write_rom_byte(self, address, value):
-        if address < 0x2000:
-            self.ram_enabled = (value & 0xA == 0xA)
+        if  address < 0x2000:
+            self.ram_enabled = (value & 0b1111) == 0b1010
+            if not self.ram_enabled:
+                #Must save in battery
+                pass
         elif address < 0x4000:
-            if self.mode == 1:
-                self.rom_bank = (value & 0x1f) | (self.rom_bank & 0xe0)
-            else:
-                self.rom_bank = (value & 0x1f)
-        elif address < 0x6000:
-            value = value & 0x03
-            if self.mode == 1:
-                self.ram_bank = value
-            else:
-                self.rom_bank = (self.rom_bank & 0x1F) | (value << 5)
-                self.rom_bank += 1 if self.rom_bank in [0x0, 0x20, 0x40, 0x60] else 0
-        elif address < 0x8000:
-            self.mode = value & 0x01
+            bank = self.rom_bank & 0b01100000
+            bank = bank | (value & 0b00011111)
+            self.rom_bank = bank
+        elif address < 0x6000 and self.memory_model == 0:
+            bank = self.rom_bank & 0b00011111
+            bank = bank | ((value & 0b11) << 5)
+            self.rom_bank = bank
+        elif address < 0x6000 and self.memory_model == 1:
+            bank = value & 0b11
+            self.ram_bank = bank
+        elif  address < 0x8000:
+            self.memory_model = value & 1
 
 class MBC2(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
+        logging.warning('MBC2 is not implemented')
 
 class MBC3(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
+        logging.warning('MBC3 is not implemented')
 
 class MBC4(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
+        logging.warning('MBC4 is not implemented')
 
 class MBC5(CartridgeType):
 
     def __init__(self, data):
         super().__init__(data)
+        logging.warning('MBC5 is not implemented')

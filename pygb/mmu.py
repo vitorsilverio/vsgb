@@ -37,10 +37,11 @@ class MMU:
         self.video_ram = [0x00]*0x2000
         self.internal_ram = [0x00]*0x2000
         self.oam = [0x00]*0xa0
-        self.something = [0x00]*0x60
+        #self.something = [0x00]*0x60
         self.io_ports = [0x00]*0x4c
         self.high_internal_ram = [0x00]*0x80
         self.bootstrap_enabled = True
+        self.single_ram = [0x00]*0x10000
         
     def read_byte(self, address):
         if ( address < 0x100 ) and self.bootstrap_enabled:
@@ -58,13 +59,15 @@ class MMU:
         if address < 0xfea0:
             return self.oam[address - 0xfe00]
         if address < 0xff00:
-            return self.something[address - 0xfea0]
+            logging.warning('Invalid memory address: {}'.format(hex(address)))
+            return 0xff
         if address < 0xff4c:
             if address == 0xff00:
                 return self.input.read_input(self.io_ports[0])
             return self.io_ports[address - 0xff00]
         if address < 0xff80:
-            return 0x00 # Empty area
+            logging.warning('Invalid memory address: {}'.format(hex(address)))
+            return 0xff
         if address < 0x10000:
             return self.internal_ram[address - 0xff80]
 
@@ -83,7 +86,8 @@ class MMU:
         elif address < 0xfea0:
             self.oam[address - 0xfe00] = value
         elif address < 0xff00:
-            self.something[address - 0xfea0] = value
+            logging.warning('Cannot put {} in invalid memory address: {}'.format(hex(value),hex(address)))
+            return
         elif address < 0xff4c:
             if not hardware_operation:
                 if address == IO_Registers.P1:
@@ -96,11 +100,14 @@ class MMU:
                     self.io_ports[address - 0xff00] = value
             else:     
                 self.io_ports[address - 0xff00] = value
-        elif address < 0x10000:
+        elif address < 0xff80:
             if address == 0xff50:
                 self.bootstrap_enabled = False
             else:
-                self.internal_ram[address - 0xff80] = value
+                logging.warning('Cannot put {} in invalid memory address: {}'.format(hex(value),hex(address)))
+                return
+        elif address < 0x10000:
+            self.internal_ram[address - 0xff80] = value
 
     def dma_transfer(self, start):
         address = start << 8
