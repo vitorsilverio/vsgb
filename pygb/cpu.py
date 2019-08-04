@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
+
 from pygb.interrupt_manager import InterruptManager, Interrupt
 from pygb.instruction_performer import InstructionPerformer
 from pygb.io_registers import IO_Registers
@@ -62,6 +64,9 @@ class CPU:
         self.ticks = 20
 
     def fetch_instruction(self):
+        if self.registers.pc < 0x00 or self.registers.pc >= 0x8000:
+            logging.error('Access memoty violation')
+            raise MemoryError('Instruction out ouf bounds')
         instruction = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if instruction == 0xcb:

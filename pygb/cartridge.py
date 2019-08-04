@@ -90,10 +90,12 @@ class MBC1(CartridgeType):
             bank = self.rom_bank & 0b01100000
             bank = bank | (value & 0b00011111)
             self.rom_bank = bank
+            logging.warning('Bank {}'.format(hex(bank)))
         elif address < 0x6000 and self.memory_model == 0:
             bank = self.rom_bank & 0b00011111
             bank = bank | ((value & 0b11) << 5)
             self.rom_bank = bank
+            logging.warning('Bank {}'.format(hex(bank)))
         elif address < 0x6000 and self.memory_model == 1:
             bank = value & 0b11
             self.ram_bank = bank
