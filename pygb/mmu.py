@@ -35,7 +35,7 @@ class MMU:
         self.io_ports = [0x00]*0x80
         self.high_internal_ram = [0x00]*0x80
         self.bootstrap_enabled = True
-        self.single_ram = [0x00]*0x10000
+        self.unusable_memory_space = [0x00]*0x60
         
     def read_byte(self, address):
         if address >= 0 and address < 0x100  and self.bootstrap_enabled:
@@ -54,7 +54,7 @@ class MMU:
             return self.oam[address - 0xfe00]
         if address >= 0xfea0 and address < 0xff00:
             logging.warning('Invalid memory address: {}'.format(hex(address)))
-            return 0x00
+            return self.unusable_memory_space[address - 0xfea0]
         if address >= 0xff00 and address < 0xff80:
             if address == IO_Registers.P1:
                 self.write_byte(address, self.input.read_input(self.io_ports[0]))
@@ -77,8 +77,8 @@ class MMU:
         elif address >= 0xfe00 and address < 0xfea0:
             self.oam[address - 0xfe00] = value
         elif address >= 0xfea0 and address < 0xff00:
-            logging.warning('Cannot put {} in invalid memory address: {}'.format(hex(value),hex(address)))
-            return
+            logging.warning('Putting {} in invalid memory address: {}'.format(hex(value),hex(address)))
+            self.unusable_memory_space[address - 0xfea0] = value
         elif address >= 0xff00 and address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
