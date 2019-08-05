@@ -28,14 +28,14 @@ class PPU:
         self.mode = PPU.V_BLANK_STATE
         self.modeclock = 0
         self.vblank_line = 0
-        self.auxiliary_modeclock = 0
+        self.auxillary_modeclock = 0
         self.screen_enabled = True
         self.window_line = 0   
 
     def step(self, cycles=1):
         self.vblank = False
         self.modeclock += cycles
-        self.auxiliary_modeclock += cycles
+        self.auxillary_modeclock += cycles
         if self.lcdController.is_screen_enabled():
             if self.screen_enabled:
                 if self.mode == PPU.H_BLANK_STATE:
@@ -53,7 +53,7 @@ class PPU:
                 self.screen_enabled = True
                 self.modeclock = 0
                 self.mode = 0
-                self.auxiliary_modeclock = 0
+                self.auxillary_modeclock = 0
                 self.window_line = 0
                 self.reset_current_line()
                 self.update_stat_mode()
@@ -102,6 +102,7 @@ class PPU:
             self.mode = PPU.OAM_READ_STATE    
             self.update_stat_mode()
             self.vblank_line = 0
+            self.reset_current_line()
 
     def scanline(self):
         line = self.current_line()

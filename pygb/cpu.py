@@ -28,7 +28,7 @@ class CPU:
     def step(self):
         self.ticks = 0
         if self.halted:
-            if self.pre_halt_interrupt != self.mmu.read_byte(IO_Registers.IF):
+            if self.ime:
                 self.halted = False
         if self.ime:
             self.serve_interrupt()
@@ -66,7 +66,7 @@ class CPU:
     def fetch_instruction(self):
         if not (self.registers.pc >= 0x00 and self.registers.pc < 0x8000) and not (self.registers.pc >= 0xff80 and self.registers.pc < 0xffff) :
             logging.warning('CPU executing instructions out of ROM or Zero page. Address: {}'.format(hex(self.registers.pc)))
-            raise MemoryError("CPU tryed access invalid data in memory")
+            raise MemoryError("CPU tried access invalid data in memory")
         instruction = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if instruction == 0xcb:

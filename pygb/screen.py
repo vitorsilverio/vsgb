@@ -14,13 +14,9 @@ class Screen(Thread):
 
     SCREEN_WIDTH = 160
     SCREEN_HEIGHT = 144 
-
     SCALE = 3
-
     WINDOW_WIDTH = SCREEN_WIDTH * SCALE
     WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
-
-     
 
     def __init__(self, _input):
         super(Screen, self). __init__()
@@ -28,14 +24,14 @@ class Screen(Thread):
         self.updated = False
         self.last = time.monotonic()
         self.input = _input
+        self.window = None
         
-
     def run(self):
         glutInit()
         glutInitDisplayMode(GLUT_RGBA)
         glutInitWindowSize(Screen.WINDOW_WIDTH, Screen.WINDOW_HEIGHT)
         glutInitWindowPosition(200, 200)
-        window = glutCreateWindow(b'pygb')
+        self.window = glutCreateWindow(b'pygb')
         glPixelZoom(Screen.SCALE,Screen.SCALE)
         glutDisplayFunc(self.draw)
         glutIdleFunc(self.draw)
@@ -47,7 +43,8 @@ class Screen(Thread):
         t = time.monotonic()
         fps = 1.0 / (t - self.last)
         self.last = t
-        glutSetWindowTitle('pygb ({} fps)'.format(str(int(fps))).encode())
+        if self.window is not None:
+            glutSetWindowTitle('pygb ({} fps)'.format(str(int(fps))).encode())
         self.updated = False
 
     def draw(self):
