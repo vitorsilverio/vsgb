@@ -99,7 +99,7 @@ class MMU:
     def dma_transfer(self, start):
         address = start << 8
         if address >= 0x8000 and address < 0xE000:
-            for i in range(0,0x9f):
+            for i in range(0,0xa0):
                 self.write_byte((0xfe00 + i), self.read_byte(address + i))
 
     def read_word(self, address):
