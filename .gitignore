@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.dll
 *.gb*
+pygb.log
