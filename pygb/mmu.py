@@ -56,8 +56,8 @@ class MMU:
             logging.warning('Invalid memory address: {}'.format(hex(address)))
             return 0x00
         if address >= 0xff00 and address < 0xff80:
-            if address == 0xff00:
-                return self.input.read_input(self.io_ports[0])
+            if address == IO_Registers.P1:
+                self.write_byte(address, self.input.read_input(self.io_ports[0]))
             return self.io_ports[address - 0xff00]
         if address >= 0xff80 and address < 0x10000:
             return self.high_internal_ram[address - 0xff80]
