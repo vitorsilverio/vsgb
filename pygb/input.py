@@ -16,24 +16,24 @@ class Input:
         }
 
     def read_input(self, joyp):
-        input = 0xF
+        inputs = 0xf
         if joyp & 0x20 == 0x00:
             if self.buttons['START']:
-                input ^= 0x8
+                inputs ^= 0x8
             elif self.buttons['SELECT']:
-                input ^= 0x4
+                inputs ^= 0x4
             elif self.buttons['A']:
-                input ^= 0x1
+                inputs ^= 0x1
             elif self.buttons['B']:
-                input ^= 0x2
+                inputs ^= 0x2
         elif joyp & 0x10 == 0x0:
             if self.buttons['UP'] == 1:
-                input ^= 0x4
+                inputs ^= 0x4
             elif self.buttons['DOWN']:
-                input ^= 0x8
+                inputs ^= 0x8
             elif self.buttons['LEFT']:
-                input ^= 0x2
+                inputs ^= 0x2
             elif self.buttons['RIGHT']:
-                input ^= 0x1
+                inputs ^= 0x1
 
-        return (0xF0 & joyp) | input
+        return (0xf0 & joyp) | inputs

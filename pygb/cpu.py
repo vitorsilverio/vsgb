@@ -64,7 +64,7 @@ class CPU:
         self.ticks = 20
 
     def fetch_instruction(self):
-        if self.registers.pc < 0x00 or self.registers.pc >= 0x8000:
+        if not (self.registers.pc >= 0x00 and self.registers.pc < 0x8000) and not (self.registers.pc >= 0xff80 and self.registers.pc < 0xffff) :
             logging.error('Access memoty violation')
             raise MemoryError('Instruction out ouf bounds')
         instruction = self.mmu.read_byte(self.registers.pc)
