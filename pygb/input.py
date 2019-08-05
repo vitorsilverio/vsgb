@@ -27,7 +27,7 @@ class Input:
             elif self.buttons['B']:
                 input ^= 0x2
         elif joyp & 0x10 == 0x0:
-            if self.buttons['UP'] == 1:
+            if self.buttons['UP']:
                 input ^= 0x4
             elif self.buttons['DOWN']:
                 input ^= 0x8
