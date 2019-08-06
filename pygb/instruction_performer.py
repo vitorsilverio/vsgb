@@ -1374,7 +1374,7 @@ class InstructionPerformer:
     def instruction_0xf6(self):
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        self._or(self.byte)
+        self._or(byte)
         self.debug('{}: OR {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
