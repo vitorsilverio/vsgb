@@ -26,7 +26,7 @@ class Timer:
         if self.tima.running():
             # increment TIMA and DIV register
             self.tima_cycles += cycles
-            frequency = self.tima.frequency
+            frequency = self.tima.frequency()
             if self.tima_cycles >= frequency:
                 self.inc_tima_register()
                 self.tima_cycles -= frequency
