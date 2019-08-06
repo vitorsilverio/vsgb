@@ -1432,9 +1432,84 @@ class InstructionPerformer:
         self.registers.pc = 0x38
         return 16
 
+    def instruction_0xcb00(self):
+        self.registers.b = self.rlc(self.registers.b)
+        self.debug('{}: RLC B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb01(self):
+        self.registers.c = self.rlc(self.registers.c)
+        self.debug('{}: RLC C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb02(self):
+        self.registers.d = self.rlc(self.registers.d)
+        self.debug('{}: RLC D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb03(self):
+        self.registers.e = self.rlc(self.registers.e)
+        self.debug('{}: RLC E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb04(self):
+        self.registers.h = self.rlc(self.registers.h)
+        self.debug('{}: RLC H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb05(self):
+        self.registers.l = self.rlc(self.registers.l)
+        self.debug('{}: RLC L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb06(self):
+        self.mmu.write_byte(self.registers.get_hl(), self.rlc(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: RLC (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb07(self):
+        self.registers.a = self.rlc(self.registers.a)
+        self.debug('{}: RLC A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb10(self):
+        self.registers.b = self.rl(self.registers.b)
+        self.debug('{}: RL B'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcb11(self):
         self.registers.c = self.rl(self.registers.c)
         self.debug('{}: RL C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb12(self):
+        self.registers.d = self.rl(self.registers.d)
+        self.debug('{}: RL D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb13(self):
+        self.registers.e = self.rl(self.registers.e)
+        self.debug('{}: RL E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb14(self):
+        self.registers.h = self.rl(self.registers.h)
+        self.debug('{}: RL H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb15(self):
+        self.registers.l = self.rl(self.registers.l)
+        self.debug('{}: RL L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb16(self):
+        self.mmu.write_byte(self.registers.get_hl(), self.rl(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: RL (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb17(self):
+        self.registers.a = self.rl(self.registers.a)
+        self.debug('{}: RL A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcb30(self):
@@ -2331,6 +2406,12 @@ class InstructionPerformer:
             self.registers.set_c_flag() 
         else: 
             self.registers.reset_c_flag()
+        if ((value << 1) & 0xff) + bit_out == 0x00:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
         return ((value << 1) & 0xff) + bit_out
 
     def rr(self, value):
