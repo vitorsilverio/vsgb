@@ -3,12 +3,11 @@
 
 import logging
 from pygb.byte_operations import signed_value, set_bit, bit_mask
-from pygb.cpu import CPU
 from pygb.io_registers import IO_Registers
 
 class InstructionPerformer:
 
-    def __init__(self, cpu : CPU):
+    def __init__(self, cpu):
         self.cpu = cpu
         self.mmu = cpu.mmu
         self.registers = cpu.registers
