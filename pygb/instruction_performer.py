@@ -1139,8 +1139,8 @@ class InstructionPerformer:
         return 8
 
     def instruction_0xc9(self) -> int:
-        self.registers.pc = self.stackManager.pop_word()
         self.debug('{}: RET'.format(hex(self.registers.pc-1)))
+        self.registers.pc = self.stackManager.pop_word()
         return 16
 
     def instruction_0xca(self) -> int:
@@ -1244,9 +1244,9 @@ class InstructionPerformer:
         return 8
 
     def instruction_0xd9(self) -> int:
+        self.debug('{}: RETI'.format(hex(self.registers.pc-1)))
         self.registers.pc = self.stackManager.pop_word()
         self.cpu.ime = True
-        self.debug('{}: RETI'.format(hex(self.registers.pc-1)))
         return 16
 
     def instruction_0xda(self) -> int:
@@ -1319,9 +1319,9 @@ class InstructionPerformer:
         return 16
 
     def instruction_0xe9(self) -> int:
+        self.debug('{}: JP (HL)'.format(hex(self.registers.pc-1)))
         word = self.mmu.read_word(self.registers.get_hl())
         self.registers.pc = word
-        self.debug('{}: JP (HL)'.format(hex(self.registers.pc-1)))
         return 4
     
     def instruction_0xea(self) -> int:

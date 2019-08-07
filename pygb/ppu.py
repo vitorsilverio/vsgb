@@ -95,7 +95,7 @@ class PPU:
             self.vblank_line += 1
 
             if self.vblank_line <= 9:
-            #    self.next_line() #This next line causes slow
+                self.next_line() #This next line causes slow
                 self.compare_lylc()
 
         if self.modeclock >= PPU.V_BLANK_TIME:
