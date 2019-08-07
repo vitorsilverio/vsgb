@@ -10,7 +10,7 @@ A simple gameboy emulator writen in python
   - wheel
   
 ## Compiling
-python -m pyinstaller --onefile main.py -n pygb
+pyinstaller --onefile main.py -n pygb
 The binary file will be in dist directory
 
 ## Running
