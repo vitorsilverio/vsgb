@@ -12,7 +12,7 @@ from pygb.sound import Sound
 
 class Emulator:
 
-    def __init__(self, file):
+    def __init__(self, file : str):
         self.cartridge = Cartridge(file)
         self.input = Input()
         self.mmu = MMU(self.cartridge.rom(), self.input) 

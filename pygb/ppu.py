@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from pygb.byte_operations import signed_value
-from pygb.interrupt_manager import Interrupt
+from pygb.interrupt_manager import Interrupt, InterruptManager
 from pygb.io_registers import IO_Registers
+from pygb.mmu import MMU
 from pygb.screen import Screen
 
 class PPU:
@@ -20,7 +21,7 @@ class PPU:
     H_BLANK_TIME        = 204
     V_BLANK_TIME        = 4560
 
-    def __init__(self, mmu, interruptManager):
+    def __init__(self, mmu : MMU, interruptManager : InterruptManager):
         self.mmu = mmu
         self.interruptManager = interruptManager
         self.lcdController = LCDController(self.mmu)
@@ -32,7 +33,7 @@ class PPU:
         self.screen_enabled = True
         self.window_line = 0   
 
-    def step(self, cycles=1):
+    def step(self, cycles : int = 1):
         self.vblank = False
         self.modeclock += cycles
         self.auxillary_modeclock += cycles
@@ -94,7 +95,7 @@ class PPU:
             self.vblank_line += 1
 
             if self.vblank_line <= 9:
-                self.next_line()
+            #    self.next_line() #This next line causes slow
                 self.compare_lylc()
 
         if self.modeclock >= PPU.V_BLANK_TIME:
@@ -125,7 +126,7 @@ class PPU:
     def next_line(self):
         self.mmu.write_byte(IO_Registers.LY, self.current_line() + 1)
 
-    def rgb(self, color_code):
+    def rgb(self, color_code : int) -> int:
         return {
             0: 0xffffffff,
             1: 0xffa8a8a8,
@@ -144,7 +145,7 @@ class PPU:
                 stat = stat & 0xfb
             self.mmu.write_byte(IO_Registers.STAT, stat)
 
-    def render_background(self, line):
+    def render_background(self, line : int):
         line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
 
         if self.lcdController.is_background_enabled:
@@ -194,7 +195,7 @@ class PPU:
                 self.framebuffer[line_width + i] = 0
 
 
-    def render_window(self, line):
+    def render_window(self, line : int):
         line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
         # dont render if the window is outside the bounds of the screen or
         # if the LCDC window enable bit flag is not set
@@ -251,7 +252,7 @@ class PPU:
 
         self.window_line += 1
 
-    def render_sprite(self, line):
+    def render_sprite(self, line : int):
         line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
         if not self.lcdController.is_sprite_enabled():
             return
@@ -316,33 +317,33 @@ class PPU:
 
 class LCDController:
 
-    def __init__(self, mmu):
+    def __init__(self, mmu : MMU):
         self.mmu = mmu
 
-    def lcdc_status(self):
+    def lcdc_status(self) -> int:
         return self.mmu.read_byte(IO_Registers.LCDC)
 
-    def is_screen_enabled(self):
+    def is_screen_enabled(self) -> bool:
         return self.lcdc_status() & 0x80 == 0x80
 
-    def select_window_map(self):
+    def select_window_map(self) -> int:
         return 1 if self.lcdc_status() & 0x40 == 0x40 else 0
 
-    def is_window_enabled(self):
+    def is_window_enabled(self) -> bool:
         return self.lcdc_status() & 0x20 == 0x20
 
-    def select_background_window_map_tile_data(self):
+    def select_background_window_map_tile_data(self) -> int:
         return 0x8000 if self.lcdc_status() & 0x10 == 0x10 else 0x8800
 
-    def select_background_map_tile_data(self):
+    def select_background_map_tile_data(self) -> int:
         return 0x9c00 if self.lcdc_status() & 0x8 == 0x8 else 0x9800
 
-    def sprite_size(self):
+    def sprite_size(self) -> int:
         return 16 if self.lcdc_status() & 0x4 == 0x4 else 8
 
-    def is_sprite_enabled(self):
+    def is_sprite_enabled(self) -> bool:
         return self.lcdc_status() & 0x2 == 0x2 
 
-    def is_background_enabled(self):
+    def is_background_enabled(self) -> bool:
         return self.lcdc_status() & 0x1 == 0x1
     

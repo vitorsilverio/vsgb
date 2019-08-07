@@ -7,7 +7,7 @@ import struct
 
 class Cartridge:
 
-    def __init__(self, file):
+    def __init__(self, file : str):
         self.data = []
         size = os.stat(file).st_size
         with open(file,'rb') as f:
@@ -32,55 +32,55 @@ class Cartridge:
 
 class CartridgeType:
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         self.data = data
         self.external_ram = [0]*0x2000
 
-    def select_data(self):
+    def select_data(self) -> list:
         return self.data
 
-    def select_external_ram(self):
+    def select_external_ram(self) -> list:
         return self.external_ram
 
-    def read_rom_byte(self, address):
+    def read_rom_byte(self, address : int) -> int:
         return self.select_data()[address]
 
-    def write_rom_byte(self, address, value):
+    def write_rom_byte(self, address : int, value : int):
         value = value & 0xff
         self.select_data()[address] = value
 
-    def read_external_ram_byte(self, address):
+    def read_external_ram_byte(self, address : int) -> int:
         return self.select_external_ram()[address - 0xa000]
 
-    def write_external_ram_byte(self, address, value):
+    def write_external_ram_byte(self, address : int, value : int):
         value = value & 0xff
         self.select_external_ram()[address - 0xa000] = value
 
 class ROM(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data: list):
         super().__init__(data)
 
-    def write_rom_byte(self, address, value):
+    def write_rom_byte(self, address : int, value : int):
         logging.warning('Changing ROM Bank or RAM Bank is not possible in this cartridge type')
 
 class MBC1(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         super().__init__(data)
         self.rom_bank = 1
         self.ram_bank = 0
         self.ram_enabled = False
         self.memory_model = 0
 
-    def read_rom_byte(self, address):
+    def read_rom_byte(self, address : int) -> int:
         if address < 0x4000:
             return super().read_rom_byte(address)
         point_address = address - 0x4000
         offset = self.rom_bank * 0x4000
         return self.data[offset + point_address]
 
-    def write_rom_byte(self, address, value):
+    def write_rom_byte(self, address : int, value : int):
         if  address < 0x2000:
             self.ram_enabled = (value & 0b1111) == 0b1010
             if not self.ram_enabled:
@@ -104,24 +104,24 @@ class MBC1(CartridgeType):
 
 class MBC2(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         super().__init__(data)
         logging.warning('MBC2 is not implemented')
 
 class MBC3(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         super().__init__(data)
         logging.warning('MBC3 is not implemented')
 
 class MBC4(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         super().__init__(data)
         logging.warning('MBC4 is not implemented')
 
 class MBC5(CartridgeType):
 
-    def __init__(self, data):
+    def __init__(self, data : list):
         super().__init__(data)
         logging.warning('MBC5 is not implemented')

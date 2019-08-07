@@ -20,32 +20,32 @@ class Registers:
         self.pc = 0x0000
         self.sp = 0x0000
 
-    def set_af(self, word):
+    def set_af(self, word : int):
         self.a = ( word >> 8 ) & 0xff
         self.f = word & 0xff
 
-    def set_bc(self, word):
+    def set_bc(self, word : int):
         self.b = ( word >> 8 ) & 0xff
         self.c = word & 0xff
 
-    def set_de(self, word):
+    def set_de(self, word : int):
         self.d = ( word >> 8 ) & 0xff
         self.e = word & 0xff
 
-    def set_hl(self, word):
+    def set_hl(self, word : int):
         self.h = ( word >> 8 ) & 0xff
         self.l = word & 0xff
 
-    def get_af(self):
+    def get_af(self) -> int:
         return (self.a << 8) + self.f
 
-    def get_bc(self):
+    def get_bc(self) -> int:
         return (self.b << 8) + self.c
 
-    def get_de(self):
+    def get_de(self) -> int:
         return (self.d << 8) + self.e
 
-    def get_hl(self):
+    def get_hl(self) -> int:
         return (self.h << 8) + self.l
 
     def set_z_flag(self):
@@ -72,14 +72,14 @@ class Registers:
     def reset_h_flag(self):
         self.f &= Registers.H_FLAG ^ 0xff
 
-    def is_z_flag(self):
+    def is_z_flag(self) -> bool:
         return self.f & Registers.Z_FLAG == Registers.Z_FLAG
 
-    def is_n_flag(self):
+    def is_n_flag(self) -> bool:
         return self.f & Registers.N_FLAG == Registers.N_FLAG
 
-    def is_c_flag(self):
+    def is_c_flag(self) -> bool:
         return self.f & Registers.C_FLAG == Registers.C_FLAG
 
-    def is_h_flag(self):
+    def is_h_flag(self) -> bool:
         return self.f & Registers.H_FLAG == Registers.H_FLAG

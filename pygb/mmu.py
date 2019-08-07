@@ -3,12 +3,14 @@
 
 import logging
 
+from pygb.input import Input
 from pygb.io_registers import IO_Registers
+from pygb.cartridge import ROM
 
 class MMU:
 
-    def __init__(self, rom, _input):
-        self.boot_rom = [
+    def __init__(self, rom : ROM, _input : Input):
+        self.boot_rom : list = [
         0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
         0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
         0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
@@ -30,14 +32,14 @@ class MMU:
         self.input = _input
         self.video_ram = [0x00]*0x2000
         self.internal_ram = [0x00]*0x2000
-        self.oam = [0x00]*0xa0
+        self.oam= [0x00]*0xa0
         self.zero_page = [0x00]*0x7f
         self.io_ports = [0x00]*0x80
         self.high_internal_ram = [0x00]*0x80
         self.bootstrap_enabled = True
         self.unusable_memory_space = [0x00]*0x60
         
-    def read_byte(self, address):
+    def read_byte(self, address: int) -> int:
         if address >= 0 and address < 0x100  and self.bootstrap_enabled:
             return self.boot_rom[address]
         if address >= 0 and address < 0x8000:
@@ -62,7 +64,7 @@ class MMU:
         if address >= 0xff80 and address < 0x10000:
             return self.high_internal_ram[address - 0xff80]
 
-    def write_byte(self, address, value, hardware_operation = False):
+    def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff
         if address >= 0 and address < 0x8000:
             self.rom.write_rom_byte(address, value)
@@ -96,16 +98,16 @@ class MMU:
         elif address >= 0xff80 and address < 0x10000:
             self.high_internal_ram[address - 0xff80] = value
 
-    def dma_transfer(self, start):
+    def dma_transfer(self, start : int):
         address = start << 8
         if address >= 0x8000 and address < 0xe000:
             for i in range(0,0xa0):
                 self.oam[i] = self.read_byte(address + i)
 
-    def read_word(self, address):
+    def read_word(self, address: int) -> int:
         return self.read_byte(address) | (self.read_byte(address + 1) << 8)
 
-    def write_word(self, address, value):
+    def write_word(self, address : int, value : int):
         value = (value & 0xffff)
         self.write_byte(address, (value & 0xff))
         self.write_byte((address + 1), (value >> 8) & 0xff)

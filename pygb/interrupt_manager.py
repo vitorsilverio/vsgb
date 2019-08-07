@@ -4,17 +4,18 @@
 from enum import IntEnum
 
 from pygb.io_registers import IO_Registers
+from pygb.mmu import MMU
 
 class InterruptManager:
 
-    def __init__(self, mmu):
+    def __init__(self, mmu : MMU):
         self.mmu = mmu
 
-    def request_interrupt(self, interrupt):
+    def request_interrupt(self, interrupt : int):
         if_register = self.mmu.read_byte(IO_Registers.IF)
         self.mmu.write_byte(IO_Registers.IF, (if_register | interrupt))
 
-    def pending_interrupt(self):
+    def pending_interrupt(self) -> int:
         ie_register = self.mmu.read_byte(IO_Registers.IE)
         if_register = self.mmu.read_byte(IO_Registers.IF)
         pending_interrupt = ie_register & if_register

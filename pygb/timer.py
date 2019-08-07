@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.interrupt_manager import Interrupt
+from pygb.interrupt_manager import Interrupt, InterruptManager
 from pygb.io_registers import IO_Registers
+from pygb.mmu import MMU
 
 DIV_INC_TIME = 256 # cycles
 
 class Timer:
 
-    def __init__(self, mmu, interruptManager):
+    def __init__(self, mmu : MMU, interruptManager : InterruptManager):
         self.mmu = mmu
         self.interruptManager = interruptManager
         self.div_cycles = 0
         self.tima_cycles = 0
         self.tima = Tima(mmu)
 
-    def tick(self, cycles = 0):
+    def tick(self, cycles : int = 0):
         self.div_cycles += cycles
         # incremnt DIV register if its time to
         if self.div_cycles >= DIV_INC_TIME :
@@ -48,17 +49,17 @@ class Timer:
 
 class Tima:
 
-    def __init__(self, mmu):
+    def __init__(self, mmu : MMU):
         self.mmu = mmu
         self.register = 0
 
     def update(self):
         self.register = self.mmu.read_byte(IO_Registers.TAC)
 
-    def running(self):
+    def running(self) -> bool:
         return self.register & 0x4 == 0x4
 
-    def frequency(self):
+    def frequency(self) -> int:
         return {
             0x0 : 1024,
             0x1 : 16,

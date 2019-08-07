@@ -9,6 +9,8 @@ from OpenGL.GLUT import *
 from threading import Thread
 import time
 
+from pygb.input import Input
+
 
 class Screen(Thread):
 
@@ -18,7 +20,7 @@ class Screen(Thread):
     WINDOW_WIDTH = SCREEN_WIDTH * SCALE
     WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
 
-    def __init__(self, _input):
+    def __init__(self, _input : Input):
         super(Screen, self). __init__()
         self.framebuffer = [0xffffffff]*(Screen.WINDOW_WIDTH * Screen.WINDOW_HEIGHT)
         self.updated = False
@@ -38,7 +40,7 @@ class Screen(Thread):
         glutKeyboardFunc(self.keyboard)
         glutMainLoop()
 
-    def render(self, framebuffer):
+    def render(self, framebuffer : list):
         self.framebuffer = framebuffer
         t = time.monotonic()
         fps = 1.0 / (t - self.last)
@@ -56,7 +58,7 @@ class Screen(Thread):
             glutSwapBuffers()
         self.updated = True
 
-    def keyboard(self, key, x, y):
+    def keyboard(self, key, x : int, y : int):
         for button in self.input.buttons:
             self.input.buttons[button] = False
 

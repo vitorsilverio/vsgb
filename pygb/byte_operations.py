@@ -12,8 +12,8 @@ bit_mask = {
     7: 0x80
 }
 
-def signed_value(byte):
+def signed_value(byte : int) -> int:
     return (byte & 0x7F) - 0x80 if byte > 127 else byte
 
-def set_bit(bit, value):
+def set_bit(bit : int, value : int) -> int:
     return value | bit_mask[bit]

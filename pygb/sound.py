@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.interrupt_manager import Interrupt
+from pygb.interrupt_manager import Interrupt, InterruptManager
 from pygb.io_registers import IO_Registers
+from pygb.mmu import MMU
 
 class Sound:
 
-    def __init__(self, mmu, interruptManager):
+    def __init__(self, mmu : MMU, interruptManager : InterruptManager):
         self.mmu = mmu
         self.interruptManager = interruptManager
         self.allModes = [
@@ -47,37 +48,37 @@ class Sound:
 
         self.output.play(left & 0xff, right & 0xff)
         
-    def enabled(self):
+    def enabled(self) -> bool:
         sound_on_off = self.mmu.read_byte(IO_Registers.NR_52)
         return sound_on_off & 0x80 == 0x80
 
-    def enableChannel(self, i, enabled):
+    def enableChannel(self, i : int, enabled : bool):
         self.overridenEnabled[i] = enabled
     
 
 class AbstractSoundMode:
 
-    def step(self):
+    def step(self) -> int:
         return 0
 
 class SoundMode1(AbstractSoundMode):
 
-    def step(self):
+    def step(self) -> int:
         return 0
 
 class SoundMode2(AbstractSoundMode):
 
-    def step(self):
+    def step(self) -> int:
         return 0
 
 class SoundMode3(AbstractSoundMode):
 
-    def step(self):
+    def step(self) -> int:
         return 0
 
 class SoundMode4(AbstractSoundMode):
 
-    def step(self):
+    def step(self) -> int:
         return 0
 
 class SoundOutput:
@@ -85,6 +86,6 @@ class SoundOutput:
     def __init__(self):
         pass
 
-    def play(self, left, right):
+    def play(self, left : int, right : int):
         pass
         

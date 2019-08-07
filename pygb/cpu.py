@@ -6,13 +6,14 @@ import logging
 from pygb.interrupt_manager import InterruptManager, Interrupt
 from pygb.instruction_performer import InstructionPerformer
 from pygb.io_registers import IO_Registers
+from pygb.mmu import MMU
 from pygb.registers import Registers
 from pygb.stack_manager import StackManager
 from pygb.timer import Timer
 
 class CPU:
 
-    def __init__(self,mmu):
+    def __init__(self,mmu: MMU):
         self.mmu = mmu
         self.registers = Registers()
         self.interruptManager = InterruptManager(mmu)
@@ -63,7 +64,7 @@ class CPU:
             self.mmu.write_byte(IO_Registers.IF, if_register & 0xEF)
         self.ticks = 20
 
-    def fetch_instruction(self):
+    def fetch_instruction(self) -> int:
         if not (self.registers.pc >= 0x00 and self.registers.pc < 0x8000) and not (self.registers.pc >= 0xff80 and self.registers.pc < 0xffff) :
             logging.warning('CPU executing instructions out of ROM or Zero page. Address: {}'.format(hex(self.registers.pc)))
             raise MemoryError("CPU tried access invalid data in memory")
@@ -73,7 +74,7 @@ class CPU:
             return 0xcb00 + self.fetch_instruction()
         return instruction
 
-    def perform_instruction(self, instruction):
+    def perform_instruction(self, instruction : int):
         self.ticks = self.instructionPerformer.perform_instruction(instruction)
 
 

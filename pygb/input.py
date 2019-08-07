@@ -15,7 +15,7 @@ class Input:
             'RIGHT': False
         }
 
-    def read_input(self, joyp):
+    def read_input(self, joyp : int) -> int:
         _input = 0x0f
         if joyp & 0x20 == 0x00:
             if self.buttons['START']:
