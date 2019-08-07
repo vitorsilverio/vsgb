@@ -13,9 +13,9 @@ def main():
     parser.add_argument('-d', '--debug', help='Debug mode', action='store_true')
     args = parser.parse_args()
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+        logging.basicConfig(level=logging.DEBUG, filename='pygb.log', filemode='w', format='%(levelname)s: %(message)s')
     else:
-        logging.basicConfig(level=logging.INFO, filename='pygb.log', filemode='w', format='%(levelname)s: %(message)s')
+        logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     emulator = Emulator(args.rom)
     if args.skip:
         emulator.skip_boot_rom()
