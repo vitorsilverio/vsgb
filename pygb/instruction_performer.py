@@ -1472,6 +1472,46 @@ class InstructionPerformer:
         self.debug('{}: RLC A'.format(hex(self.registers.pc-2)))
         return 8
 
+    def instruction_0xcb08(self) -> int:
+        self.registers.b = self.rrc(self.registers.b)
+        self.debug('{}: RRC B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb09(self) -> int:
+        self.registers.c = self.rrc(self.registers.c)
+        self.debug('{}: RRC C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb0a(self) -> int:
+        self.registers.d = self.rrc(self.registers.d)
+        self.debug('{}: RRC D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb0b(self) -> int:
+        self.registers.e = self.rrc(self.registers.e)
+        self.debug('{}: RRC E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb0c(self) -> int:
+        self.registers.h = self.rrc(self.registers.h)
+        self.debug('{}: RRC H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb0d(self) -> int:
+        self.registers.l = self.rrc(self.registers.l)
+        self.debug('{}: RRC L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb0e(self) -> int:
+        self.mmu.write_byte(self.registers.get_hl(), self.rrc(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: RRC (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb0f(self) -> int:
+        self.registers.a = self.rrc(self.registers.a)
+        self.debug('{}: RRC A'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcb10(self) -> int:
         self.registers.b = self.rl(self.registers.b)
         self.debug('{}: RL B'.format(hex(self.registers.pc-2)))
@@ -1510,6 +1550,46 @@ class InstructionPerformer:
     def instruction_0xcb17(self) -> int:
         self.registers.a = self.rl(self.registers.a)
         self.debug('{}: RL A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb18(self) -> int:
+        self.registers.b = self.rr(self.registers.b)
+        self.debug('{}: RR B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb19(self) -> int:
+        self.registers.c = self.rr(self.registers.c)
+        self.debug('{}: RR C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb1a(self) -> int:
+        self.registers.d = self.rr(self.registers.d)
+        self.debug('{}: RR D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb1b(self) -> int:
+        self.registers.e = self.rr(self.registers.e)
+        self.debug('{}: RR E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb1c(self) -> int:
+        self.registers.h = self.rr(self.registers.h)
+        self.debug('{}: RR H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb1d(self) -> int:
+        self.registers.l = self.rr(self.registers.l)
+        self.debug('{}: RR L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb1e(self) -> int:
+        self.mmu.write_byte(self.registers.get_hl(), self.rr(self.mmu.read_byte(self.registers.get_hl())))
+        self.debug('{}: RR (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb1f(self) -> int:
+        self.registers.a = self.rr(self.registers.a)
+        self.debug('{}: RR A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcb30(self) -> int:
@@ -2735,6 +2815,12 @@ class InstructionPerformer:
             self.registers.set_c_flag() 
         else: 
             self.registers.reset_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        if (value >> 1) + carry == 0:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
         return (value >> 1) + carry
 
     def rrc(self, value : int) -> int:
@@ -2743,6 +2829,12 @@ class InstructionPerformer:
             self.registers.set_c_flag() 
         else: 
             self.registers.reset_c_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        if (value >> 1) + bit_out == 0:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
         return (value >> 1) + bit_out
 
     def debug(self, text : str):
