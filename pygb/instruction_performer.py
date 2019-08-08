@@ -1592,6 +1592,102 @@ class InstructionPerformer:
         self.debug('{}: RR A'.format(hex(self.registers.pc-2)))
         return 8
 
+    def instruction_0xcb20(self) -> int:
+        self.registers.b = self.rlc(self.registers.b)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb21(self) -> int:
+        self.registers.c = self.rlc(self.registers.c)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb22(self) -> int:
+        self.registers.d = self.rlc(self.registers.d)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb23(self) -> int:
+        self.registers.e = self.rlc(self.registers.e)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb24(self) -> int:
+        self.registers.h = self.rlc(self.registers.h)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb25(self) -> int:
+        self.registers.l = self.rlc(self.registers.l)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb26(self) -> int:
+        self.mmu.write_byte(self.registers.get_hl(), self.rlc(self.mmu.read_byte(self.registers.get_hl())))
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb27(self) -> int:
+        self.registers.a = self.rlc(self.registers.a)
+        self.registers.reset_c_flag()
+        self.debug('{}: SLA A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb28(self) -> int:
+        self.registers.b = self.rr(self.registers.b)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb29(self) -> int:
+        self.registers.c = self.rr(self.registers.c)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb2a(self) -> int:
+        self.registers.d = self.rr(self.registers.d)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb2b(self) -> int:
+        self.registers.e = self.rr(self.registers.e)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb2c(self) -> int:
+        self.registers.h = self.rr(self.registers.h)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb2d(self) -> int:
+        self.registers.l = self.rr(self.registers.l)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb2e(self) -> int:
+        self.mmu.write_byte(self.registers.get_hl(), self.rr(self.mmu.read_byte(self.registers.get_hl())))
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb2f(self) -> int:
+        self.registers.a = self.rr(self.registers.a)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRA A'.format(hex(self.registers.pc-2)))
+        return 8
+
     def instruction_0xcb30(self) -> int:
         self.registers.b = self.swap(self.registers.b)
         self.debug('{}: SWAP B'.format(hex(self.registers.pc-2)))
@@ -1630,6 +1726,54 @@ class InstructionPerformer:
     def instruction_0xcb37(self) -> int:
         self.registers.a = self.swap(self.registers.a)
         self.debug('{}: SWAP A'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb38(self) -> int:
+        self.registers.b = self.rrc(self.registers.b)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL B'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb39(self) -> int:
+        self.registers.c = self.rrc(self.registers.c)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL C'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb3a(self) -> int:
+        self.registers.d = self.rrc(self.registers.d)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL D'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb3b(self) -> int:
+        self.registers.e = self.rrc(self.registers.e)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL E'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb3c(self) -> int:
+        self.registers.h = self.rrc(self.registers.h)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL H'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb3d(self) -> int:
+        self.registers.l = self.rrc(self.registers.l)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL L'.format(hex(self.registers.pc-2)))
+        return 8
+
+    def instruction_0xcb3e(self) -> int:
+        self.mmu.write_byte(self.registers.get_hl(), self.rrc(self.mmu.read_byte(self.registers.get_hl())))
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL (HL)'.format(hex(self.registers.pc-2)))
+        return 16
+
+    def instruction_0xcb3f(self) -> int:
+        self.registers.a = self.rrc(self.registers.a)
+        self.registers.reset_c_flag()
+        self.debug('{}: SRL A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcb40(self) -> int:
