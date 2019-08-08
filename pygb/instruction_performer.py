@@ -1319,8 +1319,8 @@ class InstructionPerformer:
         return 16
 
     def instruction_0xe9(self) -> int:
-        self.debug('{}: JP (HL)'.format(hex(self.registers.pc-1)))
-        word = self.mmu.read_word(self.registers.get_hl())
+        self.debug('{}: JP HL'.format(hex(self.registers.pc-1)))
+        word = self.registers.get_hl()
         self.registers.pc = word
         return 4
     
@@ -2746,4 +2746,4 @@ class InstructionPerformer:
         return (value >> 1) + bit_out
 
     def debug(self, text : str):
-        logging.debug(text)
+        logging.debug('{} [{}]'.format(text,self.registers.__str__()))

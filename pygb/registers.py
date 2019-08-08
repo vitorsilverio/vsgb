@@ -83,3 +83,14 @@ class Registers:
 
     def is_h_flag(self) -> bool:
         return self.f & Registers.H_FLAG == Registers.H_FLAG
+
+    def __str__(self) -> str:
+        return 'A: {} F: {} BC: {} DE: {} HL: {}: SP: {} PC: {} '.format(
+           hex(self.a),
+           hex(self.f),
+           hex(self.get_bc()),
+           hex(self.get_de()),
+           hex(self.get_hl()),
+           hex(self.sp),
+           hex(self.pc)
+        )
