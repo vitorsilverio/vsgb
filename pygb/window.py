@@ -131,7 +131,7 @@ class Window(Thread):
                 logging.debug("START released")
                 self.request_input_interrupt()
             elif c == chr(8):
-                self.input.buttons['SELCT'] = False
+                self.input.buttons['SELECT'] = False
                 logging.debug("SELECT released")
                 self.request_input_interrupt()
         else:
@@ -148,7 +148,7 @@ class Window(Thread):
                 logging.debug("START pressed")
                 self.request_input_interrupt()
             elif c == chr(8):
-                self.input.buttons['SELCT'] = True
+                self.input.buttons['SELECT'] = True
                 logging.debug("SELECT pressed")
                 self.request_input_interrupt()
 
