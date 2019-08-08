@@ -10,6 +10,7 @@ from threading import Thread
 import time
 
 from pygb.input import Input
+from pygb.interrupt_manager import Interrupt, InterruptManager
 
 
 class Screen(Thread):
@@ -20,12 +21,13 @@ class Screen(Thread):
     WINDOW_WIDTH = SCREEN_WIDTH * SCALE
     WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
 
-    def __init__(self, _input : Input):
+    def __init__(self, _input : Input, interruptManager : InterruptManager):
         super(Screen, self). __init__()
         self.framebuffer = [0xffffffff]*(Screen.WINDOW_WIDTH * Screen.WINDOW_HEIGHT)
         self.updated = False
         self.last = time.monotonic()
         self.input = _input
+        self.interruptManager = interruptManager
         self.window = None
         
     def run(self):
@@ -34,10 +36,13 @@ class Screen(Thread):
         glutInitWindowSize(Screen.WINDOW_WIDTH, Screen.WINDOW_HEIGHT)
         glutInitWindowPosition(200, 200)
         self.window = glutCreateWindow(b'pygb')
+        glutKeyboardFunc(self._key)
+        glutKeyboardUpFunc(self._keyUp)
+        glutSpecialFunc(self._spec)
+        glutSpecialUpFunc(self._specUp)
         glPixelZoom(Screen.SCALE,Screen.SCALE)
         glutDisplayFunc(self.draw)
         glutIdleFunc(self.draw)
-        glutKeyboardFunc(self.keyboard)
         glutMainLoop()
 
     def render(self, framebuffer : list):
@@ -58,26 +63,94 @@ class Screen(Thread):
             glutSwapBuffers()
         self.updated = True
 
-    def keyboard(self, key, x : int, y : int):
-        for button in self.input.buttons:
-            self.input.buttons[button] = False
+    def request_input_interrupt(self):
+        self.interruptManager.request_interrupt(Interrupt.INTERRUPT_JOYPAD)
 
-        if key == GLUT_KEY_UP:
-            self.input.buttons['UP'] = True
-        elif key == GLUT_KEY_DOWN:
-            self.input.buttons['DOWN'] = True
-        elif key == GLUT_KEY_LEFT:
-            self.input.buttons['LEFT'] = True
-        elif key == GLUT_KEY_RIGHT:
-            self.input.buttons['RIGHT'] = True
-        elif key == 'x':
-            self.input.buttons['A'] = True
-        elif key == 'z':
-            self.input.buttons['B'] = True
-        elif key == 'v':
-            self.input.buttons['START'] = True
-        elif key == 'c':
-            self.input.buttons['SELCT'] = True
+    def _key(self, c, x, y):
+        self._glkeyboard(c.decode("ascii"), x, y, False)
+
+    def _keyUp(self, c, x, y):
+        self._glkeyboard(c.decode("ascii"), x, y, True)
+
+    def _spec(self, c, x, y):
+        self._glkeyboardspecial(c, x, y, False)
+
+    def _specUp(self, c, x, y):
+        self._glkeyboardspecial(c, x, y, True)
+
+
+
+    def _glkeyboardspecial(self, c, x, y, up):
+        if up:
+            if c == GLUT_KEY_UP:
+                self.input.buttons['UP'] = False
+                logging.warning("UP released")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_DOWN:
+                self.input.buttons['DOWN'] = False
+                logging.warning("DOWN released")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_LEFT:
+                self.input.buttons['LEFT'] = False
+                logging.warning("LEFT released")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_RIGHT:
+                self.input.buttons['RIGHT'] = False
+                logging.warning("RIGHT released")
+                self.request_input_interrupt()
+        else:
+            if c == GLUT_KEY_UP:
+                self.input.buttons['UP'] = True
+                logging.warning("UP pressed")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_DOWN:
+                self.input.buttons['DOWN'] = True
+                logging.warning("DOWN pressed")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_LEFT:
+                self.input.buttons['LEFT'] = True
+                logging.warning("LEFT pressed")
+                self.request_input_interrupt()
+            if c == GLUT_KEY_RIGHT:
+                self.input.buttons['RIGHT'] = True
+                logging.warning("RIGHT pressed")
+                self.request_input_interrupt()
+
+    def _glkeyboard(self, c, x, y, up):
+        if up:
+            if c == 'z':
+                self.input.buttons['A'] = False
+                logging.warning("A released")
+                self.request_input_interrupt()
+            elif c == 'x':
+                self.input.buttons['B'] = False
+                logging.warning("B released")
+                self.request_input_interrupt()
+            elif c == chr(13):
+                self.input.buttons['START'] = False
+                logging.warning("START released")
+                self.request_input_interrupt()
+            elif c == chr(8):
+                self.input.buttons['SELCT'] = False
+                logging.warning("SELECT released")
+                self.request_input_interrupt()
+        else:
+            if c == 'z':
+                self.input.buttons['A'] = True
+                logging.warning("A pressed")
+                self.request_input_interrupt()
+            elif c == 'x':
+                self.input.buttons['B'] = True
+                logging.warning("B pressed")
+                self.request_input_interrupt()
+            elif c == chr(13):
+                self.input.buttons['START'] = True
+                logging.warning("START pressed")
+                self.request_input_interrupt()
+            elif c == chr(8):
+                self.input.buttons['SELCT'] = True
+                logging.warning("SELECT pressed")
+                self.request_input_interrupt()
 
 
          

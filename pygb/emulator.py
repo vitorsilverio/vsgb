@@ -19,7 +19,7 @@ class Emulator:
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.sound = Sound(self.mmu, self.cpu.interruptManager)
-        self.screen = Screen(self.input)
+        self.screen = Screen(self.input, self.cpu.interruptManager)
         self.screen.start()
 
     def run(self):
