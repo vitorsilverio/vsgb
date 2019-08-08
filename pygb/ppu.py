@@ -5,11 +5,11 @@ from pygb.byte_operations import signed_value
 from pygb.interrupt_manager import Interrupt, InterruptManager
 from pygb.io_registers import IO_Registers
 from pygb.mmu import MMU
-from pygb.screen import Screen
+from pygb.window import Window
 
 class PPU:
 
-    FRAMEBUFFER_SIZE = Screen.SCREEN_WIDTH * Screen.SCREEN_HEIGHT
+    FRAMEBUFFER_SIZE = Window.SCREEN_WIDTH * Window.SCREEN_HEIGHT
 
     H_BLANK_STATE     = 0
     V_BLANK_STATE     = 1
@@ -146,7 +146,7 @@ class PPU:
             self.mmu.write_byte(IO_Registers.STAT, stat)
 
     def render_background(self, line : int):
-        line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
+        line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
 
         if self.lcdController.is_background_enabled:
             # tile and map select
@@ -180,7 +180,7 @@ class PPU:
                 byte_2 = self.mmu.read_byte(tile_address + 1)
                 pixelx = 0
                 buffer_addr = line_pixel_offset - scx
-                while pixelx < 8 and buffer_addr < Screen.SCREEN_WIDTH:
+                while pixelx < 8 and buffer_addr < Window.SCREEN_WIDTH:
                     shift = 0x1 << (7 - pixelx)
                     pixel = 1 if (byte_1 & shift > 0) else 0
                     pixel |= 2 if (byte_2 & shift > 0) else 0
@@ -191,12 +191,12 @@ class PPU:
                     buffer_addr = line_pixel_offset + pixelx - scx
                 x += 1
         else:
-            for i in range(0, Screen.SCREEN_WIDTH):
+            for i in range(0, Window.SCREEN_WIDTH):
                 self.framebuffer[line_width + i] = 0
 
 
     def render_window(self, line : int):
-        line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
+        line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
         # dont render if the window is outside the bounds of the screen or
         # if the LCDC window enable bit flag is not set
         if self.window_line > 143 or not self.lcdController.is_window_enabled():
@@ -233,7 +233,7 @@ class PPU:
             for pixelx in range(0,8):
                 buffer_addr = line_pixel_offset + pixelx + window_pos_x
 
-                if buffer_addr < 0 or buffer_addr >= Screen.SCREEN_WIDTH:
+                if buffer_addr < 0 or buffer_addr >= Window.SCREEN_WIDTH:
                     continue
 
                 shift = 0x1 << (7 - pixelx)
@@ -253,7 +253,7 @@ class PPU:
         self.window_line += 1
 
     def render_sprite(self, line : int):
-        line_width = (Screen.SCREEN_HEIGHT - line -1) * Screen.SCREEN_WIDTH
+        line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
         if not self.lcdController.is_sprite_enabled():
             return
 
@@ -267,7 +267,7 @@ class PPU:
                 continue
 
             sprite_x = self.mmu.read_byte(0xfe00 + sprite_offset + 1) - 8
-            if sprite_x < -7 or sprite_x >= Screen.SCREEN_WIDTH:
+            if sprite_x < -7 or sprite_x >= Window.SCREEN_WIDTH:
                 continue
 
             sprite_tile_offset = (self.mmu.read_byte(0xfe00 + sprite_offset + 2) & (0xfe if sprite_size == 16 else 0xff)) * 16
@@ -307,7 +307,7 @@ class PPU:
                     continue
 
                 buffer_x = sprite_x + pixelx
-                if buffer_x < 0 or buffer_x >= Screen.SCREEN_WIDTH:
+                if buffer_x < 0 or buffer_x >= Window.SCREEN_WIDTH:
                     continue
 
                 position = line_width + buffer_x

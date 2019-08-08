@@ -13,7 +13,7 @@ from pygb.input import Input
 from pygb.interrupt_manager import Interrupt, InterruptManager
 
 
-class Screen(Thread):
+class Window(Thread):
 
     SCREEN_WIDTH = 160
     SCREEN_HEIGHT = 144 
@@ -22,8 +22,8 @@ class Screen(Thread):
     WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
 
     def __init__(self, _input : Input, interruptManager : InterruptManager):
-        super(Screen, self). __init__()
-        self.framebuffer = [0xffffffff]*(Screen.WINDOW_WIDTH * Screen.WINDOW_HEIGHT)
+        super(Window, self). __init__()
+        self.framebuffer = [0xffffffff]*(Window.WINDOW_WIDTH * Window.WINDOW_HEIGHT)
         self.updated = False
         self.last = time.monotonic()
         self.input = _input
@@ -33,14 +33,14 @@ class Screen(Thread):
     def run(self):
         glutInit()
         glutInitDisplayMode(GLUT_RGBA)
-        glutInitWindowSize(Screen.WINDOW_WIDTH, Screen.WINDOW_HEIGHT)
+        glutInitWindowSize(Window.WINDOW_WIDTH, Window.WINDOW_HEIGHT)
         glutInitWindowPosition(200, 200)
         self.window = glutCreateWindow(b'pygb')
         glutKeyboardFunc(self._key)
         glutKeyboardUpFunc(self._keyUp)
         glutSpecialFunc(self._spec)
         glutSpecialUpFunc(self._specUp)
-        glPixelZoom(Screen.SCALE,Screen.SCALE)
+        glPixelZoom(Window.SCALE,Window.SCALE)
         glutDisplayFunc(self.draw)
         glutIdleFunc(self.draw)
         glutMainLoop()
@@ -58,7 +58,7 @@ class Screen(Thread):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
         if not self.updated:
-            glDrawPixels(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, self.framebuffer)
+            glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, self.framebuffer)
             glFlush()
             glutSwapBuffers()
         self.updated = True

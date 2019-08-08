@@ -7,8 +7,8 @@ from pygb.input import Input
 from pygb.io_registers import IO_Registers
 from pygb.mmu import MMU
 from pygb.ppu import PPU
-from pygb.screen import Screen
 from pygb.sound import Sound
+from pygb.window import Window
 
 class Emulator:
 
@@ -19,15 +19,15 @@ class Emulator:
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.sound = Sound(self.mmu, self.cpu.interruptManager)
-        self.screen = Screen(self.input, self.cpu.interruptManager)
-        self.screen.start()
+        self.window = Window(self.input, self.cpu.interruptManager)
+        self.window.start()
 
     def run(self):
         while True:
             self.cpu.step()
             self.ppu.step(self.cpu.ticks)
             if self.ppu.vblank:
-                self.screen.render(self.ppu.framebuffer)
+                self.window.render(self.ppu.framebuffer)
             self.sound.step()
 
     def skip_boot_rom(self):
