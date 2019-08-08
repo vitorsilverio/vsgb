@@ -84,72 +84,72 @@ class Screen(Thread):
         if up:
             if c == GLUT_KEY_UP:
                 self.input.buttons['UP'] = False
-                logging.warning("UP released")
+                logging.debug("UP released")
                 self.request_input_interrupt()
             if c == GLUT_KEY_DOWN:
                 self.input.buttons['DOWN'] = False
-                logging.warning("DOWN released")
+                logging.debug("DOWN released")
                 self.request_input_interrupt()
             if c == GLUT_KEY_LEFT:
                 self.input.buttons['LEFT'] = False
-                logging.warning("LEFT released")
+                logging.debug("LEFT released")
                 self.request_input_interrupt()
             if c == GLUT_KEY_RIGHT:
                 self.input.buttons['RIGHT'] = False
-                logging.warning("RIGHT released")
+                logging.debug("RIGHT released")
                 self.request_input_interrupt()
         else:
             if c == GLUT_KEY_UP:
                 self.input.buttons['UP'] = True
-                logging.warning("UP pressed")
+                logging.debug("UP pressed")
                 self.request_input_interrupt()
             if c == GLUT_KEY_DOWN:
                 self.input.buttons['DOWN'] = True
-                logging.warning("DOWN pressed")
+                logging.debug("DOWN pressed")
                 self.request_input_interrupt()
             if c == GLUT_KEY_LEFT:
                 self.input.buttons['LEFT'] = True
-                logging.warning("LEFT pressed")
+                logging.debug("LEFT pressed")
                 self.request_input_interrupt()
             if c == GLUT_KEY_RIGHT:
                 self.input.buttons['RIGHT'] = True
-                logging.warning("RIGHT pressed")
+                logging.debug("RIGHT pressed")
                 self.request_input_interrupt()
 
     def _glkeyboard(self, c, x, y, up):
         if up:
             if c == 'z':
                 self.input.buttons['A'] = False
-                logging.warning("A released")
+                logging.debug("A released")
                 self.request_input_interrupt()
             elif c == 'x':
                 self.input.buttons['B'] = False
-                logging.warning("B released")
+                logging.debug("B released")
                 self.request_input_interrupt()
             elif c == chr(13):
                 self.input.buttons['START'] = False
-                logging.warning("START released")
+                logging.debug("START released")
                 self.request_input_interrupt()
             elif c == chr(8):
                 self.input.buttons['SELCT'] = False
-                logging.warning("SELECT released")
+                logging.debug("SELECT released")
                 self.request_input_interrupt()
         else:
             if c == 'z':
                 self.input.buttons['A'] = True
-                logging.warning("A pressed")
+                logging.debug("A pressed")
                 self.request_input_interrupt()
             elif c == 'x':
                 self.input.buttons['B'] = True
-                logging.warning("B pressed")
+                logging.debug("B pressed")
                 self.request_input_interrupt()
             elif c == chr(13):
                 self.input.buttons['START'] = True
-                logging.warning("START pressed")
+                logging.debug("START pressed")
                 self.request_input_interrupt()
             elif c == chr(8):
                 self.input.buttons['SELCT'] = True
-                logging.warning("SELECT pressed")
+                logging.debug("SELECT pressed")
                 self.request_input_interrupt()
 
 
