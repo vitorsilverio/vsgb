@@ -2858,7 +2858,7 @@ class InstructionPerformer:
         self.registers.reset_h_flag()
         self.registers.a = result & 0xff
 
-    def cp(self, value: int) -> int:
+    def cp(self, value: int):
         result = self.registers.a - value
         if result & 0xff == 0x0:
             self.registers.set_z_flag()
