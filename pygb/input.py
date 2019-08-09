@@ -14,6 +14,15 @@ class Input:
             'LEFT': False,
             'RIGHT': False
         }
+        self._interrupt = False
+
+    def must_interrupt(self):
+        must_interrupt = self._interrupt 
+        self._interrupt = False
+        return must_interrupt
+
+    def request_interrupt(self):
+        self._interrupt = True
 
     def read_input(self, joyp : int) -> int:
         _input = 0x0f

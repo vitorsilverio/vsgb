@@ -10,7 +10,6 @@ from threading import Thread
 import time
 
 from pygb.input import Input
-from pygb.interrupt_manager import Interrupt, InterruptManager
 
 
 class Window(Thread):
@@ -21,13 +20,12 @@ class Window(Thread):
     WINDOW_WIDTH = SCREEN_WIDTH * SCALE
     WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
 
-    def __init__(self, _input : Input, interruptManager : InterruptManager):
+    def __init__(self, _input : Input):
         super(Window, self). __init__()
         self.framebuffer = [0xffffffff]*(Window.WINDOW_WIDTH * Window.WINDOW_HEIGHT)
         self.updated = False
         self.last = time.monotonic()
         self.input = _input
-        self.interruptManager = interruptManager
         self.window = None
         
     def run(self):
@@ -64,7 +62,7 @@ class Window(Thread):
         self.updated = True
 
     def request_input_interrupt(self):
-        self.interruptManager.request_interrupt(Interrupt.INTERRUPT_JOYPAD)
+        self.input.request_interrupt()
 
     def _key(self, c, x, y):
         self._glkeyboard(c.decode("ascii"), x, y, False)

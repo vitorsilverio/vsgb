@@ -4,6 +4,7 @@
 from pygb.cartridge import Cartridge
 from pygb.cpu import CPU
 from pygb.input import Input
+from pygb.interrupt_manager import Interrupt
 from pygb.io_registers import IO_Registers
 from pygb.mmu import MMU
 from pygb.ppu import PPU
@@ -19,11 +20,13 @@ class Emulator:
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
         self.sound = Sound(self.mmu, self.cpu.interruptManager)
-        self.window = Window(self.input, self.cpu.interruptManager)
+        self.window = Window(self.input)
         self.window.start()
 
     def run(self):
         while True:
+            if self.input.must_interrupt():
+                self.cpu.interruptManager.request_interrupt(Interrupt.INTERRUPT_JOYPAD)
             self.cpu.step()
             self.ppu.step(self.cpu.ticks)
             if self.ppu.vblank:
