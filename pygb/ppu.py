@@ -95,7 +95,7 @@ class PPU:
             self.vblank_line += 1
 
             if self.vblank_line <= 9:
-                self.next_line() #This next line causes slow
+                self.next_line()
                 self.compare_lylc()
 
         if self.modeclock >= PPU.V_BLANK_TIME:
@@ -129,9 +129,9 @@ class PPU:
     def rgb(self, color_code : int) -> int:
         return {
             0: 0xffffffff,
-            1: 0xffa8a8a8,
-            2: 0xff555555,
-            3: 0x00000000
+            1: 0xffa8a8ff,
+            2: 0xff5555ff,
+            3: 0x000000ff
         }.get(color_code)
 
     def compare_lylc(self):
@@ -262,7 +262,7 @@ class PPU:
         for sprite in range(39,-1,-1):
             sprite_offset = sprite * 4
 
-            sprite_y = self.mmu.read_byte(0xFE00 + sprite_offset) - 16
+            sprite_y = self.mmu.read_byte(0xfe00 + sprite_offset) - 16
             if sprite_y > line or (sprite_y + sprite_size) <= line:
                 continue
 

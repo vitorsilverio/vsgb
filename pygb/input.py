@@ -29,20 +29,20 @@ class Input:
         if joyp & 0x20 == 0x00:
             if self.buttons['START']:
                 _input ^= 0x08
-            elif self.buttons['SELECT']:
+            if self.buttons['SELECT']:
                 _input ^= 0x04
-            elif self.buttons['A']:
+            if self.buttons['A']:
                 _input ^= 0x01
-            elif self.buttons['B']:
+            if self.buttons['B']:
                 _input ^= 0x02
         elif joyp & 0x10 == 0x00:
             if self.buttons['UP']:
                 _input ^= 0x04
-            elif self.buttons['DOWN']:
+            if self.buttons['DOWN']:
                 _input ^= 0x08
-            elif self.buttons['LEFT']:
+            if self.buttons['LEFT']:
                 _input ^= 0x02
-            elif self.buttons['RIGHT']:
+            if self.buttons['RIGHT']:
                 _input ^= 0x01
 
         return (0xf0 & joyp) | _input
