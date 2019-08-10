@@ -22,6 +22,6 @@ The executable will be:
 **executable** -r romfile.gb
 
 ## Parameters
-- **-r/-rom** Specify the rom file
+- **-r/--rom** Specify the rom file
 - **-d/--debug** Set logging to DEBUG and output to file
 - **-s/--skip** Skip boot rom, let me directly to rom
