@@ -1329,13 +1329,13 @@ class InstructionPerformer:
         self.registers.pc += 2
         self.mmu.write_byte(word, self.registers.a)
         self.debug('{}: LD ({}), A'.format(hex(self.registers.pc-3),hex(word)))
-        return 8
+        return 16
 
     def instruction_0xee(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.xor(byte)
-        self.debug('{}: XOR {}'.format(hex(self.registers.pc-1), hex(byte)))
+        self.debug('{}: XOR {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
     def instruction_0xef(self) -> int:
