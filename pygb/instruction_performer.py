@@ -1297,7 +1297,7 @@ class InstructionPerformer:
 
     def instruction_0xe2(self) -> int:
         self.mmu.write_byte((self.registers.c + 0xff00), self.registers.a)
-        self.debug('{}: LD (0xff00+C), A'.format(hex(self.registers.pc-1)))
+        self.debug('{}: LD (0xff00+C), A'.format(hex(self.registers.pc-2)))
         return 8
     
     def instruction_0xe5(self) -> int:
@@ -1329,13 +1329,13 @@ class InstructionPerformer:
         self.registers.pc += 2
         self.mmu.write_byte(word, self.registers.a)
         self.debug('{}: LD ({}), A'.format(hex(self.registers.pc-3),hex(word)))
-        return 8
+        return 16
 
     def instruction_0xee(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.xor(byte)
-        self.debug('{}: XOR {}'.format(hex(self.registers.pc-1), hex(byte)))
+        self.debug('{}: XOR {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 8
 
     def instruction_0xef(self) -> int:
@@ -1358,7 +1358,7 @@ class InstructionPerformer:
     
     def instruction_0xf2(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.c + 0xff00)
-        self.debug('{}: LD A, (0xff00+C)'.format(hex(self.registers.pc-1)))
+        self.debug('{}: LD A, (0xff00+C)'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xf3(self) -> int:
