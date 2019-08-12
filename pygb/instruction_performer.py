@@ -1332,7 +1332,7 @@ class InstructionPerformer:
         else:
             self.registers.reset_h_flag()
         self.registers.sp += signed_value(byte)
-        self.debug('{}: ADD SP, {}'.format(hex(self.registers.pc-2), hex(bute)))
+        self.debug('{}: ADD SP, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 16
 
     def instruction_0xe9(self) -> int:
@@ -2434,322 +2434,322 @@ class InstructionPerformer:
         return 8
 
     def instruction_0xcbc0(self) -> int:
-        set_bit(0, self.registers.b)
+        self.registers.b = set_bit(0, self.registers.b)
         self.debug('{}: SET 0, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc1(self) -> int:
-        set_bit(0, self.registers.c)
+        self.registers.c = set_bit(0, self.registers.c)
         self.debug('{}: SET 0, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc2(self) -> int:
-        set_bit(0, self.registers.d)
+        self.registers.d = set_bit(0, self.registers.d)
         self.debug('{}: SET 0, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc3(self) -> int:
-        set_bit(0, self.registers.e)
+        self.registers.e = set_bit(0, self.registers.e)
         self.debug('{}: SET 0, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc4(self) -> int:
-        set_bit(0, self.registers.h)
+        self.registers.h = set_bit(0, self.registers.h)
         self.debug('{}: SET 0, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc5(self) -> int:
-        set_bit(0, self.registers.l)
+        self.registers.l = set_bit(0, self.registers.l)
         self.debug('{}: SET 0, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc6(self) -> int:
-        set_bit(0, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(0, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 0, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbc7(self) -> int:
-        set_bit(0, self.registers.a)
+        self.registers.a = set_bit(0, self.registers.a)
         self.debug('{}: SET 0, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc8(self) -> int:
-        set_bit(1, self.registers.b)
+        self.registers.b = set_bit(1, self.registers.b)
         self.debug('{}: SET 1, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbc9(self) -> int:
-        set_bit(1, self.registers.c)
+        self.registers.c = set_bit(1, self.registers.c)
         self.debug('{}: SET 1, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbca(self) -> int:
-        set_bit(1, self.registers.d)
+        self.registers.d = set_bit(1, self.registers.d)
         self.debug('{}: SET 1, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbcb(self) -> int:
-        set_bit(1, self.registers.e)
+        self.registers.e = set_bit(1, self.registers.e)
         self.debug('{}: SET 1, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbcc(self) -> int:
-        set_bit(1, self.registers.h)
+        self.registers.h = set_bit(1, self.registers.h)
         self.debug('{}: SET 1, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbcd(self) -> int:
-        set_bit(1, self.registers.l)
+        self.registers.l = set_bit(1, self.registers.l)
         self.debug('{}: SET 1, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbce(self) -> int:
-        set_bit(1, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(1, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 1, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbcf(self) -> int:
-        set_bit(1, self.registers.a)
+        self.registers.a = set_bit(1, self.registers.a)
         self.debug('{}: SET 1, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd0(self) -> int:
-        set_bit(2, self.registers.b)
+        self.registers.b = set_bit(2, self.registers.b)
         self.debug('{}: SET 2, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd1(self) -> int:
-        set_bit(2, self.registers.c)
+        self.registers.c = set_bit(2, self.registers.c)
         self.debug('{}: SET 2, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd2(self) -> int:
-        set_bit(2, self.registers.d)
+        self.registers.d = set_bit(2, self.registers.d)
         self.debug('{}: SET 2, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd3(self) -> int:
-        set_bit(2, self.registers.e)
+        self.registers.e = set_bit(2, self.registers.e)
         self.debug('{}: SET 2, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd4(self) -> int:
-        set_bit(2, self.registers.h)
+        self.registers.h = set_bit(2, self.registers.h)
         self.debug('{}: SET 2, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd5(self) -> int:
-        set_bit(2, self.registers.l)
+        self.registers.l = set_bit(2, self.registers.l)
         self.debug('{}: SET 2, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd6(self) -> int:
-        set_bit(2, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(2, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 2, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbd7(self) -> int:
-        set_bit(2, self.registers.a)
+        self.registers.a = set_bit(2, self.registers.a)
         self.debug('{}: SET 2, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd8(self) -> int:
-        set_bit(3, self.registers.b)
+        self.registers.b = set_bit(3, self.registers.b)
         self.debug('{}: SET 3, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbd9(self) -> int:
-        set_bit(3, self.registers.c)
+        self.registers.c = set_bit(3, self.registers.c)
         self.debug('{}: SET 3, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbda(self) -> int:
-        set_bit(3, self.registers.d)
+        self.registers.d = set_bit(3, self.registers.d)
         self.debug('{}: SET 3, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbdb(self) -> int:
-        set_bit(3, self.registers.e)
+        self.registers.e = set_bit(3, self.registers.e)
         self.debug('{}: SET 3, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbdc(self) -> int:
-        set_bit(3, self.registers.h)
+        self.registers.h = set_bit(3, self.registers.h)
         self.debug('{}: SET 3, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbdd(self) -> int:
-        set_bit(3, self.registers.l)
+        self.registers.l = set_bit(3, self.registers.l)
         self.debug('{}: SET 3, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbde(self) -> int:
-        set_bit(3, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(3, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 3, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbdf(self) -> int:
-        set_bit(3, self.registers.a)
+        self.registers.a = set_bit(3, self.registers.a)
         self.debug('{}: SET 3, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe0(self) -> int:
-        set_bit(4, self.registers.b)
+        self.registers.b = set_bit(4, self.registers.b)
         self.debug('{}: SET 4, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe1(self) -> int:
-        set_bit(4, self.registers.c)
+        self.registers.c = set_bit(4, self.registers.c)
         self.debug('{}: SET 4, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe2(self) -> int:
-        set_bit(4, self.registers.d)
+        self.registers.d = set_bit(4, self.registers.d)
         self.debug('{}: SET 4, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe3(self) -> int:
-        set_bit(4, self.registers.e)
+        self.registers.e = set_bit(4, self.registers.e)
         self.debug('{}: SET 4, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe4(self) -> int:
-        set_bit(4, self.registers.h)
+        self.registers.h = set_bit(4, self.registers.h)
         self.debug('{}: SET 4, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe5(self) -> int:
-        set_bit(4, self.registers.l)
+        self.registers.l = set_bit(4, self.registers.l)
         self.debug('{}: SET 4, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe6(self) -> int:
-        set_bit(4, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(4, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 4, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbe7(self) -> int:
-        set_bit(4, self.registers.a)
+        self.registers.a = set_bit(4, self.registers.a)
         self.debug('{}: SET 4, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe8(self) -> int:
-        set_bit(5, self.registers.b)
+        self.registers.b = set_bit(5, self.registers.b)
         self.debug('{}: SET 5, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbe9(self) -> int:
-        set_bit(5, self.registers.c)
+        self.registers.c = set_bit(5, self.registers.c)
         self.debug('{}: SET 5, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbea(self) -> int:
-        set_bit(5, self.registers.d)
+        self.registers.d = set_bit(5, self.registers.d)
         self.debug('{}: SET 5, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbeb(self) -> int:
-        set_bit(5, self.registers.e)
+        self.registers.e = set_bit(5, self.registers.e)
         self.debug('{}: SET 5, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbec(self) -> int:
-        set_bit(5, self.registers.h)
+        self.registers.h = set_bit(5, self.registers.h)
         self.debug('{}: SET 5, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbed(self) -> int:
-        set_bit(5, self.registers.l)
+        self.registers.l = set_bit(5, self.registers.l)
         self.debug('{}: SET 5, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbee(self) -> int:
-        set_bit(5, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(5, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 5, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbef(self) -> int:
-        set_bit(5, self.registers.a)
+        self.registers.a = set_bit(5, self.registers.a)
         self.debug('{}: SET 5, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf0(self) -> int:
-        set_bit(6, self.registers.b)
+        self.registers.b = set_bit(6, self.registers.b)
         self.debug('{}: SET 6, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf1(self) -> int:
-        set_bit(6, self.registers.c)
+        self.registers.c = set_bit(6, self.registers.c)
         self.debug('{}: SET 6, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf2(self) -> int:
-        set_bit(6, self.registers.d)
+        self.registers.d = set_bit(6, self.registers.d)
         self.debug('{}: SET 6, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf3(self) -> int:
-        set_bit(6, self.registers.e)
+        self.registers.e = set_bit(6, self.registers.e)
         self.debug('{}: SET 6, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf4(self) -> int:
-        set_bit(6, self.registers.h)
+        self.registers.h = set_bit(6, self.registers.h)
         self.debug('{}: SET 6, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf5(self) -> int:
-        set_bit(6, self.registers.l)
+        self.registers.l = set_bit(6, self.registers.l)
         self.debug('{}: SET 6, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf6(self) -> int:
-        set_bit(6, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(6, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 6, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbf7(self) -> int:
-        set_bit(6, self.registers.a)
+        self.registers.a = set_bit(6, self.registers.a)
         self.debug('{}: SET 6, A'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf8(self) -> int:
-        set_bit(7, self.registers.b)
+        self.registers.b = set_bit(7, self.registers.b)
         self.debug('{}: SET 7, B'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbf9(self) -> int:
-        set_bit(7, self.registers.c)
+        self.registers.c = set_bit(7, self.registers.c)
         self.debug('{}: SET 7, C'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbfa(self) -> int:
-        set_bit(7, self.registers.d)
+        self.registers.d = set_bit(7, self.registers.d)
         self.debug('{}: SET 7, D'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbfb(self) -> int:
-        set_bit(7, self.registers.e)
+        self.registers.e = set_bit(7, self.registers.e)
         self.debug('{}: SET 7, E'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbfc(self) -> int:
-        set_bit(7, self.registers.h)
+        self.registers.h = set_bit(7, self.registers.h)
         self.debug('{}: SET 7, H'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbfd(self) -> int:
-        set_bit(7, self.registers.l)
+        self.registers.l = set_bit(7, self.registers.l)
         self.debug('{}: SET 7, L'.format(hex(self.registers.pc-2)))
         return 8
 
     def instruction_0xcbfe(self) -> int:
-        set_bit(7, self.mmu.read_byte(self.registers.get_hl()))
+        self.mmu.write_byte(self.registers.get_hl(), set_bit(7, self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SET 7, (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def instruction_0xcbff(self) -> int:
-        set_bit(7, self.registers.a)
+        self.registers.a = set_bit(7, self.registers.a)
         self.debug('{}: SET 7, A'.format(hex(self.registers.pc-2)))
         return 8
     

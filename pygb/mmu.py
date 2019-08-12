@@ -56,7 +56,6 @@ class MMU:
         if 0xfe00 <= address < 0xfea0:
             return self.oam[address - 0xfe00]
         if 0xfea0 <= address < 0xff00:
-            logging.warning('Invalid memory address: {}'.format(hex(address)))
             return self.unusable_memory_space[address - 0xfea0]
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
