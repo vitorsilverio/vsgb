@@ -59,7 +59,7 @@ class MMU:
             return self.unusable_memory_space[address - 0xfea0]
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
-                self.write_byte(address, self.input.read_input(self.io_ports[0]))
+                return self.input.read_input(self.io_ports[0])
             return self.io_ports[address - 0xff00]
         if 0xff80 <= address < 0x10000:
             return self.high_internal_ram[address - 0xff80]
@@ -79,7 +79,6 @@ class MMU:
         elif 0xfe00 <= address < 0xfea0:
             self.oam[address - 0xfe00] = value
         elif 0xfea0 <= address < 0xff00:
-            logging.warning('Putting {} in invalid memory address: {}'.format(hex(value),hex(address)))
             self.unusable_memory_space[address - 0xfea0] = value
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:

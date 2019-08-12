@@ -28,11 +28,9 @@ class CPU:
         
     def step(self):
         self.ticks = 0
-        if self.halted:
-            if self.ime:
-                self.halted = False
         if self.ime:
             self.serve_interrupt()
+            self.halted = False
         if self.halted:
             self.ticks = 4
         else:
