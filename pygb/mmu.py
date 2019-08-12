@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import array
 import logging
 
 from pygb.input import Input
@@ -10,7 +11,7 @@ from pygb.cartridge import ROM
 class MMU:
 
     def __init__(self, rom : ROM, _input : Input):
-        self.boot_rom : list = [
+        self.boot_rom  = array.array('B', [
         0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
         0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
         0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
@@ -27,61 +28,61 @@ class MMU:
         0xDD, 0xDC, 0x99, 0x9F, 0xBB, 0xB9, 0x33, 0x3E, 0x3C, 0x42, 0xB9, 0xA5, 0xB9, 0xA5, 0x42, 0x3C,
         0x21, 0x04, 0x01, 0x11, 0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x00, 0x00, 0x23, 0x7D, 0xFE, 0x34, 0x20,
         0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x00, 0x00, 0x3E, 0x01, 0xE0, 0x50
-        ]
+        ])
         self.rom = rom
         self.input = _input
-        self.video_ram = [0x00]*0x2000
-        self.internal_ram = [0x00]*0x2000
-        self.oam= [0x00]*0xa0
-        self.zero_page = [0x00]*0x7f
-        self.io_ports = [0x00]*0x80
-        self.high_internal_ram = [0x00]*0x80
+        self.video_ram = array.array('B', [0x00]*0x2000)
+        self.internal_ram = array.array('B', [0x00]*0x2000)
+        self.oam = array.array('B', [0x00]*0xa0)
+        self.zero_page = array.array('B', [0x00]*0x7f)
+        self.io_ports = array.array('B', [0x00]*0x80)
+        self.high_internal_ram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
-        self.unusable_memory_space = [0x00]*0x60
+        self.unusable_memory_space = array.array('B', [0x00]*0x60)
         
     def read_byte(self, address: int) -> int:
-        if address >= 0 and address < 0x100  and self.bootstrap_enabled:
+        if 0 <= address < 0x100 and self.bootstrap_enabled:
             return self.boot_rom[address]
-        if address >= 0 and address < 0x8000:
+        if 0 <= address < 0x8000:
             return self.rom.read_rom_byte(address)
-        if address >= 0x8000 and address < 0xa000:
+        if 0x8000 <= address < 0xa000:
             return self.video_ram[address - 0x8000]
-        if address >= 0xa000 and address < 0xc000:
+        if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address)
-        if address >= 0xc000 and address < 0xe000:
+        if 0xc000 <= address < 0xe000:
             return self.internal_ram[address - 0xc000]
-        if address >= 0xe000 and address < 0xfe00:
+        if 0xe000 <= address < 0xfe00:
             return self.internal_ram[address - 0xe000] #Shadow
-        if address >= 0xfe00 and address < 0xfea0:
+        if 0xfe00 <= address < 0xfea0:
             return self.oam[address - 0xfe00]
-        if address >= 0xfea0 and address < 0xff00:
+        if 0xfea0 <= address < 0xff00:
             logging.warning('Invalid memory address: {}'.format(hex(address)))
             return self.unusable_memory_space[address - 0xfea0]
-        if address >= 0xff00 and address < 0xff80:
+        if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
                 self.write_byte(address, self.input.read_input(self.io_ports[0]))
             return self.io_ports[address - 0xff00]
-        if address >= 0xff80 and address < 0x10000:
+        if 0xff80 <= address < 0x10000:
             return self.high_internal_ram[address - 0xff80]
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff
-        if address >= 0 and address < 0x8000:
+        if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
-        elif address >= 0x8000 and address < 0xa000:
+        elif 0x8000 <= address < 0xa000:
             self.video_ram[address - 0x8000] = value
-        elif address >= 0xa000 and address < 0xc000:
+        elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
-        elif address >= 0xc000 and address < 0xe000:
+        elif 0xc000 <= address < 0xe000:
             self.internal_ram[address - 0xc000] = value
-        elif address >= 0xe000 and address < 0xfe00:
+        elif 0xe000 <= address < 0xfe00:
             self.internal_ram[address - 0xe000] = value # Shadow
-        elif address >= 0xfe00 and address < 0xfea0:
+        elif 0xfe00 <= address < 0xfea0:
             self.oam[address - 0xfe00] = value
-        elif address >= 0xfea0 and address < 0xff00:
+        elif 0xfea0 <= address < 0xff00:
             logging.warning('Putting {} in invalid memory address: {}'.format(hex(value),hex(address)))
             self.unusable_memory_space[address - 0xfea0] = value
-        elif address >= 0xff00 and address < 0xff80:
+        elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
                     self.io_ports[address - 0xff00] = value | 0xf
@@ -95,7 +96,7 @@ class MMU:
                     self.io_ports[address - 0xff00] = value
             else:     
                 self.io_ports[address - 0xff00] = value
-        elif address >= 0xff80 and address < 0x10000:
+        elif 0xff80 <= address < 0x10000:
             self.high_internal_ram[address - 0xff80] = value
 
     def dma_transfer(self, start : int):
