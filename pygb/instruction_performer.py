@@ -1318,6 +1318,23 @@ class InstructionPerformer:
         self.registers.pc = 0x20
         return 16
 
+    def instruction_0xe8(self) -> int:
+        byte = self.mmu.read_byte(self.registers.pc)
+        self.registers.pc += 1
+        self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        if self.registers.sp ^ byte ^ ((self.registers.sp + signed_value(byte)) & 0xffff) & 0x100 == 0x100:
+            self.registers.set_c_flag()
+        else:
+            self.registers.reset_c_flag()
+        if self.registers.sp ^ byte ^ ((self.registers.sp + signed_value(byte)) & 0xffff) & 0x10 == 0x10:
+            self.registers.set_h_flag()
+        else:
+            self.registers.reset_h_flag()
+        self.registers.sp += signed_value(byte)
+        self.debug('{}: ADD SP, {}'.format(hex(self.registers.pc-2), hex(bute)))
+        return 16
+
     def instruction_0xe9(self) -> int:
         self.debug('{}: JP HL'.format(hex(self.registers.pc-1)))
         word = self.registers.get_hl()
