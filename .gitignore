@@ -4,5 +4,8 @@ dist/
 *.pyc
 *.dll
 *.gb*
+*.c
+*.so
+*.pyd
 pygb.log
 main.spec

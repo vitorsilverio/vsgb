@@ -35,9 +35,9 @@ class Sound:
             if self.overridenEnabled[i]:
                 continue
             if (selection & (1 << i + 4)) != 0:
-                left += channels[i] 
+                left += self.channels[i] 
             if (selection & (1 << i)) != 0:
-                right += channels[i]
+                right += self.channels[i]
 
         left = int(left / 4)
         right = int(right / 4)
