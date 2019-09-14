@@ -1408,13 +1408,13 @@ class InstructionPerformer:
         self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         if (self.registers.sp ^ signed_value(byte) ^ hl) & 0x100 == 0x100:
-            self.registers.set_c_flag 
+            self.registers.set_c_flag()
         else: 
-            self.registers.reset_c_flag
+            self.registers.reset_c_flag()
         if (self.registers.sp ^ signed_value(byte) ^ hl) & 0x10 == 0x10:
-            self.registers.set_h_flag 
+            self.registers.set_h_flag()
         else: 
-            self.registers.reset_h_flag
+            self.registers.reset_h_flag()
         self.registers.set_hl(hl)
         self.debug('{}: LDHL SP, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 12

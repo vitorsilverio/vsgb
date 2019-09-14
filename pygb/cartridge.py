@@ -29,6 +29,7 @@ class Cartridge:
             return MBC4(self.data)
         if rom_type in [0x19, 0x1b, 0x1c, 0x1d, 0x1e]:
             return MBC5(self.data)
+        return None
 
 class CartridgeType:
 

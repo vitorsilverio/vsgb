@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from threading import Thread
+import time
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from threading import Thread
-import time
+
+
 
 from pygb.input import Input
 

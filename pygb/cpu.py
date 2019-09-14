@@ -40,7 +40,7 @@ class CPU:
         
     def serve_interrupt(self):
         interrupt = self.interruptManager.pending_interrupt()
-        if (interrupt == Interrupt.INTERRUPT_NONE):
+        if interrupt == Interrupt.INTERRUPT_NONE:
             return False
         self.ime = False
         self.stackManager.push_word(self.registers.pc)

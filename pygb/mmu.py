@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import array
-import logging
 
 from pygb.input import Input
 from pygb.io_registers import IO_Registers
@@ -99,7 +98,7 @@ class MMU:
 
     def dma_transfer(self, start : int):
         address = start << 8
-        if address >= 0x8000 and address < 0xe000:
+        if 0x8000 <= address < 0xe000:
             for i in range(0,0xa0):
                 self.oam[i] = self.read_byte(address + i)
 
