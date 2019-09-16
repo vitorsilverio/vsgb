@@ -62,11 +62,11 @@ class CPU:
             self.mmu.write_byte(IO_Registers.IF, if_register & 0xEF)
         self.ticks = 20
 
-    def fetch_instruction(self) -> int:
+    def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        if instruction == 0xcb:
-            return 0xcb00 + self.fetch_instruction()
+        if instruction == 0xcb and not prefix:
+            return 0xcb00 + self.fetch_instruction(True)
         return instruction
 
     def perform_instruction(self, instruction : int):
