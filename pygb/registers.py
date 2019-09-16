@@ -22,7 +22,7 @@ class Registers:
 
     def set_af(self, word : int):
         self.a = ( word >> 8 ) & 0xff
-        self.f = word & 0xff
+        self.f = word & 0xf0
 
     def set_bc(self, word : int):
         self.b = ( word >> 8 ) & 0xff
@@ -37,7 +37,7 @@ class Registers:
         self.l = word & 0xff
 
     def get_af(self) -> int:
-        return (self.a << 8) + self.f
+        return ((self.a << 8) + self.f) & 0xfff0
 
     def get_bc(self) -> int:
         return (self.b << 8) + self.c

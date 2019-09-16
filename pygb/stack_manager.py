@@ -25,12 +25,4 @@ class StackManager:
         return byte
 
     def pop_word(self) -> int:
-        try:
-            low_byte = self.pop_byte() & 0xff
-        except TypeError:
-            low_byte = 0
-        try:
-            high_byte = self.pop_byte() & 0xff
-        except TypeError:
-            high_byte = 0
-        return low_byte | ( high_byte << 8 )
+        return self.pop_byte() | ( self.pop_byte() << 8 )
