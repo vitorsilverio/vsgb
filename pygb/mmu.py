@@ -41,27 +41,27 @@ class MMU:
         
     def read_byte(self, address: int) -> int:
         if 0 <= address < 0x100 and self.bootstrap_enabled:
-            return self.boot_rom[address]
+            return self.boot_rom[address] & 0xff
         if 0 <= address < 0x8000:
-            return self.rom.read_rom_byte(address)
+            return self.rom.read_rom_byte(address) & 0xff
         if 0x8000 <= address < 0xa000:
-            return self.video_ram[address - 0x8000]
+            return self.video_ram[address - 0x8000] & 0xff
         if 0xa000 <= address < 0xc000:
-            return self.rom.read_external_ram_byte(address)
+            return self.rom.read_external_ram_byte(address) & 0xff
         if 0xc000 <= address < 0xe000:
-            return self.internal_ram[address - 0xc000]
+            return self.internal_ram[address - 0xc000] & 0xff
         if 0xe000 <= address < 0xfe00:
-            return self.internal_ram[address - 0xe000] #Shadow
+            return self.internal_ram[address - 0xe000] & 0xff #Shadow
         if 0xfe00 <= address < 0xfea0:
-            return self.oam[address - 0xfe00]
+            return self.oam[address - 0xfe00] & 0xff
         if 0xfea0 <= address < 0xff00:
-            return self.unusable_memory_space[address - 0xfea0]
+            return self.unusable_memory_space[address - 0xfea0] & 0xff
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
-                return self.input.read_input(self.io_ports[0])
-            return self.io_ports[address - 0xff00]
+                return self.input.read_input(self.io_ports[0]) & 0xff
+            return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
-            return self.high_internal_ram[address - 0xff80]
+            return self.high_internal_ram[address - 0xff80] & 0xff
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff
@@ -103,7 +103,7 @@ class MMU:
                 self.oam[i] = self.read_byte(address + i)
 
     def read_word(self, address: int) -> int:
-        return self.read_byte(address) | (self.read_byte(address + 1) << 8)
+        return (self.read_byte(address) | (self.read_byte(address + 1) << 8)) & 0xffff
 
     def write_word(self, address : int, value : int):
         value = (value & 0xffff)

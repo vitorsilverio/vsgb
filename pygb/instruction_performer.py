@@ -519,9 +519,10 @@ class InstructionPerformer:
         #tempRegister.W = AF.B.B1;
         #tempRegister.W |= (AF.B.B0 & (GB_C_FLAG | GB_H_FLAG | GB_N_FLAG)) << 4;
         #AF.W = DAATable[tempRegister.W];
-        temp = self.registers.f
-        temp |= (self.registers.a & (Registers.C_FLAG | Registers.H_FLAG | Registers.N_FLAG)) << 4
-        self.registers.set_af(DAATable[temp & 0xffff])
+        temp = self.registers.a
+        temp |= (self.registers.f & (Registers.C_FLAG | Registers.H_FLAG | Registers.N_FLAG)) << 4
+        self.registers.set_af(DAATable[temp])
+        print(hex(DAATable[temp & 0xffff]))
         self.debug('{}: DAA'.format(hex(self.registers.pc-1)))
         return 4
 
