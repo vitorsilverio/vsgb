@@ -3183,7 +3183,7 @@ class InstructionPerformer:
             self.registers.set_z_flag() 
         else: 
             self.registers.reset_z_flag()
-        if result & 0xf == 0x0:
+        if result & 0xf == 0xf:
             self.registers.set_h_flag() 
         else: 
             self.registers.reset_h_flag()
