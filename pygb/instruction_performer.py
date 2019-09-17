@@ -1567,19 +1567,20 @@ class InstructionPerformer:
         return 16
 
     def inst0xe8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
+        byte = signed_value(self.mmu.read_byte(self.registers.pc))
+        temp = self.registers.sp + byte
         self.registers.pc += 1
         self.registers.reset_z_flag()
         self.registers.reset_n_flag()
-        if self.registers.sp ^ byte ^ ((self.registers.sp + signed_value(byte)) & 0xffff) & 0x100 == 0x100:
+        if ( self.registers.sp ^ byte ^ temp ) & 0x100 == 0x100:
             self.registers.set_c_flag()
         else:
             self.registers.reset_c_flag()
-        if self.registers.sp ^ byte ^ ((self.registers.sp + signed_value(byte)) & 0xffff) & 0x10 == 0x10:
+        if ( self.registers.sp ^ byte ^ temp ) & 0x10 == 0x10:
             self.registers.set_h_flag()
         else:
             self.registers.reset_h_flag()
-        self.registers.sp += signed_value(byte)
+        self.registers.sp = temp
         self.debug('{}: ADD SP, {}'.format(hex(self.registers.pc-2), hex(byte)))
         return 16
 
