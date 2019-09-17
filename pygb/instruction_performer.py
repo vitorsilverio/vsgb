@@ -522,7 +522,6 @@ class InstructionPerformer:
         temp = self.registers.a
         temp |= (self.registers.f & (Registers.C_FLAG | Registers.H_FLAG | Registers.N_FLAG)) << 4
         self.registers.set_af(DAATable[temp])
-        print(hex(DAATable[temp & 0xffff]))
         self.debug('{}: DAA'.format(hex(self.registers.pc-1)))
         return 4
 
