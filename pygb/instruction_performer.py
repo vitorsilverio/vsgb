@@ -1859,98 +1859,82 @@ class InstructionPerformer:
         return 8
 
     def inst0xcb20(self) -> int:
-        self.registers.b = self.rlc(self.registers.b)
-        self.registers.reset_c_flag()
+        self.registers.b = self.sla(self.registers.b)
         self.debug('{}: SLA B'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb21(self) -> int:
-        self.registers.c = self.rlc(self.registers.c)
-        self.registers.reset_c_flag()
+        self.registers.c = self.sla(self.registers.c)
         self.debug('{}: SLA C'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb22(self) -> int:
-        self.registers.d = self.rlc(self.registers.d)
-        self.registers.reset_c_flag()
+        self.registers.d = self.sla(self.registers.d)
         self.debug('{}: SLA D'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb23(self) -> int:
-        self.registers.e = self.rlc(self.registers.e)
-        self.registers.reset_c_flag()
+        self.registers.e = self.sla(self.registers.e)
         self.debug('{}: SLA E'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb24(self) -> int:
-        self.registers.h = self.rlc(self.registers.h)
-        self.registers.reset_c_flag()
+        self.registers.h = self.sla(self.registers.h)
         self.debug('{}: SLA H'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb25(self) -> int:
-        self.registers.l = self.rlc(self.registers.l)
-        self.registers.reset_c_flag()
+        self.registers.l = self.sla(self.registers.l)
         self.debug('{}: SLA L'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb26(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rlc(self.mmu.read_byte(self.registers.get_hl())))
-        self.registers.reset_c_flag()
+        self.mmu.write_byte(self.registers.get_hl(), self.sla(self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SLA (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def inst0xcb27(self) -> int:
-        self.registers.a = self.rlc(self.registers.a)
-        self.registers.reset_c_flag()
+        self.registers.a = self.sla(self.registers.a)
         self.debug('{}: SLA A'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb28(self) -> int:
-        self.registers.b = self.rr(self.registers.b)
-        self.registers.reset_c_flag()
+        self.registers.b = self.sra(self.registers.b)
         self.debug('{}: SRA B'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb29(self) -> int:
-        self.registers.c = self.rr(self.registers.c)
-        self.registers.reset_c_flag()
+        self.registers.c = self.sra(self.registers.c)
         self.debug('{}: SRA C'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb2a(self) -> int:
-        self.registers.d = self.rr(self.registers.d)
-        self.registers.reset_c_flag()
+        self.registers.d = self.sra(self.registers.d)
         self.debug('{}: SRA D'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb2b(self) -> int:
-        self.registers.e = self.rr(self.registers.e)
-        self.registers.reset_c_flag()
+        self.registers.e = self.sra(self.registers.e)
         self.debug('{}: SRA E'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb2c(self) -> int:
-        self.registers.h = self.rr(self.registers.h)
-        self.registers.reset_c_flag()
+        self.registers.h = self.sra(self.registers.h)
         self.debug('{}: SRA H'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb2d(self) -> int:
-        self.registers.l = self.rr(self.registers.l)
-        self.registers.reset_c_flag()
+        self.registers.l = self.sra(self.registers.l)
         self.debug('{}: SRA L'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb2e(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rr(self.mmu.read_byte(self.registers.get_hl())))
-        self.registers.reset_c_flag()
+        self.mmu.write_byte(self.registers.get_hl(), self.sra(self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SRA (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def inst0xcb2f(self) -> int:
-        self.registers.a = self.rr(self.registers.a)
-        self.registers.reset_c_flag()
+        self.registers.a = self.sra(self.registers.a)
         self.debug('{}: SRA A'.format(hex(self.registers.pc-2)))
         return 8
 
@@ -1995,50 +1979,42 @@ class InstructionPerformer:
         return 8
 
     def inst0xcb38(self) -> int:
-        self.registers.b = self.rrc(self.registers.b)
-        self.registers.reset_c_flag()
+        self.registers.b = self.srl(self.registers.b)
         self.debug('{}: SRL B'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb39(self) -> int:
-        self.registers.c = self.rrc(self.registers.c)
-        self.registers.reset_c_flag()
+        self.registers.c = self.srl(self.registers.c)
         self.debug('{}: SRL C'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb3a(self) -> int:
-        self.registers.d = self.rrc(self.registers.d)
-        self.registers.reset_c_flag()
+        self.registers.d = self.srl(self.registers.d)
         self.debug('{}: SRL D'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb3b(self) -> int:
-        self.registers.e = self.rrc(self.registers.e)
-        self.registers.reset_c_flag()
+        self.registers.e = self.srl(self.registers.e)
         self.debug('{}: SRL E'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb3c(self) -> int:
-        self.registers.h = self.rrc(self.registers.h)
-        self.registers.reset_c_flag()
+        self.registers.h = self.srl(self.registers.h)
         self.debug('{}: SRL H'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb3d(self) -> int:
-        self.registers.l = self.rrc(self.registers.l)
-        self.registers.reset_c_flag()
+        self.registers.l = self.srl(self.registers.l)
         self.debug('{}: SRL L'.format(hex(self.registers.pc-2)))
         return 8
 
     def inst0xcb3e(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rrc(self.mmu.read_byte(self.registers.get_hl())))
-        self.registers.reset_c_flag()
+        self.mmu.write_byte(self.registers.get_hl(), self.srl(self.mmu.read_byte(self.registers.get_hl())))
         self.debug('{}: SRL (HL)'.format(hex(self.registers.pc-2)))
         return 16
 
     def inst0xcb3f(self) -> int:
-        self.registers.a = self.rrc(self.registers.a)
-        self.registers.reset_c_flag()
+        self.registers.a = self.srl(self.registers.a)
         self.debug('{}: SRL A'.format(hex(self.registers.pc-2)))
         return 8
 
@@ -3246,6 +3222,48 @@ class InstructionPerformer:
         else:
             self.registers.reset_z_flag()
         return (value >> 1) + bit_out
+
+    def srl(self, value: int) -> int:
+        if value & 0x01 == 0x01:
+            self.registers.set_c_flag()
+        else:
+            self.registers.reset_c_flag()
+        temp = value >> 1
+        if temp == 0:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        return temp & 0xff
+
+    def sra(self, value: int) -> int:
+        if value & 0x01 == 0x01:
+            self.registers.set_c_flag()
+        else:
+            self.registers.reset_c_flag()
+        temp = ( value >> 1 ) | ( value & 0x80 )
+        if temp == 0:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        return temp & 0xff
+
+    def sla(self, value: int) -> int:
+        if value & 0x80 == 0x80:
+            self.registers.set_c_flag()
+        else:
+            self.registers.reset_c_flag()
+        temp = value << 1
+        if temp & 0xff == 0:
+            self.registers.set_z_flag()
+        else:
+            self.registers.reset_z_flag()
+        self.registers.reset_n_flag()
+        self.registers.reset_h_flag()
+        return temp & 0xff
 
     def debug(self, text : str):
         logging.debug('{} [{}]'.format(text,self.registers.__str__()))
