@@ -48,16 +48,16 @@ class Window(Thread):
     def render(self, framebuffer : list):
         self.framebuffer = framebuffer
         t = time.monotonic()
-        fps = 1.0 / (t - self.last)
+        fps = 1.0 / (t - self.last + 0.001)
         self.last = t
         if self.window is not None:
             glutSetWindowTitle('pygb ({} fps)'.format(str(int(fps))).encode())
         self.updated = False
 
     def draw(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
         if not self.updated:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glLoadIdentity()
             glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, self.framebuffer)
             glFlush()
             glutSwapBuffers()
