@@ -179,8 +179,9 @@ class PPU:
                 byte_1 = self.mmu.read_byte(tile_address)
                 byte_2 = self.mmu.read_byte(tile_address + 1)
                 pixelx = 0
-                buffer_addr = line_pixel_offset - scx
+                buffer_addr = (line_pixel_offset - scx)
                 while pixelx < 8:
+                    buffer_addr = buffer_addr & 0xff
                     shift = 0x1 << (7 - pixelx)
                     pixel = 1 if (byte_1 & shift > 0) else 0
                     pixel |= 2 if (byte_2 & shift > 0) else 0
@@ -189,7 +190,7 @@ class PPU:
                     if 0 <= buffer_addr < Window.SCREEN_WIDTH:
                         position = line_width + buffer_addr
                         self.framebuffer[position] = self.rgb(color)
-                        buffer_addr = line_pixel_offset + pixelx - scx
+                        buffer_addr = ( line_pixel_offset + pixelx - scx )  
                 x += 1
         else:
             for i in range(0, Window.SCREEN_WIDTH):
