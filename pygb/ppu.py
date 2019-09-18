@@ -148,7 +148,7 @@ class PPU:
     def render_background(self, line : int):
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
 
-        if self.lcdController.is_background_enabled:
+        if self.lcdController.is_background_enabled():
             # tile and map select
             tiles_select = self.lcdController.select_background_window_map_tile_data()
             map_select = self.lcdController.select_background_map_tile_data()
@@ -180,19 +180,20 @@ class PPU:
                 byte_2 = self.mmu.read_byte(tile_address + 1)
                 pixelx = 0
                 buffer_addr = line_pixel_offset - scx
-                while pixelx < 8 and buffer_addr < Window.SCREEN_WIDTH:
+                while pixelx < 8:
                     shift = 0x1 << (7 - pixelx)
                     pixel = 1 if (byte_1 & shift > 0) else 0
                     pixel |= 2 if (byte_2 & shift > 0) else 0
-                    position = line_width + buffer_addr
                     color = (palette >> (pixel * 2)) & 0x3
-                    self.framebuffer[position] = self.rgb(color)
                     pixelx += 1
-                    buffer_addr = line_pixel_offset + pixelx - scx
+                    if 0 <= buffer_addr < Window.SCREEN_WIDTH:
+                        position = line_width + buffer_addr
+                        self.framebuffer[position] = self.rgb(color)
+                        buffer_addr = line_pixel_offset + pixelx - scx
                 x += 1
         else:
             for i in range(0, Window.SCREEN_WIDTH):
-                self.framebuffer[line_width + i] = 0
+                self.framebuffer[line_width + i] = self.rgb(0)
 
 
     def render_window(self, line : int):
