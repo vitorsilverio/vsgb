@@ -230,13 +230,190 @@ class MBC2(CartridgeType):
 
 class MBC3(CartridgeType):
 
-    def __init__(self, data: list, hasRam: bool, hasBattery: bool, hasTimer: bool):
+     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
         super().__init__(data, hasRam, hasBattery)
-        self.hasTimer = hasTimer
-        logging.warning('MBC3 is not implemented')
+        self.selected_ram_bank = 0
+        self.selected_rom_bank = 1
+        self.memory_model = 0
+        self.cached_rom_bank_for_0x0000 = -1
+        self.cached_ram_bank_for_0x4000 = -1
+        self.ram_write_enabled = False
+
+    def get_rom_bank_for_0x0000(self):
+        if self.cached_rom_bank_for_0x0000 == -1:
+            if self.memory_model == 0:
+                self.cached_rom_bank_for_0x0000 = 0
+            else:
+                bank = self.selected_ram_bank << 5
+                bank %= self.rom_banks
+                self.cached_rom_bank_for_0x0000 = bank
+        return self.cached_rom_bank_for_0x0000
+
+    def get_rom_bank_for_0x4000(self):
+        if self.cached_ram_bank_for_0x4000 == -1:
+            bank = self.selected_rom_bank
+            if bank % 0x20 == 0:
+                bank += 1
+            if self.memory_model == 1:
+                bank &= 0b00011111
+                bank |= (self.selected_ram_bank << 5)
+            bank %= self.rom_banks
+            self.cached_ram_bank_for_0x4000 = bank
+        return self.cached_ram_bank_for_0x4000
+
+    def get_rom_byte(self, bank, address):
+        cartOffset = bank * 0x4000 + address
+        if cartOffset < len(self.data):
+            return self.data[cartOffset]
+        else:
+            return 0xff
+
+    def get_ram_address(self, address):
+        if self.memory_model == 0:
+            return address - 0xa000
+        else:
+            return (self.selected_ram_bank % self.ram_banks) * 0x2000 + (address - 0xa000)
+        
+    def read_rom_byte(self, address : int) -> int:
+        if address < 0x4000:
+            return self.get_rom_byte(self.get_rom_bank_for_0x0000(), address)
+        else:
+            return self.get_rom_byte(self.get_rom_bank_for_0x4000(), address - 0x4000)
+
+    def write_rom_byte(self, address : int, value : int):
+        if address < 0x2000:
+            self.ram_write_enabled = (value & 0b1111) == 0b1010
+            if not self.ram_write_enabled:
+                self.battery.save_ram(self.ram)
+        elif 0x2000 <= address < 0x4000:
+            bank = self.selected_rom_bank & 0b01100000
+            bank = bank | (value & 0b00011111)
+            self.selected_rom_bank  = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x4000 <= address < 0x6000 and self.memory_model == 0:
+            bank = self.selected_rom_bank & 0b00011111
+            bank = bank | ((value & 0b11) << 5)
+            self.selected_rom_bank  = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x4000 <= address < 0x6000 and self.memory_model == 1:
+            bank = value & 0b11
+            self.selected_ram_bank = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x6000 <= address < 0x8000:
+            self.memory_model = value & 1
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        
+    def read_external_ram_byte(self, address : int) -> int:
+        if self.ram_write_enabled:
+            ram_address = self.get_ram_address(address)
+            if ram_address < len(self.ram):
+                return self.ram[ram_address]
+            else:
+                return 0xff
+        else:
+            return 0xff
+
+    def write_external_ram_byte(self, address : int, value : int):
+        if self.ram_write_enabled:
+            ram_address = self.get_ram_address(address)
+            if ram_address < len(self.ram):
+                self.ram[ram_address] = value
 
 class MBC5(CartridgeType):
 
-    def __init__(self, data: list, hasRam: bool, hasBattery: bool):
+     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
         super().__init__(data, hasRam, hasBattery)
-        logging.warning('MBC5 is not implemented')
+        self.selected_ram_bank = 0
+        self.selected_rom_bank = 1
+        self.memory_model = 0
+        self.cached_rom_bank_for_0x0000 = -1
+        self.cached_ram_bank_for_0x4000 = -1
+        self.ram_write_enabled = False
+
+    def get_rom_bank_for_0x0000(self):
+        if self.cached_rom_bank_for_0x0000 == -1:
+            if self.memory_model == 0:
+                self.cached_rom_bank_for_0x0000 = 0
+            else:
+                bank = self.selected_ram_bank << 5
+                bank %= self.rom_banks
+                self.cached_rom_bank_for_0x0000 = bank
+        return self.cached_rom_bank_for_0x0000
+
+    def get_rom_bank_for_0x4000(self):
+        if self.cached_ram_bank_for_0x4000 == -1:
+            bank = self.selected_rom_bank
+            if bank % 0x20 == 0:
+                bank += 1
+            if self.memory_model == 1:
+                bank &= 0b00011111
+                bank |= (self.selected_ram_bank << 5)
+            bank %= self.rom_banks
+            self.cached_ram_bank_for_0x4000 = bank
+        return self.cached_ram_bank_for_0x4000
+
+    def get_rom_byte(self, bank, address):
+        cartOffset = bank * 0x4000 + address
+        if cartOffset < len(self.data):
+            return self.data[cartOffset]
+        else:
+            return 0xff
+
+    def get_ram_address(self, address):
+        if self.memory_model == 0:
+            return address - 0xa000
+        else:
+            return (self.selected_ram_bank % self.ram_banks) * 0x2000 + (address - 0xa000)
+        
+    def read_rom_byte(self, address : int) -> int:
+        if address < 0x4000:
+            return self.get_rom_byte(self.get_rom_bank_for_0x0000(), address)
+        else:
+            return self.get_rom_byte(self.get_rom_bank_for_0x4000(), address - 0x4000)
+
+    def write_rom_byte(self, address : int, value : int):
+        if address < 0x2000:
+            self.ram_write_enabled = (value & 0b1111) == 0b1010
+            if not self.ram_write_enabled:
+                self.battery.save_ram(self.ram)
+        elif 0x2000 <= address < 0x4000:
+            bank = self.selected_rom_bank & 0b01100000
+            bank = bank | (value & 0b00011111)
+            self.selected_rom_bank  = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x4000 <= address < 0x6000 and self.memory_model == 0:
+            bank = self.selected_rom_bank & 0b00011111
+            bank = bank | ((value & 0b11) << 5)
+            self.selected_rom_bank  = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x4000 <= address < 0x6000 and self.memory_model == 1:
+            bank = value & 0b11
+            self.selected_ram_bank = bank
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        elif 0x6000 <= address < 0x8000:
+            self.memory_model = value & 1
+            self.cached_rom_bank_for_0x0000 = -1
+            self.cached_ram_bank_for_0x4000 = -1
+        
+    def read_external_ram_byte(self, address : int) -> int:
+        if self.ram_write_enabled:
+            ram_address = self.get_ram_address(address)
+            if ram_address < len(self.ram):
+                return self.ram[ram_address]
+            else:
+                return 0xff
+        else:
+            return 0xff
+
+    def write_external_ram_byte(self, address : int, value : int):
+        if self.ram_write_enabled:
+            ram_address = self.get_ram_address(address)
+            if ram_address < len(self.ram):
+                self.ram[ram_address] = value
