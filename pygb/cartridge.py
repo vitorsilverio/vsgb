@@ -67,7 +67,7 @@ class Battery:
             pass
 
     def save_ram(self, ram: list):
-        with open(save_file,'wb') as f:
+        with open(self.save_file,'wb') as f:
             for i in range(0,len(ram)):
                 f.write(struct.pack('<B',ram[i]))
 
@@ -230,7 +230,7 @@ class MBC2(CartridgeType):
 
 class MBC3(CartridgeType):
 
-     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
+    def __init__(self, data: list, hasRam: bool, hasBattery: bool, hasTimer: bool):
         super().__init__(data, hasRam, hasBattery)
         self.selected_ram_bank = 0
         self.selected_rom_bank = 1
@@ -325,7 +325,7 @@ class MBC3(CartridgeType):
 
 class MBC5(CartridgeType):
 
-     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
+    def __init__(self, data: list, hasRam: bool, hasBattery: bool):
         super().__init__(data, hasRam, hasBattery)
         self.selected_ram_bank = 0
         self.selected_rom_bank = 1
