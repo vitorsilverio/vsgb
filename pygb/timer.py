@@ -5,9 +5,9 @@ from pygb.interrupt_manager import Interrupt, InterruptManager
 from pygb.io_registers import IO_Registers
 from pygb.mmu import MMU
 
-DIV_INC_TIME = 256 # cycles
-
 class Timer:
+
+    DIV_INC_TIME = 256 # cycles
 
     def __init__(self, mmu : MMU, interruptManager : InterruptManager):
         self.mmu = mmu
@@ -19,7 +19,7 @@ class Timer:
     def tick(self, cycles : int = 0):
         self.div_cycles += cycles
         # incremnt DIV register if its time to
-        if self.div_cycles >= DIV_INC_TIME :
+        if self.div_cycles >= Timer.DIV_INC_TIME :
             self.inc_div_register()
         # update TIMA register
         self.tima.update()
@@ -45,7 +45,7 @@ class Timer:
         div = self.mmu.read_byte(IO_Registers.DIV)
         div = ( div + 1 ) & 0xff
         self.mmu.write_byte(IO_Registers.DIV, div, True)
-        self.div_cycles -= DIV_INC_TIME
+        self.div_cycles -= Timer.DIV_INC_TIME
 
 class Tima:
 
