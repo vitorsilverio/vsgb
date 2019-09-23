@@ -3,8 +3,6 @@
 
 import logging
 from threading import Thread
-import time
-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -26,7 +24,6 @@ class Window(Thread):
         super(Window, self). __init__()
         self.framebuffer = [0xffffffff]*(Window.WINDOW_WIDTH * Window.WINDOW_HEIGHT)
         self.updated = False
-        self.last = time.monotonic()
         self.input = _input
         self.window = None
         
@@ -47,11 +44,6 @@ class Window(Thread):
 
     def render(self, framebuffer : list):
         self.framebuffer = framebuffer
-        t = time.monotonic()
-        fps = 1.0 / (t - self.last + 0.001)
-        self.last = t
-        if self.window is not None:
-            glutSetWindowTitle('pygb ({} fps)'.format(str(int(fps))).encode())
         self.updated = False
 
     def draw(self):
