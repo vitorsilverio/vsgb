@@ -25,23 +25,26 @@ class CPU:
         self.halted = False
         self.stop = False
         self.pc_before_interrupt = 0x0000
-        self.halt_interrupted = False
         self.pending_interrupts_before_halt = 0x00
         
     def step(self):
         self.ticks = 0
         if self.stop:
             return None
+        self.check_halted()
         if self.ime or self.pending_interrupts_before_halt != 0:
             self.serve_interrupt()
         if self.halted:
             self.ticks = 4
-            self.serve_interrupt()
         else:
             instruction = self.fetch_instruction()
             self.perform_instruction(instruction)
         self.timer.tick(self.ticks)
-        
+    
+    def check_halted(self):
+        if self.halted and self.pending_interrupts_before_halt != self.mmu.read_byte(IO_Registers.IF):
+            self.halted = False
+
     def serve_interrupt(self):
         interrupt = self.interruptManager.pending_interrupt()
         if interrupt == Interrupt.INTERRUPT_NONE:
@@ -49,7 +52,6 @@ class CPU:
         self.ime = False
         if self.halted:
             self.halted = False
-            self.halt_interrupted = True
         self.stackManager.push_word(self.registers.pc)
         self.pc_before_interrupt = self.registers.pc
         if_register = self.mmu.read_byte(IO_Registers.IF)
@@ -72,8 +74,7 @@ class CPU:
 
     def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)
-        if not (self.pc_before_interrupt == self.registers.pc and self.halt_interrupted):
-            self.registers.pc += 1
+        self.registers.pc += 1
         if instruction == 0xcb and not prefix:
             return 0xcb00 + self.fetch_instruction(True)
         return instruction
