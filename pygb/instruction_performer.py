@@ -976,8 +976,9 @@ class InstructionPerformer:
         return 8
 
     def inst0x76(self) -> int:
-        self.cpu.pre_halt_interrupt = self.mmu.read_byte(IO_Registers.IF)
         self.cpu.halted = True
+        self.cpu.pending_interrupts_before_halt = self.mmu.read_byte(IO_Registers.IF)
+        print('HALT')
         self.debug('{}: HALT'.format(hex(self.registers.pc-1)))
         return 4
     

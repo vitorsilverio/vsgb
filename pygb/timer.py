@@ -37,6 +37,7 @@ class Timer:
         if tima == 0xff:
             tima = self.mmu.read_byte(IO_Registers.TMA)
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
+            print('request timer')
         else:
             tima += 1
         self.mmu.write_byte(IO_Registers.TIMA, tima, True)

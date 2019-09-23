@@ -23,16 +23,20 @@ class CPU:
         self.ticks = 0
         self.ime = False
         self.halted = False
-        self.pre_halt_interrupt = 0x00
         self.stop = False
+        self.pc_before_interrupt = 0x0000
+        self.halt_interrupted = False
+        self.pending_interrupts_before_halt = 0x00
         
     def step(self):
         self.ticks = 0
-        if self.ime:
+        if self.stop:
+            return None
+        if self.ime or self.pending_interrupts_before_halt != 0:
             self.serve_interrupt()
-            self.halted = False
         if self.halted:
             self.ticks = 4
+            self.serve_interrupt()
         else:
             instruction = self.fetch_instruction()
             self.perform_instruction(instruction)
@@ -41,30 +45,35 @@ class CPU:
     def serve_interrupt(self):
         interrupt = self.interruptManager.pending_interrupt()
         if interrupt == Interrupt.INTERRUPT_NONE:
-            return False
+            return None
         self.ime = False
+        if self.halted:
+            self.halted = False
+            self.halt_interrupted = True
         self.stackManager.push_word(self.registers.pc)
+        self.pc_before_interrupt = self.registers.pc
         if_register = self.mmu.read_byte(IO_Registers.IF)
         if interrupt == Interrupt.INTERRUPT_VBLANK:
-            self.registers.pc = 0x40
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0xFE)
+            self.registers.pc = 0x40 #RST 40H
+            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111110)
         if interrupt == Interrupt.INTERRUPT_LCDSTAT:
-            self.registers.pc = 0x48
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0xFD)
+            self.registers.pc = 0x48 #RST 48H
+            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111101)
         if interrupt == Interrupt.INTERRUPT_TIMER:
-            self.registers.pc = 0x50
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0xFB)
+            self.registers.pc = 0x50 #RST 50H
+            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111011)
         if interrupt == Interrupt.INTERRUPT_SERIAL:
-            self.registers.pc = 0x58
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0xF7)
+            self.registers.pc = 0x58 #RST 58H
+            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11110111)
         if interrupt == Interrupt.INTERRUPT_JOYPAD:
-            self.registers.pc = 0x60
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0xEF)
+            self.registers.pc = 0x60 #RST 60H
+            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11101111)
         self.ticks = 20
 
     def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        if not (self.pc_before_interrupt == self.registers.pc and self.halt_interrupted):
+            self.registers.pc += 1
         if instruction == 0xcb and not prefix:
             return 0xcb00 + self.fetch_instruction(True)
         return instruction
