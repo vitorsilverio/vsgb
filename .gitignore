@@ -7,5 +7,7 @@ dist/
 *.c
 *.so
 *.pyd
+*.sav
+.vscode/
 pygb.log
 main.spec
