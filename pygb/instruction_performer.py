@@ -2080,7 +2080,7 @@ class InstructionPerformer:
     def inst0xcb46(self) -> int:
         self.bit(0, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 0, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb47(self) -> int:
         self.bit(0, self.registers.a)
@@ -2120,7 +2120,7 @@ class InstructionPerformer:
     def inst0xcb4e(self) -> int:
         self.bit(1, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 1, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb4f(self) -> int:
         self.bit(1, self.registers.a)
@@ -2160,7 +2160,7 @@ class InstructionPerformer:
     def inst0xcb56(self) -> int:
         self.bit(2, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 2, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb57(self) -> int:
         self.bit(2, self.registers.a)
@@ -2200,7 +2200,7 @@ class InstructionPerformer:
     def inst0xcb5e(self) -> int:
         self.bit(3, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 3, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb5f(self) -> int:
         self.bit(3, self.registers.a)
@@ -2240,7 +2240,7 @@ class InstructionPerformer:
     def inst0xcb66(self) -> int:
         self.bit(4, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 4, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb67(self) -> int:
         self.bit(4, self.registers.a)
@@ -2280,7 +2280,7 @@ class InstructionPerformer:
     def inst0xcb6e(self) -> int:
         self.bit(5, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 5, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb6f(self) -> int:
         self.bit(5, self.registers.a)
@@ -2320,7 +2320,7 @@ class InstructionPerformer:
     def inst0xcb76(self) -> int:
         self.bit(6, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 6, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb77(self) -> int:
         self.bit(6, self.registers.a)
@@ -2360,7 +2360,7 @@ class InstructionPerformer:
     def inst0xcb7e(self) -> int:
         self.bit(7, self.mmu.read_byte(self.registers.get_hl()))
         self.debug('{}: BIT 7, (HL)'.format(hex(self.registers.pc-2)))
-        return 16
+        return 12
 
     def inst0xcb7f(self) -> int:
         self.bit(7, self.registers.a)
