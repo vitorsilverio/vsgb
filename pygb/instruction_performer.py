@@ -407,8 +407,7 @@ class InstructionPerformer:
 
     def inst0x10(self) -> int:
         self.cpu.stop = True
-        self.registers.pc += 1
-        self.debug('{}: STOP 0'.format(hex(self.registers.pc-2)))
+        self.debug('{}: STOP'.format(hex(self.registers.pc-1)))
         return 4       
     
     def inst0x11(self) -> int:
