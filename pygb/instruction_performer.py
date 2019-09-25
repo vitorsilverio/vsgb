@@ -1447,7 +1447,7 @@ class InstructionPerformer:
         self.debug('{}: CALL {}'.format(hex(self.registers.pc-3), hex(word)))
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = word
-        return 12
+        return 24
     
     def inst0xce(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
