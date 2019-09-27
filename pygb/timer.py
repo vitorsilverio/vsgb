@@ -39,6 +39,7 @@ class Timer:
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
         else:
             tima += 1
+            tima &= 0xff
         self.mmu.write_byte(IO_Registers.TIMA, tima, True)
 
     def inc_div_register(self):
