@@ -40,6 +40,7 @@ class CPU:
             instruction = self.fetch_instruction()
             self.perform_instruction(instruction)
         self.timer.tick(self.ticks)
+        return None
     
     def check_halted(self):
         if self.halted and self.pending_interrupts_before_halt != self.mmu.read_byte(IO_Registers.IF):
@@ -72,6 +73,7 @@ class CPU:
             self.registers.pc = 0x60 #RST 60H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11101111)
         self.ticks += 20
+        return None
 
     def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)

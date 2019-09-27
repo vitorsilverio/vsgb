@@ -62,6 +62,7 @@ class MMU:
             return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
             return self.high_internal_ram[address - 0xff80] & 0xff
+        return 0xff
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff

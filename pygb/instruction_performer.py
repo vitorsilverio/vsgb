@@ -506,8 +506,7 @@ class InstructionPerformer:
         if not self.registers.is_z_flag():
             self.registers.pc += signed_value(byte)
             return 12
-        else:
-            return 8
+        return 8
     
     def inst0x21(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -562,8 +561,7 @@ class InstructionPerformer:
         if self.registers.is_z_flag():
             self.registers.pc += signed_value(byte)
             return 12
-        else:
-            return 8
+        return 8
 
     def inst0x29(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_hl()))
@@ -612,8 +610,7 @@ class InstructionPerformer:
         if not self.registers.is_c_flag():
             self.registers.pc += signed_value(byte)
             return 12
-        else:
-            return 8
+        return 8
     
     def inst0x31(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -664,8 +661,7 @@ class InstructionPerformer:
         if self.registers.is_c_flag():
             self.registers.pc += signed_value(byte)
             return 12
-        else:
-            return 8
+        return 8
 
     def inst0x39(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.sp))
@@ -1370,8 +1366,7 @@ class InstructionPerformer:
         if not self.registers.is_z_flag():
             self.registers.pc = word
             return 16
-        else:
-            return 12
+        return 12
 
     def inst0xc3(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -1387,8 +1382,7 @@ class InstructionPerformer:
             self.stackManager.push_word(self.registers.pc)
             self.registers.pc = word
             return 24
-        else:
-            return 12
+        return 12
     
     def inst0xc5(self) -> int:
         self.stackManager.push_word(self.registers.get_bc())
@@ -1427,8 +1421,7 @@ class InstructionPerformer:
         if self.registers.is_z_flag():
             self.registers.pc = word
             return 16
-        else:
-            return 12
+        return 12
 
     def inst0xcc(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -1438,8 +1431,7 @@ class InstructionPerformer:
             self.stackManager.push_word(self.registers.pc)
             self.registers.pc = word
             return 24
-        else:
-            return 12
+        return 12
 
     def inst0xcd(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -1481,8 +1473,7 @@ class InstructionPerformer:
         if not self.registers.is_c_flag():
             self.registers.pc = word
             return 16
-        else:
-            return 12
+        return 12
 
     def inst0xd4(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -1492,8 +1483,7 @@ class InstructionPerformer:
             self.stackManager.push_word(self.registers.pc)
             self.registers.pc = word
             return 24
-        else:
-            return 12
+        return 12
     
     def inst0xd5(self) -> int:
         self.stackManager.push_word(self.registers.get_de())
@@ -1533,8 +1523,7 @@ class InstructionPerformer:
         if self.registers.is_c_flag():
             self.registers.pc = word
             return 16
-        else:
-            return 12
+        return 12
 
     def inst0xdc(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
@@ -1544,8 +1533,7 @@ class InstructionPerformer:
             self.stackManager.push_word(self.registers.pc)
             self.registers.pc = word
             return 24
-        else:
-            return 12
+        return 12
 
     def inst0xde(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
