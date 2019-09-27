@@ -70,7 +70,6 @@ class PPU:
 
     def exec_oam(self):
         self.modeclock -= PPU.OAM_SCANLINE_TIME
-        self.scanline_transfered = False
         self.mode = PPU.VMRAM_READ_STATE
         self.update_stat_mode()
 
