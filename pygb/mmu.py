@@ -63,7 +63,7 @@ class MMU:
         if 0xff80 <= address < 0x10000:
             return self.high_internal_ram[address - 0xff80] & 0xff
 
-    def write_byte(self, address : int, value : int, hardware_operation : bool = False) -> None:
+    def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
@@ -96,7 +96,7 @@ class MMU:
         elif 0xff80 <= address < 0x10000:
             self.high_internal_ram[address - 0xff80] = value
 
-    def dma_transfer(self, start : int) -> None:
+    def dma_transfer(self, start : int):
         address = start << 8
         if 0x8000 <= address < 0xe000:
             for i in range(0xa0):
@@ -105,7 +105,7 @@ class MMU:
     def read_word(self, address: int) -> int:
         return (self.read_byte(address) | (self.read_byte(address + 1) << 8)) & 0xffff
 
-    def write_word(self, address : int, value : int) -> None:
+    def write_word(self, address : int, value : int):
         value = (value & 0xffff)
         self.write_byte(address, (value & 0xff))
         self.write_byte((address + 1), (value >> 8) & 0xff)

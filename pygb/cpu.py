@@ -27,7 +27,7 @@ class CPU:
         self.pc_before_interrupt = 0x0000
         self.pending_interrupts_before_halt = 0x00
         
-    def step(self) -> None:
+    def step(self):
         self.ticks = 0
         if self.stop:
             return None
@@ -41,12 +41,12 @@ class CPU:
             self.perform_instruction(instruction)
         self.timer.tick(self.ticks)
     
-    def check_halted(self) -> None:
+    def check_halted(self):
         if self.halted and self.pending_interrupts_before_halt != self.mmu.read_byte(IO_Registers.IF):
             self.ticks += 4
             self.halted = False
 
-    def serve_interrupt(self) -> None:
+    def serve_interrupt(self):
         interrupt = self.interruptManager.pending_interrupt()
         if interrupt == Interrupt.INTERRUPT_NONE:
             return None
@@ -80,7 +80,7 @@ class CPU:
             return 0xcb00 + self.fetch_instruction(True)
         return instruction
 
-    def perform_instruction(self, instruction : int) -> None:
+    def perform_instruction(self, instruction : int):
         self.ticks += self.instructionPerformer.perform_instruction(instruction)
 
 
