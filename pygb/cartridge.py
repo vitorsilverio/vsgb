@@ -11,12 +11,11 @@ class Cartridge:
         self.data = []
         size = os.stat(file).st_size
         with open(file,'rb') as f:
-            for i in range(0,size):
+            for i in range(size):
                 self.data.append(struct.unpack('<B', f.read(1))[0])
 
     def rom(self):
         rom_type = self.data[0x147]
-        logging.debug('ROM TYPE: {}'.format(rom_type))
         if rom_type == 0x00:
             return ROM(self.data, False, False)
         if rom_type == 0x01:
@@ -61,14 +60,14 @@ class Battery:
         try:
             size = os.stat(self.save_file).st_size
             with open(self.save_file,'rb') as f:
-                for i in range(0,size):
+                for i in range(size):
                     ram[i] = struct.unpack('<B', f.read(1))[0]
-        except:
+        except Exception:
             pass
 
     def save_ram(self, ram: list):
         with open(self.save_file,'wb') as f:
-            for i in range(0,len(ram)):
+            for i in range(len(ram)):
                 f.write(struct.pack('<B',ram[i]))
 
 class CartridgeType:
@@ -89,7 +88,7 @@ class CartridgeType:
             0x06: 128,
             0x07: 256,
             0x52: 72,
-            0x54: 80,
+            0x53: 80,
             0x54: 96
         }.get(rom_banks_reg, 0)
 
