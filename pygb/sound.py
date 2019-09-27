@@ -24,14 +24,14 @@ class Sound:
         if not self.enabled():
             return
 
-        for i in range(0,4):
+        for i in range(4):
             self.channels[i] = self.allModes[i].step()
 
         selection = self.mmu.read_byte(IO_Registers.NR_51)
         right = 0
         left = 0
 
-        for i in range(0,4):
+        for i in range(4):
             if self.overridenEnabled[i]:
                 continue
             if (selection & (1 << i + 4)) != 0:
