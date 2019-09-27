@@ -35,7 +35,7 @@ class CPU:
         if self.ime or self.pending_interrupts_before_halt != 0:
             self.serve_interrupt()
         if self.halted:
-            self.ticks = 4
+            self.ticks += 4
         else:
             instruction = self.fetch_instruction()
             self.perform_instruction(instruction)
@@ -43,6 +43,7 @@ class CPU:
     
     def check_halted(self):
         if self.halted and self.pending_interrupts_before_halt != self.mmu.read_byte(IO_Registers.IF):
+            self.ticks += 4
             self.halted = False
 
     def serve_interrupt(self):
@@ -70,7 +71,7 @@ class CPU:
         if interrupt == Interrupt.INTERRUPT_JOYPAD:
             self.registers.pc = 0x60 #RST 60H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11101111)
-        self.ticks = 20
+        self.ticks += 20
 
     def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)
@@ -80,7 +81,7 @@ class CPU:
         return instruction
 
     def perform_instruction(self, instruction : int):
-        self.ticks = self.instructionPerformer.perform_instruction(instruction)
+        self.ticks += self.instructionPerformer.perform_instruction(instruction)
 
 
 
