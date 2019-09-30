@@ -127,10 +127,10 @@ class PPU:
 
     def rgb(self, color_code : int) -> int:
         return {
-            0: 0xffffffff,
-            1: 0xffa8a8ff,
-            2: 0xff5555ff,
-            3: 0x000000ff
+             0: 0xfcf6dfff,
+             1: 0xb3ac9aff,
+             2: 0x605f49ff,
+             3: 0x343329ff
         }.get(color_code)
 
     def compare_lylc(self):
