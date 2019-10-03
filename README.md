@@ -9,15 +9,11 @@ A simple gameboy emulator writen in python
   - pyinstaller
   - wheel
   
-## Compiling
-pyinstaller --onefile main.py -n pygb
-The binary file will be in dist directory
 
 ## Running
 The executable will be:
 - **python main.py** if you running directly by python script
-- **pygb** if you compiled the source
-
+* For performance i recommend to use pypy3 instead python3
 
 **executable** -r romfile.gb
 
