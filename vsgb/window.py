@@ -6,10 +6,7 @@ from threading import Thread
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-
-
-
-from pygb.input import Input
+from vsgb.input import Input
 
 
 class Window(Thread):
