@@ -138,10 +138,13 @@ class ROM(CartridgeType):
 # writing to the MBCs Control Registers. 
 class MBC1(CartridgeType):
 
+    ROM_BANKING_MODE = 0x00
+    RAM_BANKING_MODE = 0x01
+
     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
         super().__init__(data, hasRam, hasBattery)
-        self.selected_ram_bank = 0
-        self.selected_rom_bank = 1
+        self.ram_bank = 0
+        self.rom_bank = 1
         self.memory_mode = 0
         self.ram_enabled = False
 
@@ -155,9 +158,11 @@ class MBC1(CartridgeType):
         # This area may contain any of the further 16KByte banks of the ROM, allowing to 
         # address up to 125 ROM Banks (almost 2MByte). As described below, bank numbers 
         # 20h, 40h, and 60h cannot be used, resulting in the odd amount of 125 banks. 
-        if self.selected_rom_bank in [0, 0x20, 0x40, 0x60]:
-            self.selected_rom_bank += 1
-        return self.data[(0x4000 * self.selected_rom_bank) + (address - 0x4000)]
+        if self.rom_bank == 0:
+            self.rom_bank += 1
+        if self.memory_mode == MBC1.ROM_BANKING_MODE and self.rom_bank in [0x20, 0x40, 0x60]:
+            self.rom_bank += 1
+        return self.data[(0x4000 * self.rom_bank) + (address - 0x4000)]
 
     def write_rom_byte(self, address : int, value : int):
         # 0000-1FFF - RAM Enable (Write Only)
@@ -178,20 +183,22 @@ class MBC1(CartridgeType):
         # below to specify the upper ROM Bank bits), the same happens for Bank 20h, 40h, and 60h. Any attempt 
         # to address these ROM Banks will select Bank 21h, 41h, and 61h instead. 
         if 0x2000 <= address <= 0x3fff:
-            self.selected_rom_bank = value & 0b00011111
-            if self.selected_rom_bank in [0, 0x20, 0x40, 0x60]:
-                self.selected_rom_bank += 1
+            self.rom_bank = value & 0b00011111
+            if self.rom_bank == 0:
+                self.rom_bank += 1
+            if self.memory_mode == MBC1.ROM_BANKING_MODE and self.rom_bank in [0x20, 0x40, 0x60]:
+                self.rom_bank += 1
 
         # 4000-5FFF - RAM Bank Number - or - Upper Bits of ROM Bank Number (Write Only)
         # This 2bit register can be used to select a RAM Bank in range from 00-03h, or to specify the upper 
         # two bits (Bit 5-6) of the ROM Bank number, depending on the current ROM/RAM Mode. (See below.) 
         if 0x4000 <= address <= 0x5fff:
-            if self.memory_mode == 1:
-                self.selected_ram_bank = (value & 0b00000011)
-                self.selected_rom_bank = self.selected_rom_bank & 0b00011111
+            if self.memory_mode == MBC1.RAM_BANKING_MODE:
+                self.ram_bank = (value & 0b00000011)
+                self.rom_bank = self.rom_bank & 0b00011111
             else:
-                self.selected_ram_bank = 0
-                self.selected_rom_bank = self.selected_rom_bank | ((value & 0b00000011) << 5)
+                self.ram_bank = 0
+                self.rom_bank = self.rom_bank | ((value & 0b00000011) << 5)
         
         # 6000-7FFF - ROM/RAM Mode Select (Write Only)
         # This 1bit Register selects whether the two bits of the above register should be used as upper 
@@ -210,7 +217,7 @@ class MBC1(CartridgeType):
         # or if the cartridge is removed from the gameboy. Available RAM sizes are: 2KByte (at A000-A7FF), 
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
-            return self.ram[(self.selected_ram_bank * 0x2000) + (address - 0xa000)]
+            return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
         else:
             0xff
 
@@ -221,7 +228,7 @@ class MBC1(CartridgeType):
         # or if the cartridge is removed from the gameboy. Available RAM sizes are: 2KByte (at A000-A7FF), 
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
-            self.ram[(self.selected_ram_bank * 0x2000) + (address - 0xa000)] = value
+            self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
             if self.hasBattery:
                 self.battery.save_ram(self.ram)
         
