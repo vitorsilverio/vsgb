@@ -32,7 +32,7 @@ class Window(Thread):
         glutInitDisplayMode(GLUT_RGBA)
         glutInitWindowSize(Window.WINDOW_WIDTH, Window.WINDOW_HEIGHT)
         glutInitWindowPosition(200, 200)
-        self.window = glutCreateWindow(b'pygb')
+        self.window = glutCreateWindow(b'vsgb')
         glutKeyboardFunc(self._key)
         glutKeyboardUpFunc(self._keyUp)
         glutSpecialFunc(self._spec)

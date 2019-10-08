@@ -1,4 +1,4 @@
-# pygb
+# vsgb
 A simple gameboy emulator writen in python
 
 ## Requirements

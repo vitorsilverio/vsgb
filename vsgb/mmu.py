@@ -3,9 +3,9 @@
 
 import array
 
-from pygb.input import Input
-from pygb.io_registers import IO_Registers
-from pygb.cartridge import ROM
+from vsgb.input import Input
+from vsgb.io_registers import IO_Registers
+from vsgb.cartridge import ROM
 
 class MMU:
 

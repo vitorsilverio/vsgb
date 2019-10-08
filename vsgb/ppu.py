@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.byte_operations import signed_value
-from pygb.interrupt_manager import Interrupt, InterruptManager
-from pygb.io_registers import IO_Registers
-from pygb.mmu import MMU
-from pygb.window import Window
+from vsgb.byte_operations import signed_value
+from vsgb.interrupt_manager import Interrupt, InterruptManager
+from vsgb.io_registers import IO_Registers
+from vsgb.mmu import MMU
+from vsgb.window import Window
 
 class PPU:
 

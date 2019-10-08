@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.mmu import MMU
-from pygb.registers import Registers
+from vsgb.mmu import MMU
+from vsgb.registers import Registers
 
 class StackManager:
 

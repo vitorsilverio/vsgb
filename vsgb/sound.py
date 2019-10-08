@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.interrupt_manager import Interrupt, InterruptManager
-from pygb.io_registers import IO_Registers
-from pygb.mmu import MMU
+from vsgb.interrupt_manager import Interrupt, InterruptManager
+from vsgb.io_registers import IO_Registers
+from vsgb.mmu import MMU
 
 class Sound:
 

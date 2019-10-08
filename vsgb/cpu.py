@@ -3,13 +3,13 @@
 
 import logging
 
-from pygb.interrupt_manager import InterruptManager, Interrupt
-from pygb.instruction_performer import InstructionPerformer
-from pygb.io_registers import IO_Registers
-from pygb.mmu import MMU
-from pygb.registers import Registers
-from pygb.stack_manager import StackManager
-from pygb.timer import Timer
+from vsgb.interrupt_manager import InterruptManager, Interrupt
+from vsgb.instruction_performer import InstructionPerformer
+from vsgb.io_registers import IO_Registers
+from vsgb.mmu import MMU
+from vsgb.registers import Registers
+from vsgb.stack_manager import StackManager
+from vsgb.timer import Timer
 
 class CPU:
 

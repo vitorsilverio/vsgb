@@ -3,8 +3,8 @@
 
 from enum import IntEnum
 
-from pygb.io_registers import IO_Registers
-from pygb.mmu import MMU
+from vsgb.io_registers import IO_Registers
+from vsgb.mmu import MMU
 
 class InterruptManager:
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pygb.cartridge import Cartridge
-from pygb.cpu import CPU
-from pygb.input import Input
-from pygb.interrupt_manager import Interrupt
-from pygb.io_registers import IO_Registers
-from pygb.mmu import MMU
-from pygb.ppu import PPU
-from pygb.sound import Sound
-from pygb.window import Window
+from vsgb.cartridge import Cartridge
+from vsgb.cpu import CPU
+from vsgb.input import Input
+from vsgb.interrupt_manager import Interrupt
+from vsgb.io_registers import IO_Registers
+from vsgb.mmu import MMU
+from vsgb.ppu import PPU
+from vsgb.sound import Sound
+from vsgb.window import Window
 
 class Emulator:
 

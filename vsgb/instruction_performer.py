@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from pygb.byte_operations import signed_value, set_bit, bit_mask
-from pygb.io_registers import IO_Registers
-from pygb.registers import Registers
+from vsgb.byte_operations import signed_value, set_bit, bit_mask
+from vsgb.io_registers import IO_Registers
+from vsgb.registers import Registers
 
 DAATable = [
     0x0080, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700,
