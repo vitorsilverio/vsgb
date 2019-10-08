@@ -69,8 +69,7 @@ class Battery:
 
     def save_ram(self, ram: list):
         with open(self.save_file,'wb') as f:
-            for i in range(len(ram)):
-                f.write(struct.pack('<B',ram[i]))
+            f.write(bytes(ram))
 
 class CartridgeType:
 
@@ -239,7 +238,7 @@ class MBC2(CartridgeType):
         super().__init__(data, False, hasBattery)
         logging.warning('MBC2 is not implemented')
 
-class MBC3(CartridgeType):
+class MBC3(MBC1):
 
     def __init__(self, data: list, hasRam: bool, hasBattery: bool, hasTimer: bool):
         super().__init__(data, hasRam, hasBattery)
