@@ -186,7 +186,7 @@ class MBC1(CartridgeType):
         # This 2bit register can be used to select a RAM Bank in range from 00-03h, or to specify the upper 
         # two bits (Bit 5-6) of the ROM Bank number, depending on the current ROM/RAM Mode. (See below.) 
         if 0x4000 <= address <= 0x5fff:
-            if self.memory_mode == 0:
+            if self.memory_mode == 1:
                 self.selected_ram_bank = (value & 0b00000011)
                 self.selected_rom_bank = self.selected_rom_bank & 0b00011111
             else:
