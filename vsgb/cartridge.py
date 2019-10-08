@@ -132,24 +132,16 @@ class MBC1(CartridgeType):
         self.selected_ram_bank = 0
         self.selected_rom_bank = 1
         self.memory_model = 0
-        self.cached_rom_bank_for_0x0000 = -1
         self.cached_ram_bank_for_0x4000 = -1
         self.ram_write_enabled = False
 
     def get_rom_bank_for_0x0000(self):
-        if self.cached_rom_bank_for_0x0000 == -1:
-            if self.memory_model == 0:
-                self.cached_rom_bank_for_0x0000 = 0
-            else:
-                bank = self.selected_ram_bank << 5
-                bank %= self.rom_banks
-                self.cached_rom_bank_for_0x0000 = bank
-        return self.cached_rom_bank_for_0x0000
+        return 0
 
     def get_rom_bank_for_0x4000(self):
         if self.cached_ram_bank_for_0x4000 == -1:
             bank = self.selected_rom_bank
-            if bank % 0x20 == 0:
+            if bank % 0x20 == 0 or bank == 0:
                 bank += 1
             if self.memory_model == 1:
                 bank &= 0b00011111
@@ -169,7 +161,7 @@ class MBC1(CartridgeType):
         if self.memory_model == 0:
             return address - 0xa000
         else:
-            return (self.selected_ram_bank % self.ram_banks) * 0x2000 + (address - 0xa000)
+            return self.selected_ram_bank * 0x2000 + (address - 0xa000)
         
     def read_rom_byte(self, address : int) -> int:
         if address < 0x4000:
