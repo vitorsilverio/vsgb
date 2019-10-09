@@ -38,9 +38,9 @@ class Input:
                 _input ^= 0b1000
             if self.BUTTON_SELECT:
                 _input ^= 0b0100
-            if self.BUTTON_A:
-                _input ^= 0b0010
             if self.BUTTON_B:
+                _input ^= 0b0010
+            if self.BUTTON_A:
                 _input ^= 0b0001
         elif joyp & 0b00010000 == 0x00:
             if self.BUTTON_DOWN:
