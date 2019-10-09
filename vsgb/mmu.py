@@ -46,12 +46,12 @@ class MMU:
         ])
         self.rom = rom
         self.input = _input
-        self.video_ram = array.array('B', [0x00]*0x2000)
-        self.internal_ram = array.array('B', [0x00]*0x2000)
+        self.vram = array.array('B', [0x00]*0x2000)
+        self.wram = array.array('B', [0x00]*0x2000)
         self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x7f)
         self.io_ports = array.array('B', [0x00]*0x80)
-        self.high_internal_ram = array.array('B', [0x00]*0x80)
+        self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_space = array.array('B', [0x00]*0x60)
         
@@ -61,13 +61,13 @@ class MMU:
         if 0 <= address < 0x8000:
             return self.rom.read_rom_byte(address) & 0xff
         if 0x8000 <= address < 0xa000:
-            return self.video_ram[address - 0x8000] & 0xff
+            return self.vram[address - 0x8000] & 0xff
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
         if 0xc000 <= address < 0xe000:
-            return self.internal_ram[address - 0xc000] & 0xff
+            return self.wram[address - 0xc000] & 0xff
         if 0xe000 <= address < 0xfe00:
-            return self.internal_ram[address - 0xe000] & 0xff #Shadow
+            return self.wram[address - 0xe000] & 0xff #Echo RAM
         if 0xfe00 <= address < 0xfea0:
             return self.oam[address - 0xfe00] & 0xff
         if 0xfea0 <= address < 0xff00:
@@ -77,7 +77,7 @@ class MMU:
                 return self.input.read_input(self.io_ports[0]) & 0xff
             return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
-            return self.high_internal_ram[address - 0xff80] & 0xff
+            return self.hram[address - 0xff80] & 0xff
         return 0xff
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
@@ -85,13 +85,13 @@ class MMU:
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
         elif 0x8000 <= address < 0xa000:
-            self.video_ram[address - 0x8000] = value
+            self.vram[address - 0x8000] = value
         elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
         elif 0xc000 <= address < 0xe000:
-            self.internal_ram[address - 0xc000] = value
+            self.wram[address - 0xc000] = value
         elif 0xe000 <= address < 0xfe00:
-            self.internal_ram[address - 0xe000] = value # Shadow
+            self.wram[address - 0xe000] = value # Echo RAM
         elif 0xfe00 <= address < 0xfea0:
             self.oam[address - 0xfe00] = value
         elif 0xfea0 <= address < 0xff00:
@@ -111,7 +111,7 @@ class MMU:
             else:     
                 self.io_ports[address - 0xff00] = value
         elif 0xff80 <= address < 0x10000:
-            self.high_internal_ram[address - 0xff80] = value
+            self.hram[address - 0xff80] = value
 
     def dma_transfer(self, start : int):
         address = start << 8
