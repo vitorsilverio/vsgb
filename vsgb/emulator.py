@@ -25,8 +25,6 @@ class Emulator:
 
     def run(self):
         while True:
-            if self.input.must_interrupt():
-                self.cpu.interruptManager.request_interrupt(Interrupt.INTERRUPT_JOYPAD)
             self.cpu.step()
             self.ppu.step(self.cpu.ticks)
             if self.ppu.vblank:

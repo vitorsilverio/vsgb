@@ -72,58 +72,45 @@ class Window(Thread):
     def _glkeyboardspecial(self, c, x, y, up):
         if up:
             if c == GLUT_KEY_UP:
-                self.input.buttons['UP'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_UP = False  
             if c == GLUT_KEY_DOWN:
-                self.input.buttons['DOWN'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_DOWN = False
             if c == GLUT_KEY_LEFT:
-                self.input.buttons['LEFT'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_LEFT = False
             if c == GLUT_KEY_RIGHT:
-                self.input.buttons['RIGHT'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_RIGHT = False
+                
         else:
             if c == GLUT_KEY_UP:
-                self.input.buttons['UP'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_UP = True
             if c == GLUT_KEY_DOWN:
-                self.input.buttons['DOWN'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_DOWN = True
             if c == GLUT_KEY_LEFT:
-                self.input.buttons['LEFT'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_LEFT = True
             if c == GLUT_KEY_RIGHT:
-                self.input.buttons['RIGHT'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_RIGHT = True 
 
     def _glkeyboard(self, c, x, y, up):
         if up:
             if c == 'z':
-                self.input.buttons['A'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_A = False
             elif c == 'x':
-                self.input.buttons['B'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_B = False
             elif c == chr(13):
-                self.input.buttons['START'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_START = False
             elif c == chr(8):
-                self.input.buttons['SELECT'] = False
-                self.request_input_interrupt()
+                self.input.BUTTON_SELECT = False
+                
         else:
             if c == 'z':
-                self.input.buttons['A'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_A = True  
             elif c == 'x':
-                self.input.buttons['B'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_B = True  
             elif c == chr(13):
-                self.input.buttons['START'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_START = True
             elif c == chr(8):
-                self.input.buttons['SELECT'] = True
-                self.request_input_interrupt()
+                self.input.BUTTON_SELECT = True
+                
 
 
          

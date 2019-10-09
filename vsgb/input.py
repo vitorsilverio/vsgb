@@ -22,45 +22,34 @@
 class Input:
 
     def __init__(self):
-        self.buttons = {
-            'A': False,
-            'B': False,
-            'START': False,
-            'SELECT': False,
-            'UP': False,
-            'DOWN': False,
-            'LEFT': False,
-            'RIGHT': False
-        }
-        self._interrupt = False
-
-    def must_interrupt(self):
-        must_interrupt = self._interrupt 
-        self._interrupt = False
-        return must_interrupt
-
-    def request_interrupt(self):
-        self._interrupt = True
+        self.BUTTON_A = False
+        self.BUTTON_B = False
+        self.BUTTON_START = False
+        self.BUTTON_SELECT = False
+        self.BUTTON_UP = False
+        self.BUTTON_DOWN = False
+        self.BUTTON_LEFT = False
+        self.BUTTON_RIGHT = False
 
     def read_input(self, joyp : int) -> int:
         _input = 0x0f
-        if joyp & 0x20 == 0x00:
-            if self.buttons['START']:
-                _input ^= 0x08
-            if self.buttons['SELECT']:
-                _input ^= 0x04
-            if self.buttons['A']:
-                _input ^= 0x01
-            if self.buttons['B']:
-                _input ^= 0x02
-        elif joyp & 0x10 == 0x00:
-            if self.buttons['UP']:
-                _input ^= 0x04
-            if self.buttons['DOWN']:
-                _input ^= 0x08
-            if self.buttons['LEFT']:
-                _input ^= 0x02
-            if self.buttons['RIGHT']:
-                _input ^= 0x01
+        if joyp & 0b00100000 == 0x00:
+            if self.BUTTON_START:
+                _input ^= 0b1000
+            if self.BUTTON_SELECT:
+                _input ^= 0b0100
+            if self.BUTTON_A:
+                _input ^= 0b0010
+            if self.BUTTON_B:
+                _input ^= 0b0001
+        elif joyp & 0b00010000 == 0x00:
+            if self.BUTTON_DOWN:
+                _input ^= 0b1000
+            if self.BUTTON_UP:
+                _input ^= 0b0100
+            if self.BUTTON_LEFT:
+                _input ^= 0b0010
+            if self.BUTTON_RIGHT:
+                _input ^= 0b0001
 
         return ((0xf0 & joyp) | _input) & 0b00111111
