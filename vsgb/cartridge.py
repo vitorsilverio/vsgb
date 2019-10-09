@@ -66,7 +66,7 @@ class Battery:
             return ram
         except FileNotFoundError:
             # File will be generated when saving
-            pass
+            return ram
 
 
     def save_ram(self, ram: list):
