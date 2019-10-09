@@ -55,7 +55,6 @@ class Cartridge:
 class Battery:
 
     def __init__(self, save_file: str):
-        self.ram = []
         self.save_file = save_file
 
     def load_ram(self, ram: list):
@@ -64,8 +63,11 @@ class Battery:
             with open(self.save_file,'rb') as f:
                 for i in range(size):
                     ram[i] = struct.unpack('<B', f.read(1))[0]
-        except Exception:
+            return ram
+        except FileNotFoundError:
+            # File will be generated when saving
             pass
+
 
     def save_ram(self, ram: list):
         with open(self.save_file,'wb') as f:
@@ -102,12 +104,12 @@ class CartridgeType:
             0x04: 16
         }.get(ram_banks_reg, 0)
 
-        self.ram = [0x00] * (0x2000 * self.ram_banks)
+        self.ram = [0xff] * (0x2000 * self.ram_banks)
 
         if self.hasBattery:
             save_file_name = bytes(self.data[0x0134:0x0143]).decode().rstrip('\x00')+".sav"
             self.battery = Battery(save_file_name)
-            self.battery.load_ram(self.ram)
+            self.ram = self.battery.load_ram(self.ram)
 
 
     def read_rom_byte(self, address : int) -> int:
