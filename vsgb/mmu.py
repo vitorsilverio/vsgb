@@ -99,7 +99,7 @@ class MMU:
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
-                    self.io_ports[address - 0xff00] = value | 0xf
+                    self.io_ports[address - 0xff00] = value & 0b00110000
                 elif address == IO_Registers.DIV: # Reset div register
                     self.io_ports[address - 0xff00] = 0x00
                 elif address == IO_Registers.DMA: # Start dma transfer
