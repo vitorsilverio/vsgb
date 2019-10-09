@@ -176,6 +176,8 @@ class MBC1(CartridgeType):
         # Practically any value with 0Ah in the lower 4 bits enables RAM, and any other value disables RAM.
         if 0x0000 <= address <= 0x1fff:
             self.ram_enabled = (value & 0x0f == 0x0a)
+            if self.hasBattery and not self.ram_enabled:
+                self.battery.save_ram(self.ram)
 
         # 2000-3FFF - ROM Bank Number (Write Only)
         # Writing to this address space selects the lower 5 bits of the ROM Bank Number (in range 01-1Fh). 
@@ -230,8 +232,6 @@ class MBC1(CartridgeType):
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
             self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
-            if self.hasBattery:
-                self.battery.save_ram(self.ram)
         
 
 class MBC2(CartridgeType):
