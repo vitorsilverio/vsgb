@@ -154,8 +154,8 @@ class PPU:
     def rgb(self, color_code : int) -> int:
         return {
              0: 0xfcf6dfff,
-             1: 0xb3ac9aff,
-             2: 0x605f49ff,
+             1: 0x605f49ff,
+             2: 0xb3ac9aff,
              3: 0x343329ff
         }.get(color_code)
 
@@ -228,6 +228,7 @@ class PPU:
         # if the LCDC window enable bit flag is not set
         if self.window_line > 143 or not self.lcdControlRegister.window_display_enable():
             return
+
         window_pos_x = self.mmu.read_byte(IO_Registers.WX) - 7
         window_pos_y = self.mmu.read_byte(IO_Registers.WY)
 

@@ -52,4 +52,4 @@ class Input:
             if self.BUTTON_RIGHT:
                 _input ^= 0b0001
 
-        return ((0xf0 & joyp) | _input) & 0b00111111
+        return ((0b00110000 & joyp) | _input)
