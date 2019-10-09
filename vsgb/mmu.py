@@ -46,14 +46,14 @@ class MMU:
         ])
         self.rom = rom
         self.input = _input
-        self.vram = array.array('B', [0x00]*0x2000)
-        self.wram = array.array('B', [0x00]*0x2000)
-        self.oam = array.array('B', [0x00]*0xa0)
-        self.zero_page = array.array('B', [0x00]*0x7f)
-        self.io_ports = array.array('B', [0x00]*0x80)
-        self.hram = array.array('B', [0x00]*0x80)
+        self.vram = array.array('B', [0xff]*0x2000)
+        self.wram = array.array('B', [0xff]*0x2000)
+        self.oam = array.array('B', [0xff]*0xa0)
+        self.zero_page = array.array('B', [0xff]*0x7f)
+        self.io_ports = array.array('B', [0xff]*0x80)
+        self.hram = array.array('B', [0xff]*0x80)
         self.bootstrap_enabled = True
-        self.unusable_memory_space = array.array('B', [0x00]*0x60)
+        self.unusable_memory_space = array.array('B', [0xff]*0x60)
         
     def read_byte(self, address: int) -> int:
         if 0 <= address < 0x100 and self.bootstrap_enabled:
