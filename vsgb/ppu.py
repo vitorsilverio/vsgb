@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Documentation source:
+# - https://gbdev.gg8.se/wiki/articles/Video_Display
+
 from vsgb.byte_operations import signed_value
 from vsgb.interrupt_manager import Interrupt, InterruptManager
 from vsgb.io_registers import IO_Registers
@@ -112,6 +115,29 @@ class PPU:
             self.render_sprite(line)
 
     def update_stat_mode(self):
+        # LCD Status Register
+        # FF41 - STAT - LCDC Status (R/W)
+        # -------------------------------
+        # Bit 6 - LYC=LY Coincidence Interrupt (1=Enable) (Read/Write)
+        # Bit 5 - Mode 2 OAM Interrupt         (1=Enable) (Read/Write)
+        # Bit 4 - Mode 1 V-Blank Interrupt     (1=Enable) (Read/Write)
+        # Bit 3 - Mode 0 H-Blank Interrupt     (1=Enable) (Read/Write)
+        # Bit 2 - Coincidence Flag  (0:LYC<>LY, 1:LYC=LY) (Read Only)
+        # Bit 1-0 - Mode Flag       (Mode 0-3, see below) (Read Only)
+        #   0: During H-Blank
+        #   1: During V-Blank
+        #   2: During Searching OAM
+        #   3: During Transferring Data to LCD Driver
+
+        # The two lower STAT bits show the current status of the LCD controller.
+        # The LCD controller operates on a 222 Hz = 4.194 MHz dot clock. An entire frame is 154 scanlines, 70224 dots, or 16.74 ms. On scanlines 0 through 143, the LCD controller cycles through modes 2, 3, and 0 once every 456 dots. Scanlines 144 through 153 are mode 1.
+        # The following are typical when the display is enabled: 
+
+        # Mode 2  2_____2_____2_____2_____2_____2___________________2____
+        # Mode 3  _33____33____33____33____33____33__________________3___
+        # Mode 0  ___000___000___000___000___000___000________________000
+        # Mode 1  ____________________________________11111111111111_____
+
         stat = self.mmu.read_byte(IO_Registers.STAT)
         new_stat = (stat & 0xfc) | (self.mode & 0x3)
         self.mmu.write_byte(IO_Registers.STAT, new_stat)
