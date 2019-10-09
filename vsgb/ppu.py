@@ -27,7 +27,7 @@ class PPU:
     def __init__(self, mmu : MMU, interruptManager : InterruptManager):
         self.mmu = mmu
         self.interruptManager = interruptManager
-        self.lcdController = LCDController(self.mmu)
+        self.lcdControlRegister = LCDControlRegister(self.mmu)
         self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
         self.modeclock = 0
@@ -40,7 +40,7 @@ class PPU:
         self.vblank = False
         self.modeclock += cycles
         self.auxillary_modeclock += cycles
-        if self.lcdController.is_screen_enabled():
+        if self.lcdControlRegister.lcd_display_enable():
             if self.screen_enabled:
                 if self.mode == PPU.H_BLANK_STATE:
                     if self.modeclock >= PPU.H_BLANK_TIME:
@@ -160,7 +160,7 @@ class PPU:
         }.get(color_code)
 
     def compare_lylc(self):
-      if self.lcdController.is_screen_enabled():
+      if self.lcdControlRegister.lcd_display_enable():
             lyc = self.mmu.read_byte(IO_Registers.LYC)
             stat = self.mmu.read_byte(IO_Registers.STAT)
 
@@ -173,10 +173,10 @@ class PPU:
     def render_background(self, line : int):
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
 
-        if self.lcdController.is_background_enabled():
+        if self.lcdControlRegister.bg_window_display_priority():
             # tile and map select
-            tiles_select = self.lcdController.select_background_window_map_tile_data()
-            map_select = self.lcdController.select_background_map_tile_data()
+            tiles_select = self.lcdControlRegister.bg_and_window_tile_data_select()
+            map_select = self.lcdControlRegister.bg_tile_map_display_select()
             # x pixel offset
             scx = self.mmu.read_byte(IO_Registers.SCX)
             # y pixel offset
@@ -226,7 +226,7 @@ class PPU:
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
         # dont render if the window is outside the bounds of the screen or
         # if the LCDC window enable bit flag is not set
-        if self.window_line > 143 or not self.lcdController.is_window_enabled():
+        if self.window_line > 143 or not self.lcdControlRegister.window_display_enable():
             return
         window_pos_x = self.mmu.read_byte(IO_Registers.WX) - 7
         window_pos_y = self.mmu.read_byte(IO_Registers.WY)
@@ -235,8 +235,8 @@ class PPU:
         if window_pos_x > 159 or window_pos_y > 143 or window_pos_y > line:
             return 
 
-        tiles_select = self.lcdController.select_background_window_map_tile_data()
-        map_select = self.lcdController.select_window_map()
+        tiles_select = self.lcdControlRegister.bg_and_window_tile_data_select()
+        map_select = self.lcdControlRegister.window_tile_map_display_select()
 
         line_adjusted = self.window_line
         y_offset = int(line_adjusted / 8) * 32
@@ -281,10 +281,10 @@ class PPU:
 
     def render_sprite(self, line : int):
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
-        if not self.lcdController.is_sprite_enabled():
+        if not self.lcdControlRegister.sprite_display_enable():
             return
 
-        sprite_size = self.lcdController.sprite_size()
+        sprite_size = self.lcdControlRegister.sprite_size()
 
         for sprite in range(39,-1,-1):
             sprite_offset = sprite * 4
@@ -342,7 +342,7 @@ class PPU:
                 self.framebuffer[position] = self.rgb(pixel)
 
 
-class LCDController:
+class LCDControlRegister:
 
     # LCD Control Register
     # Bit 7 - LCD Display Enable             (0=Off, 1=On)
@@ -360,27 +360,27 @@ class LCDController:
     def lcdc_status(self) -> int:
         return self.mmu.read_byte(IO_Registers.LCDC)
 
-    def is_screen_enabled(self) -> bool:
+    def lcd_display_enable(self) -> bool:
         return self.lcdc_status() & 0b10000000 == 0b10000000
 
-    def select_window_map(self) -> int:
+    def window_tile_map_display_select(self) -> int:
         return 0x9c00 if self.lcdc_status() & 0b01000000 == 0b01000000 else 0x9800
 
-    def is_window_enabled(self) -> bool:
+    def window_display_enable(self) -> bool:
         return self.lcdc_status() & 0b00100000 == 0b00100000
 
-    def select_background_window_map_tile_data(self) -> int:
+    def bg_and_window_tile_data_select(self) -> int:
         return 0x8000 if self.lcdc_status() & 0b00010000 == 0b00010000 else 0x8800
 
-    def select_background_map_tile_data(self) -> int:
+    def bg_tile_map_display_select(self) -> int:
         return 0x9c00 if self.lcdc_status() & 0b00001000 == 0b00001000 else 0x9800
 
     def sprite_size(self) -> int:
         return 16 if self.lcdc_status() & 0b00000100 == 0b00000100 else 8
 
-    def is_sprite_enabled(self) -> bool:
+    def sprite_display_enable(self) -> bool:
         return self.lcdc_status() & 0b00000010 == 0b00000010 
 
-    def is_background_enabled(self) -> bool:
+    def bg_window_display_priority(self) -> bool:
         return self.lcdc_status() & 0b00000001 == 0b00000001
     
