@@ -18,3 +18,7 @@ The executable will be:
 - **-r/--rom** Specify the rom file
 - **-d/--debug** Set logging to DEBUG and output to file
 - **-s/--skip** Skip boot rom, let me directly to rom
+
+## Coverage
+- vsgb passed all cpu instruction tests
+- ![](./screenshots/cpu_inst_tests.png)
