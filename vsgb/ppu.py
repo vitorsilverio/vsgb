@@ -210,7 +210,7 @@ class PPU:
             return 
 
         tiles_select = self.lcdController.select_background_window_map_tile_data()
-        map_select = self.lcdController.select_background_map_tile_data()
+        map_select = self.lcdController.select_window_map()
 
         line_adjusted = self.window_line
         y_offset = int(line_adjusted / 8) * 32
@@ -318,6 +318,16 @@ class PPU:
 
 class LCDController:
 
+    # LCD Control Register
+    # Bit 7 - LCD Display Enable             (0=Off, 1=On)
+    # Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+    # Bit 5 - Window Display Enable          (0=Off, 1=On)
+    # Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)
+    # Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)
+    # Bit 2 - OBJ (Sprite) Size              (0=8x8, 1=8x16)
+    # Bit 1 - OBJ (Sprite) Display Enable    (0=Off, 1=On)
+    # Bit 0 - BG/Window Display/Priority     (0=Off, 1=On)
+
     def __init__(self, mmu : MMU):
         self.mmu = mmu
 
@@ -325,26 +335,26 @@ class LCDController:
         return self.mmu.read_byte(IO_Registers.LCDC)
 
     def is_screen_enabled(self) -> bool:
-        return self.lcdc_status() & 0x80 == 0x80
+        return self.lcdc_status() & 0b10000000 == 0b10000000
 
     def select_window_map(self) -> int:
-        return 1 if self.lcdc_status() & 0x40 == 0x40 else 0
+        return 0x9c00 if self.lcdc_status() & 0b01000000 == 0b01000000 else 0x9800
 
     def is_window_enabled(self) -> bool:
-        return self.lcdc_status() & 0x20 == 0x20
+        return self.lcdc_status() & 0b00100000 == 0b00100000
 
     def select_background_window_map_tile_data(self) -> int:
-        return 0x8000 if self.lcdc_status() & 0x10 == 0x10 else 0x8800
+        return 0x8000 if self.lcdc_status() & 0b00010000 == 0b00010000 else 0x8800
 
     def select_background_map_tile_data(self) -> int:
-        return 0x9c00 if self.lcdc_status() & 0x8 == 0x8 else 0x9800
+        return 0x9c00 if self.lcdc_status() & 0b00001000 == 0b00001000 else 0x9800
 
     def sprite_size(self) -> int:
-        return 16 if self.lcdc_status() & 0x4 == 0x4 else 8
+        return 16 if self.lcdc_status() & 0b00000100 == 0b00000100 else 8
 
     def is_sprite_enabled(self) -> bool:
-        return self.lcdc_status() & 0x2 == 0x2 
+        return self.lcdc_status() & 0b00000010 == 0b00000010 
 
     def is_background_enabled(self) -> bool:
-        return self.lcdc_status() & 0x1 == 0x1
+        return self.lcdc_status() & 0b00000001 == 0b00000001
     
