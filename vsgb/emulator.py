@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.input import Input
@@ -8,7 +9,6 @@ from vsgb.interrupt_manager import Interrupt
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.ppu import PPU
-from vsgb.sound import Sound
 from vsgb.window import Window
 
 class Emulator:
@@ -19,7 +19,7 @@ class Emulator:
         self.mmu = MMU(self.cartridge.rom(), self.input) 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
-        self.sound = Sound(self.mmu, self.cpu.interruptManager)
+        self.apu = APU(self.mmu)
         self.window = Window(self.input)
         self.window.start()
 
@@ -29,7 +29,7 @@ class Emulator:
             self.ppu.step(self.cpu.ticks)
             if self.ppu.vblank:
                 self.window.render(self.ppu.framebuffer)
-            self.sound.step()
+            self.apu.step()
 
     def skip_boot_rom(self):
         self.cpu.registers.pc = 0x0100
