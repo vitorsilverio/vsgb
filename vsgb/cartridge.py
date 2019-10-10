@@ -5,6 +5,7 @@
 # - https://gbdev.gg8.se/wiki/articles/The_Cartridge_Header
 # - https://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers
 
+import datetime
 import logging
 import os
 import struct
@@ -388,11 +389,109 @@ class MBC2(CartridgeType):
 # Beside for the ability to access up to 2MB ROM (128 banks), and 64KB RAM (8 banks), the MBC3 also includes 
 # a built-in Real Time Clock (RTC). The RTC requires an external 32.768 kHz Quartz Oscillator, and an external 
 # battery (if it should continue to tick when the gameboy is turned off).
-class MBC3(MBC1):
+class MBC3(CartridgeType):
 
     def __init__(self, data: list, hasRam: bool, hasBattery: bool, hasTimer: bool):
         super().__init__(data, hasRam, hasBattery)
-        logging.warning('MBC3 is not implemented')
+        self.ram_bank = 0
+        self.rom_bank = 1
+        self.ram_enabled = False
+        self.has_timer = hasTimer
+        self.rtc_register_mode = False
+        self.rtc_register_selected = 0
+      
+    def read_rom_byte(self, address : int) -> int:
+        # 0000-3FFF - ROM Bank 00 (Read Only)
+        # Same as for MBC1. 
+        if address < 0x4000:
+            return self.data[address]
+        # 4000-7FFF - ROM Bank 01-7F (Read Only)
+        # Same as for MBC1, except that accessing banks 20h, 40h, and 60h is supported now
+        if self.rom_bank == 0:
+            self.rom_bank += 1
+        return self.data[(0x4000 * self.rom_bank) + (address - 0x4000)]
+
+    def write_rom_byte(self, address : int, value : int):
+        # 0000-1FFF - RAM and Timer Enable (Write Only)
+        # Mostly the same as for MBC1, a value of 0Ah will enable reading and writing to external RAM - and to 
+        # the RTC Registers! A value of 00h will disable either. 
+        if 0x0000 <= address <= 0x1fff:
+            self.ram_enabled = (value & 0x0f == 0x0a)
+            if self.hasBattery and not self.ram_enabled:
+                self.battery.save_ram(self.ram)
+
+        # 2000-3FFF - ROM Bank Number (Write Only)
+        # Same as for MBC1, except that the whole 7 bits of the ROM Bank Number are written directly to this address. 
+        # As for the MBC1, writing a value of 00h, will select Bank 01h instead. All other values 01-7Fh select the 
+        # corresponding ROM Banks. 
+        if 0x2000 <= address <= 0x3fff:
+            self.rom_bank = value & 0b01111111
+            if self.rom_bank == 0:
+                self.rom_bank += 1
+
+        # 4000-5FFF - RAM Bank Number - or - RTC Register Select (Write Only)
+        # As for the MBC1s RAM Banking Mode, writing a value in range for 00h-07h maps the corresponding external 
+        # RAM Bank (if any) into memory at A000-BFFF. When writing a value of 08h-0Ch, this will map the corresponding 
+        # RTC register into memory at A000-BFFF. That register could then be read/written by accessing any address in 
+        # that area, typically that is done by using address A000. 
+        if 0x4000 <= address <= 0x5fff:
+            if 0x08 <= value <= 0x0c:
+                self.rtc_register_mode = True
+                self.rtc_register_selected = value
+            elif 0x00 <= value <= 0x07:
+                self.rtc_register_mode = False
+                self.ram_bank = value
+
+        
+        # 6000-7FFF - Latch Clock Data (Write Only)
+        # When writing 00h, and then 01h to this register, the current time becomes latched into the RTC registers. 
+        # The latched data will not change until it becomes latched again, by repeating the write 00h->01h procedure. 
+        # This is supposed for <reading> from the RTC registers. This can be proven by reading the latched (frozen) time 
+        # from the RTC registers, and then unlatch the registers to show the clock itself continues to tick in background. 
+        if 0x6000 <= address <= 0x7fff:
+            pass #unimplemented latch clock
+        
+    def read_external_ram_byte(self, address : int) -> int:
+        # A000-BFFF - RAM Bank 00-07, if any (Read/Write)
+        # A000-BFFF - RTC Register 08-0C (Read/Write)
+        # Depending on the current Bank Number/RTC Register selection (see below), this memory space is used to access 
+        # an 8KByte external RAM Bank, or a single RTC Register.
+        if self.has_timer and self.rtc_register_mode:
+            now = datetime.datetime.now()
+            # The Clock Counter Registers
+            # 08h  RTC S   Seconds   0-59 (0-3Bh)
+            # 09h  RTC M   Minutes   0-59 (0-3Bh)
+            # 0Ah  RTC H   Hours     0-23 (0-17h)
+            # 0Bh  RTC DL  Lower 8 bits of Day Counter (0-FFh)
+            # 0Ch  RTC DH  Upper 1 bit of Day Counter, Carry Bit, Halt Flag
+            #       Bit 0  Most significant bit of Day Counter (Bit 8)
+            #       Bit 6  Halt (0=Active, 1=Stop Timer)
+            #       Bit 7  Day Counter Carry Bit (1=Counter Overflow)
+            if self.rtc_register_selected == 0x08:
+                return now.second & 0xff
+            if self.rtc_register_selected == 0x09:
+                return now.minute & 0xff
+            if self.rtc_register_selected == 0x0a:
+                return now.hour & 0xff
+            if self.rtc_register_selected == 0x0b:
+                return 0xff #unimplemented
+            if self.rtc_register_selected == 0x0c:
+                return 0x00 #unimplemented
+
+        if self.ram_enabled:
+            return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
+        else:
+            0xff
+
+    def write_external_ram_byte(self, address : int, value : int):
+        # A000-BFFF - RAM Bank 00-07, if any (Read/Write)
+        # A000-BFFF - RTC Register 08-0C (Read/Write)
+        # Depending on the current Bank Number/RTC Register selection (see below), this memory space is used to access 
+        # an 8KByte external RAM Bank, or a single RTC Register.
+        if self.has_timer and self.rtc_register_mode:
+            pass #Unimplmented
+        elif self.ram_enabled:
+            self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
 
 
 # MBC5 (max 8MByte ROM and/or 128KByte RAM)
