@@ -68,7 +68,7 @@ class CartridgeHeader:
     # 0147 - Cartridge Type
     # Specifies which Memory Bank Controller (if any) is used in the cartridge, and if further external 
     # hardware exists in the cartridge. 
-    #  00h  ROM ONLY                 19h  MBC5
+    # 00h  ROM ONLY                 19h  MBC5
     # 01h  MBC1                     1Ah  MBC5+RAM
     # 02h  MBC1+RAM                 1Bh  MBC5+RAM+BATTERY
     # 03h  MBC1+RAM+BATTERY         1Ch  MBC5+RUMBLE
@@ -258,10 +258,13 @@ class CartridgeType:
         pass
 
     def read_external_ram_byte(self, address : int) -> int:
-        return 0x00
+        if self.hasRam:
+            return self.ram[address - 0xa000]
+        return 0xff
 
     def write_external_ram_byte(self, address : int, value : int):
-        pass
+        if self.hasRam:
+            self.ram[address - 0xa000] = value 
 
 # None (32KByte ROM only)
 # Small games of not more than 32KBytes ROM do not require a MBC chip 
@@ -474,7 +477,7 @@ class MBC3(CartridgeType):
             if self.rtc_register_selected == 0x0a:
                 return now.hour & 0xff
             if self.rtc_register_selected == 0x0b:
-                return 0xff #unimplemented
+                return now.timetuple().tm_yday
             if self.rtc_register_selected == 0x0c:
                 return 0x00 #unimplemented
 
@@ -489,7 +492,7 @@ class MBC3(CartridgeType):
         # Depending on the current Bank Number/RTC Register selection (see below), this memory space is used to access 
         # an 8KByte external RAM Bank, or a single RTC Register.
         if self.has_timer and self.rtc_register_mode:
-            pass #Unimplmented
+            pass #unimplemented
         elif self.ram_enabled:
             self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
 
