@@ -53,75 +53,77 @@ boot_rom  = array.array('B', [
         0x21, 0x2f, 0x99, # LD HL,$992f         ; $0045
                 # Addr_0048:
         0x0e, 0x0c,       # LD C,$0c            ; $0048 
-        0x3d, 0x28, 0x08, 0x32, 0x0d, 0x20,
                 # Addr_004A:
-        0xf9,             # DEC A               ; $004a
-        0x2e, 0x0f,       # JR Z, Addr_0055     ; $004b 
-        0x18,             # LD (HL-),A          ; $004d 
-        0xf3,             # DEC C               ; $004e 
+        0x3d,             # DEC A               ; $004a
+        0x28, 0x08,       # JR Z, Addr_0055	    ; $004b
+        0x32,             # LD (HL-),A          ; $004d 
+        0x0d,             # DEC C               ; $004e 
+        0x20, 0xf9,       # JR NZ, Addr_004A    ; $004f
+        0x2e, 0x0f,       # LD L,$0f		    ; $0051 
+        0x18, 0xf3,       # JR Addr_0048        ; $0053 
         # ; === Scroll logo on screen, and play logo sound===
-                # Addr_004F
-        0x67,             # LD H,A              ; $004f  Initialize scroll count, H=0
-        0x3e, 0x64,       # LD A,$64            ; $0050
-        0x57,             # LD D,A              ; $0051  set loop count, D=$64
-        0xe0, 0x42,       # LD ($FF00+$42),A	; $0052  Set vertical scroll register 
-        0x3e, 0x91,       # LD A,$91            ; $0054 
-        0xe0, 0x40,       # LD ($FF00+$40),A    ; $0056  Turn on LCD, showing Background 
-        0x04,             # INC B               ; $0058  Set B=1
-                # Addr_005A:
-        0x1e, 0x02,       # LD E,$02            ; $005a
-                # Addr_005C:
-        0x0e, 0x0c,       # LD C,$0c            ; $005c 
-        0xf0, 0x44,       # LD A,($FF00+$44)    ; $005e  wait for screen frame 
-        0xfe, 0x90,       # CP $90              ; $0060
-        0x20, 0xfa,       # JR NZ, Addr_005C    ; $0062 
-        0x0d,             # DEC C               ; $0064
-        0x20, 0xf7,       # JR NZ, Addr_005C    ; $0065
-        0x1d,             # DEC E               ; $0067
-        0x20, 0xf2,       # JR NZ, Addr_005A	; $0068
-        0x0e, 0x13,       # LD C,$13            ; $006a
-        0x24,             # INC H               ; $006c  increment scroll count
-        0x7c,             # LD A,H              ; $006d
-        0x1e, 0x83,       # LD E,$83            ; $006e 
-        0xfe, 0x62,       # CP $62              ; $0070  $62 counts in, play sound #1
-        0x28, 0x06,       # JR Z, Addr_007A     ; $0072
-        0x1e, 0xc1,       # LD E,$c1            ; $0074
-        0xfe, 0x64,       # CP $64              ; $0076 
-        0x20, 0x06,       # JR NZ, Addr_0080    ; $0078
-                # Addr_007A:
-        0x7b,             # LD A,E              ; $007a  play sound 
-        0xe2,             # LD ($FF00+C),A      ; $007b     
-        0x0c,             # INC C               ; $007c
-        0x3e, 0x87,       # LD A,$87            ; $007d
-        0xe2,             # LD ($FF00+C),A      ; $007f
+                # Addr_0055
+        0x67,             # LD H,A              ; $0055  Initialize scroll count, H=0
+        0x3e, 0x64,       # LD A,$64            ; $0056
+        0x57,             # LD D,A              ; $0058  set loop count, D=$64
+        0xe0, 0x42,       # LD ($FF00+$42),A	; $0059  Set vertical scroll register 
+        0x3e, 0x91,       # LD A,$91            ; $005b 
+        0xe0, 0x40,       # LD ($FF00+$40),A    ; $005d  Turn on LCD, showing Background 
+        0x04,             # INC B               ; $005f  Set B=1
+                # Addr_0060:
+        0x1e, 0x02,       # LD E,$02            ; $0060
+                # Addr_0062:
+        0x0e, 0x0c,       # LD C,$0c            ; $0062 
+        0xf0, 0x44,       # LD A,($FF00+$44)    ; $0064  wait for screen frame 
+        0xfe, 0x90,       # CP $90              ; $0066
+        0x20, 0xfa,       # JR NZ, Addr_0064    ; $0068 
+        0x0d,             # DEC C               ; $006a
+        0x20, 0xf7,       # JR NZ, Addr_0064    ; $006b
+        0x1d,             # DEC E               ; $006d
+        0x20, 0xf2,       # JR NZ, Addr_0062	; $006e
+        0x0e, 0x13,       # LD C,$13            ; $0070
+        0x24,             # INC H               ; $0072  increment scroll count
+        0x7c,             # LD A,H              ; $0073
+        0x1e, 0x83,       # LD E,$83            ; $0074 
+        0xfe, 0x62,       # CP $62              ; $0076  $62 counts in, play sound #1
+        0x28, 0x06,       # JR Z, Addr_0080     ; $0078
+        0x1e, 0xc1,       # LD E,$c1            ; $007a
+        0xfe, 0x64,       # CP $64              ; $007c 
+        0x20, 0x06,       # JR NZ, Addr_0086    ; $007e
                 # Addr_0080:
-        0xf0, 0x42,       # LD A,($FF00+$42)    ; $0080 
-        0x90,             # SUB B               ; $0082 
-        0xe0, 0x42,       # LD ($FF00+$42),A    ; $0083  scroll logo up if B=1 
-        0x15,             # DEC D               ; $0085
-        0x20, 0xd2,       # JR NZ, Addr_005A    ; $0086 
-        0x05,             # DEC B               ; $0088  set B=0 first time ... next time, cause jump to "Nintendo Logo check"
-        0x20, 0x4f,       # JR NZ, Addr_00D9    ; $0089    
-        0x16, 0x20,       # LD D,$20            ; $008b  use scrolling loop to pause 
-        0x18, 0xcb,       # JR Addr_005A        ; $008d
+        0x7b,             # LD A,E              ; $0080  play sound 
+        0xe2,             # LD ($FF00+C),A      ; $0081     
+        0x0c,             # INC C               ; $0082
+        0x3e, 0x87,       # LD A,$87            ; $0083
+        0xe2,             # LD ($FF00+C),A      ; $0085
+                # Addr_0086:
+        0xf0, 0x42,       # LD A,($FF00+$42)    ; $0086 
+        0x90,             # SUB B               ; $0088 
+        0xe0, 0x42,       # LD ($FF00+$42),A    ; $0089  scroll logo up if B=1 
+        0x15,             # DEC D               ; $008b
+        0x20, 0xd2,       # JR NZ, Addr_0060    ; $008c 
+        0x05,             # DEC B               ; $008e  set B=0 first time ... next time, cause jump to "Nintendo Logo check"
+        0x20, 0x4f,       # JR NZ, Addr_00E0    ; $008f    
+        0x16, 0x20,       # LD D,$20            ; $0091  use scrolling loop to pause 
+        0x18, 0xcb,       # JR Addr_0060        ; $0093
         # ; ==== Graphic routine ==== 
-        0x4f,             # LD C,A              ; $008f  "Double up" all the bits of the graphics data and store in Video RAM
-        0x06, 0x04,       # LD B,$04            ; $0090
-                # Addr_0092:
-        0xc5,             # PUSH BC             ; $0092
-        0xcb, 0x11,       # RL C                ; $0093 
-        0x17,             # RLA                 ; $0095
-        0xc1,             # POP BC              ; $0096 
-        0xcb, 0x11,       # RL C                ; $0097 
-        0x17,             # RLA                 ; $0099
-        0x05,             # DEC B               ; $009a
-        0x20, 0xf5,       # JR NZ, Addr_0092    ; $009b 
-        0x22,             # LD (HL+),A          ; $009c
-        0x23,             # INC HL              ; $009d
-        0x22,             # LD (HL+),A          ; $009e
-        0x23,             # INC HL              ; $009f
-        0xc9,             # RET                 ; $00a0
-                # Addr_00A1: 
+        0x4f,             # LD C,A              ; $0095  "Double up" all the bits of the graphics data and store in Video RAM
+        0x06, 0x04,       # LD B,$04            ; $0096
+                # Addr_0098:
+        0xc5,             # PUSH BC             ; $0098
+        0xcb, 0x11,       # RL C                ; $0099 
+        0x17,             # RLA                 ; $009b
+        0xc1,             # POP BC              ; $009c 
+        0xcb, 0x11,       # RL C                ; $009d 
+        0x17,             # RLA                 ; $009f
+        0x05,             # DEC B               ; $00a0
+        0x20, 0xf5,       # JR NZ, Addr_0098    ; $00a1 
+        0x22,             # LD (HL+),A          ; $00a3
+        0x23,             # INC HL              ; $00a4
+        0x22,             # LD (HL+),A          ; $00a5
+        0x23,             # INC HL              ; $00a6
+        0xc9,             # RET                 ; $00a7
+                # Addr_00A8: 
         # ;Nintendo Logo
         # .DB $CE,$ED,$66,$66,$CC,$0D,$00,$0B,$03,$73,$00,$83,$00,$0C,$00,$0D 
         # .DB $00,$08,$11,$1F,$88,$89,$00,$0E,$DC,$CC,$6E,$E6,$DD,$DD,$D9,$99
@@ -129,34 +131,34 @@ boot_rom  = array.array('B', [
         0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D, 
         0x00, 0x08, 0x11, 0x1f, 0x88, 0x89, 0x00, 0x0e, 0xdc, 0xcc, 0x6e, 0xe6, 0xdd, 0xdd, 0xd9, 0x99, 
         0xbb, 0xbb, 0x67, 0x63, 0x6e, 0x0e, 0xec, 0xcc, 0xdd, 0xdc, 0x99, 0x9f, 0xbb, 0xb9, 0x33, 0x3e, 
-                # Addr_00D1: 
+                # Addr_00D8: 
         # ;More video data (the tile data for ®)
         # .DB $3C,$42,$B9,$A5,$B9,$A5,$42,$3C
         0x3c, 0x42, 0xb9, 0xa5, 0xb9, 0xa5, 0x42, 0x3c,
         # ; ===== Nintendo logo comparison routine =====
-                # Addr_00D9:
-        0x21, 0x04, 0x01, # LD HL,$0104         ; $00d9  ; point HL to Nintendo logo in cart
-        0x11, 0xa1, 0x00, # DE,$00a1            ; $00dc  ; point DE to Nintendo logo in DMG rom
-                 # Addr_00DF:
-        0x1a,             # LD A,(DE)           ; $00df
-        0x13,             # INC DE              ; $00e0
-        0xbe,             # CP (HL)             ; $00e1  ; compare logo data in cart to DMG rom 
-        0x00,             # NOP                 ; $00e2  ; if not a match, lock up here
-        0x00,             # NOP                 ; $00e3
-        0x23,             # INC HL              ; $00e4
-        0x7d,             # LD A,L              ; $00e5
-        0xfe, 0x34,       # CP $34              ; $00e6  do this for $30 bytes
-        0x20, 0xf5,       # JR NZ, Addr_00DF    ; $00e8
-        0x06, 0x19,       # LD B,$19            ; $00ea
-        0x78,             # LD A,B              ; $00ec
-                # Addr_00ED:
-        0x86,             # ADD (HL)            ; $00ed
-        0x23,             # INC HL              ; $00ee
-        0x05,             # DEC B               ; $00ef
-        0x20, 0xfb,       # JR NZ, Addr_00ED    ; $00f0
-        0x86,             # ADD (HL)            ; $00f2
-        0x00,             # NOP                 ; $00f3
-        0x00,             # NOP                 ; $00f4
-        0x3e, 0x01,       # LD A,$01            ; $00f5
-        0xe0, 0x50        # LD ($FF00+$50),A    ; $00f7	;turn off DMG rom
+                # Addr_00E0:
+        0x21, 0x04, 0x01, # LD HL,$0104         ; $00e0  ; point HL to Nintendo logo in cart
+        0x11, 0xa8, 0x00, # DE,$00a1            ; $00e3  ; point DE to Nintendo logo in DMG rom
+                 # Addr_00E6:
+        0x1a,             # LD A,(DE)           ; $00e6
+        0x13,             # INC DE              ; $00e7
+        0xbe,             # CP (HL)             ; $00e8  ; compare logo data in cart to DMG rom 
+        0x00,             # NOP                 ; $00e9  ; removed the check
+        0x00,             # NOP                 ; $00ea  ; removed the check
+        0x23,             # INC HL              ; $00eb
+        0x7d,             # LD A,L              ; $00ec
+        0xfe, 0x34,       # CP $34              ; $00ed  do this for $30 bytes
+        0x20, 0xf5,       # JR NZ, Addr_00E6    ; $00ef
+        0x06, 0x19,       # LD B,$19            ; $00f1
+        0x78,             # LD A,B              ; $00f3
+                # Addr_00F4:
+        0x86,             # ADD (HL)            ; $00f4
+        0x23,             # INC HL              ; $00f5
+        0x05,             # DEC B               ; $00f6
+        0x20, 0xfb,       # JR NZ, Addr_00F4    ; $00f7
+        0x86,             # ADD (HL)            ; $00f9
+        0x00,             # NOP                 ; $00fa  ; removed the check
+        0x00,             # NOP                 ; $00fb  ; removed the check
+        0x3e, 0x01,       # LD A,$01            ; $00fc
+        0xe0, 0x50        # LD ($FF00+$50),A    ; $00fe	;turn off DMG rom
         ])
