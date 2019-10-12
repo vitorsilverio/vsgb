@@ -320,10 +320,10 @@ class PPU:
             # Bit3   Tile VRAM-Bank  **CGB Mode Only**     (0=Bank 0, 1=Bank 1)
             # Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
             sprite_flags = self.mmu.read_byte(0xfe00 + sprite_offset + 3)
+            priority = sprite_flags & 0x80 != 0x80
             x_flip = sprite_flags & 0x20 == 0x20
             y_flip = sprite_flags & 0x40 == 0x40
             palette = sprite_flags & 0b00010000
-        
 
             tiles = 0x8000
             pixel_y = (15 if sprite_size == 16 else 7) - (line - sprite_y) if y_flip else line - sprite_y
@@ -370,7 +370,9 @@ class PPU:
 
                 color = (palette >> (pixel * 2)) & 0x3
 
-                self.framebuffer[position] = self.rgb_sprite(color)
+                if priority or self.framebuffer[position] == self.rgb(0):
+                    self.framebuffer[position] = self.rgb_sprite(color)
+
 
 
 class LCDControlRegister:
