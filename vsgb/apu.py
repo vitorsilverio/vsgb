@@ -4,6 +4,7 @@
 # Documentation source:
 # - https://gbdev.gg8.se/wiki/articles/Sound_Controller
 
+import simpleaudio as sa
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 
@@ -20,10 +21,29 @@ class APU:
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
+        self.sound_channel1 = SoundChannel1(self.mmu)
+        self.sound_channel2 = SoundChannel2(self.mmu)
+        self.wave_channel = WaveChannel(self.mmu)
+        self.noise_channel = NoiseChannel(self.mmu)
   
 
     def step(self):
-        pass
+        # NR52 - Sound on/off
+        # Bit 7 - All sound on/off  (0: stop all sound circuits) (Read/Write)
+        # Bit 3 - Sound 4 ON flag (Read Only)
+        # Bit 2 - Sound 3 ON flag (Read Only)
+        # Bit 1 - Sound 2 ON flag (Read Only)
+        # Bit 0 - Sound 1 ON flag (Read Only)
+        nr52 = self.mmu.read_byte(IO_Registers.NR_52)
+        if nr52 & 0b10000000 == 0b10000000:
+            if nr52 & 0b00000001 == 0b00000001:
+                self.sound_channel1.step()
+            if nr52 & 0b00000010 == 0b00000010:
+                self.sound_channel2.step()
+            if nr52 & 0b00000100 == 0b00000100:
+                self.wave_channel.step()
+            if nr52 & 0b00001000 == 0b00001000:
+                self.noise_channel.step()
 
 
 # Sound Channel 1 - Tone & Sweep
@@ -74,8 +94,42 @@ class APU:
 # Frequency = 131072/(2048-x) Hz 
 class SoundChannel1:
 
-    def __init__(self):
-        pass
+    def __init__(self, mmu : MMU):
+        self.mmu = mmu
 
     def step(self):
+        pass
+
+class SoundChannel2:
+
+    def __init__(self, mmu : MMU):
+        self.mmu = mmu
+
+    def step(self):
+        print('Called S Channel 2')
+        pass
+
+class WaveChannel:
+
+    def __init__(self, mmu : MMU):
+        self.mmu = mmu
+
+    def step(self):
+        print('Called Wave')
+        wave = []
+        address = IO_Registers.WAVE_PATTERN_START
+        while address <= IO_Registers.WAVE_PATTERN_END:
+            wave.append(self.mmu.read_byte(address))
+            address += 1
+        wave_obj = sa.WaveObject(bytes(wave), 2, 2, 44100)
+        wave_obj.play()
+
+
+class NoiseChannel:
+
+    def __init__(self, mmu : MMU):
+        self.mmu = mmu
+
+    def step(self):
+        print('Called Noise')
         pass

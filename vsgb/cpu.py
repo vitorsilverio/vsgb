@@ -24,7 +24,6 @@ class CPU:
         self.ime = False
         self.halted = False
         self.stop = False
-        self.pc_before_interrupt = 0x0000
         self.pending_interrupts_before_halt = 0x00
         
     def step(self):
@@ -55,7 +54,6 @@ class CPU:
         if self.halted:
             self.halted = False
         self.stackManager.push_word(self.registers.pc)
-        self.pc_before_interrupt = self.registers.pc
         if_register = self.mmu.read_byte(IO_Registers.IF)
         if interrupt == Interrupt.INTERRUPT_VBLANK:
             self.registers.pc = 0x40 #RST 40H
