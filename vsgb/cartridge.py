@@ -386,7 +386,7 @@ class MBC1(CartridgeType):
         # or if the cartridge is removed from the gameboy. Available RAM sizes are: 2KByte (at A000-A7FF), 
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
-            self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
+            self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)] = value
         
 # MBC2 (max 256KByte ROM and 512x4 bits RAM)
 class MBC2(CartridgeType):
@@ -419,7 +419,7 @@ class MBC3(CartridgeType):
         # Same as for MBC1, except that accessing banks 20h, 40h, and 60h is supported now
         if self.rom_bank == 0:
             self.rom_bank += 1
-        return self.data[(0x4000 * self.rom_bank) + (address - 0x4000)]
+        return self.data[(0x4000 * (self.rom_bank % self.rom_banks)) + (address - 0x4000)]
 
     def write_rom_byte(self, address : int, value : int):
         # 0000-1FFF - RAM and Timer Enable (Write Only)
@@ -491,7 +491,7 @@ class MBC3(CartridgeType):
                 return 0x00 
 
         if self.ram_enabled:
-            return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
+            return self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)]
         return 0xff
 
     def write_external_ram_byte(self, address : int, value : int):
@@ -502,7 +502,7 @@ class MBC3(CartridgeType):
         if self.has_timer and self.rtc_register_mode:
             pass #unimplemented
         elif self.ram_enabled:
-            self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)] = value
+            self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)] = value
 
 
 # MBC5 (max 8MByte ROM and/or 128KByte RAM)
