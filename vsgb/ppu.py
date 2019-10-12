@@ -153,10 +153,18 @@ class PPU:
 
     def rgb(self, color_code : int) -> int:
         return {
-             0: 0xfcf6dfff,
-             1: 0x605f49ff,
-             2: 0xb3ac9aff,
-             3: 0x343329ff
+             0: 0xf0f0f0ff,
+             1: 0xc0d8a8ff,
+             2: 0x0090a8ff,
+             3: 0x000000ff
+        }.get(color_code)
+
+    def rgb_sprite(self, color_code : int) -> int:
+        return {
+             0: 0xf0f0f0ff,
+             1: 0xe8a0a0ff,
+             2: 0x806050ff,
+             3: 0x000000ff
         }.get(color_code)
 
     def compare_lylc(self):
@@ -258,6 +266,8 @@ class PPU:
             byte_1 = self.mmu.read_byte(tile_address)
             byte_2 = self.mmu.read_byte(tile_address + 1)
 
+            palette = self.mmu.read_byte(IO_Registers.BGP)
+
             for pixelx in range(0,8):
                 buffer_addr = line_pixel_offset + pixelx + window_pos_x
 
@@ -276,7 +286,8 @@ class PPU:
                 elif (byte_1 & shift == 0x0) and (byte_2 & shift == 0x00):
                     pixel = 0
                 position = line_width + buffer_addr
-                self.framebuffer[position] = self.rgb(pixel)
+                color = (palette >> (pixel * 2)) & 0x3
+                self.framebuffer[position] = self.rgb(color)
 
         self.window_line += 1
 
@@ -299,9 +310,19 @@ class PPU:
                 continue
 
             sprite_tile_offset = (self.mmu.read_byte(0xfe00 + sprite_offset + 2) & (0xfe if sprite_size == 16 else 0xff)) * 16
+            
+            #  Attributes/Flags:
+            # Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
+            # (Used for both BG and Window. BG color 0 is always behind OBJ)
+            # Bit6   Y flip          (0=Normal, 1=Vertically mirrored)
+            # Bit5   X flip          (0=Normal, 1=Horizontally mirrored)
+            # Bit4   Palette number  **Non CGB Mode Only** (0=OBP0, 1=OBP1)
+            # Bit3   Tile VRAM-Bank  **CGB Mode Only**     (0=Bank 0, 1=Bank 1)
+            # Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
             sprite_flags = self.mmu.read_byte(0xfe00 + sprite_offset + 3)
             x_flip = sprite_flags & 0x20 == 0x20
             y_flip = sprite_flags & 0x40 == 0x40
+            palette = sprite_flags & 0b00010000
         
 
             tiles = 0x8000
@@ -321,6 +342,13 @@ class PPU:
             byte_1 = self.mmu.read_byte(tile_address)
             byte_2 = self.mmu.read_byte(tile_address + 1)
 
+            obp0 = self.mmu.read_byte(IO_Registers.OBP0)
+            obp1 = self.mmu.read_byte(IO_Registers.OBP1)
+            if palette == 0:
+                palette = obp0
+            else:
+                palette = obp1
+
             for pixelx in range(0,8):
                 shift = 0x1 << (pixelx if x_flip else 7 - pixelx)
                 pixel = 0
@@ -328,9 +356,9 @@ class PPU:
                 if (byte_1 & shift == shift) and (byte_2 & shift == shift):
                     pixel = 3
                 elif (byte_1 & shift == 0x0) and (byte_2 & shift == shift):
-                    pixel = 1
-                elif (byte_1 & shift == shift) and (byte_2 & shift == 0x0):
                     pixel = 2
+                elif (byte_1 & shift == shift) and (byte_2 & shift == 0x0):
+                    pixel = 1
                 elif (byte_1 & shift == 0x0) and (byte_2 & shift == 0x00):
                     continue
 
@@ -340,7 +368,9 @@ class PPU:
 
                 position = line_width + buffer_x
 
-                self.framebuffer[position] = self.rgb(pixel)
+                color = (palette >> (pixel * 2)) & 0x3
+
+                self.framebuffer[position] = self.rgb_sprite(color)
 
 
 class LCDControlRegister:
