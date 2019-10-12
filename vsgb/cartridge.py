@@ -311,7 +311,7 @@ class MBC1(CartridgeType):
             self.rom_bank += 1
         if self.memory_mode == MBC1.ROM_BANKING_MODE and self.rom_bank in [0x20, 0x40, 0x60]:
             self.rom_bank += 1
-        return self.data[(0x4000 * self.rom_bank) + (address - 0x4000)]
+        return self.data[(0x4000 * (self.rom_bank % self.rom_banks)) + (address - 0x4000)]
 
     def write_rom_byte(self, address : int, value : int):
         # 0000-1FFF - RAM Enable (Write Only)
@@ -359,7 +359,15 @@ class MBC1(CartridgeType):
         # The program may freely switch between both modes, the only limitiation is that only RAM Bank 00h 
         # can be used during Mode 0, and only ROM Banks 00-1Fh can be used during Mode 1.
         if 0x6000 <= address <= 0x7fff:
+            prev_mode = self.memory_mode
             self.memory_mode = value & 0b00000001
+            if prev_mode != self.memory_mode:
+                if self.memory_mode == MBC1.RAM_BANKING_MODE:
+                    self.ram_bank = ( self.rom_bank >> 5 ) & 0b00000011
+                    self.rom_bank = self.rom_bank & 0b00011111
+                else:
+                    self.rom_bank = self.rom_bank | ((self.ram_bank & 0b00000011) << 5)
+                    self.ram_bank = 0
         
     def read_external_ram_byte(self, address : int) -> int:
         # A000-BFFF - RAM Bank 00-03, if any (Read/Write)
@@ -368,7 +376,7 @@ class MBC1(CartridgeType):
         # or if the cartridge is removed from the gameboy. Available RAM sizes are: 2KByte (at A000-A7FF), 
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
-            return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
+            return self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)]
         0xff
 
     def write_external_ram_byte(self, address : int, value : int):
