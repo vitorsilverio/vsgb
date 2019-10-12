@@ -6,7 +6,7 @@ import array
 from vsgb.boot_rom import boot_rom
 from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
-from vsgb.cartridge import ROM
+from vsgb.cartridge import CartridgeType
 
 # General Memory Map
 # Start End     Description                      Notes
@@ -26,7 +26,7 @@ from vsgb.cartridge import ROM
 # FFFF  FFFF    Interrupts Enable Register (IE) 	
 class MMU:
 
-    def __init__(self, rom : ROM, _input : Input):
+    def __init__(self, rom : CartridgeType, _input : Input):
         self.boot_rom  = boot_rom
         self.rom = rom
         self.input = _input

@@ -243,7 +243,7 @@ class CartridgeType:
             0x04: 16
         }.get(ram_banks_reg, 0)
 
-        self.ram = [0xff] * (0x2000 * self.ram_banks)
+        self.ram = [0xff]*(0x2000 * self.ram_banks)
 
         if self.hasBattery:
             save_file_name = bytes(self.data[CartridgeHeader.TITLE:(CartridgeHeader.TITLE + 15)]).decode().rstrip('\x00')+".sav"
@@ -258,13 +258,13 @@ class CartridgeType:
         pass
 
     def read_external_ram_byte(self, address : int) -> int:
-        if self.hasRam:
-            return self.ram[address - 0xa000]
+        if self.hasRam and self.ram is not None:
+            return self.ram[address - 0xa000] & 0xff
         return 0xff
 
     def write_external_ram_byte(self, address : int, value : int):
         if self.hasRam:
-            self.ram[address - 0xa000] = value 
+            self.ram[address - 0xa000] = value & 0xff
 
 # None (32KByte ROM only)
 # Small games of not more than 32KBytes ROM do not require a MBC chip 
@@ -369,8 +369,7 @@ class MBC1(CartridgeType):
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
             return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
-        else:
-            0xff
+        0xff
 
     def write_external_ram_byte(self, address : int, value : int):
         # A000-BFFF - RAM Bank 00-03, if any (Read/Write)
