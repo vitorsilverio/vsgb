@@ -477,14 +477,15 @@ class MBC3(CartridgeType):
             if self.rtc_register_selected == 0x0a:
                 return now.hour & 0xff
             if self.rtc_register_selected == 0x0b:
-                return now.timetuple().tm_yday
+                return now.timetuple().tm_yday & 0xff
             if self.rtc_register_selected == 0x0c:
-                return 0x00 #unimplemented
+                if now.timetuple().tm_yday > 0xff:
+                    return 0x01
+                return 0x00 
 
         if self.ram_enabled:
             return self.ram[(self.ram_bank * 0x2000) + (address - 0xa000)]
-        else:
-            0xff
+        return 0xff
 
     def write_external_ram_byte(self, address : int, value : int):
         # A000-BFFF - RAM Bank 00-07, if any (Read/Write)
