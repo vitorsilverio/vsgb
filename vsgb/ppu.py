@@ -280,9 +280,9 @@ class PPU:
                 if (byte_1 & shift == shift) and (byte_2 & shift == shift):
                     pixel = 3
                 elif (byte_1 & shift == 0x0) and (byte_2 & shift == shift):
-                    pixel = 1
-                elif (byte_1 & shift == shift) and (byte_2 & shift == 0x0):
                     pixel = 2
+                elif (byte_1 & shift == shift) and (byte_2 & shift == 0x0):
+                    pixel = 1
                 elif (byte_1 & shift == 0x0) and (byte_2 & shift == 0x00):
                     pixel = 0
                 position = line_width + buffer_addr
