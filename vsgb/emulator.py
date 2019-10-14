@@ -10,6 +10,7 @@ from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.ppu import PPU
 from vsgb.window import Window
+from vsgb.instructions import instructions
 
 class Emulator:
 
@@ -35,7 +36,13 @@ class Emulator:
         except Exception as e:
             print('An error ocorried:')
             print(self.cpu.registers)
-            print('Last instruction: '+hex(self.cpu.last_instruction))
+            last_instruction = instructions[self.cpu.last_instruction][0]
+            last_instruction_size = instructions[self.cpu.last_instruction][1]
+            if last_instruction_size == 1:
+                last_instruction = last_instruction.format(hex(self.mmu.read_byte(self.cpu.last_pc+1)))
+            if last_instruction_size == 2:
+                last_instruction = last_instruction.format(hex(self.mmu.read_word(self.cpu.last_pc+1)))
+            print('{}: {}'.format(hex(self.cpu.last_pc), last_instruction))
             raise e
 
     def skip_boot_rom(self):

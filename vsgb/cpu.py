@@ -25,7 +25,9 @@ class CPU:
         self.halted = False
         self.stop = False
         self.pending_interrupts_before_halt = 0x00
-        
+        self.last_pc = 0
+        self.last_instruction = 0
+
     def step(self):
         self.ticks = 0
         if self.stop:
@@ -36,7 +38,9 @@ class CPU:
         if self.halted:
             self.ticks += 4
         else:
+            self.last_pc = self.registers.pc
             instruction = self.fetch_instruction()
+            self.last_instruction = instruction
             self.perform_instruction(instruction)
         self.timer.tick(self.ticks)
         return None
@@ -81,7 +85,6 @@ class CPU:
         return instruction
 
     def perform_instruction(self, instruction : int):
-        self.last_instruction = instruction
         self.ticks += self.instructionPerformer.perform_instruction(instruction)
 
 
