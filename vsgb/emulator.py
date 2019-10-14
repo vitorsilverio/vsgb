@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from vsgb.apu import APU
+#from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.input import Input
@@ -19,17 +19,24 @@ class Emulator:
         self.mmu = MMU(self.cartridge.rom(), self.input) 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager)
-        self.apu = APU(self.mmu)
+        #self.apu = APU(self.mmu)
         self.window = Window(self.input)
         self.window.start()
 
     def run(self):
-        while True:
-            self.cpu.step()
-            self.ppu.step(self.cpu.ticks)
-            if self.ppu.vblank:
-                self.window.render(self.ppu.framebuffer)
-            self.apu.step()
+        try:
+            while True:
+            
+                self.cpu.step()
+                self.ppu.step(self.cpu.ticks)
+                if self.ppu.vblank:
+                    self.window.render(self.ppu.framebuffer)
+                #self.apu.step()
+        except Exception as e:
+            print('An error ocorried:')
+            print(self.cpu.registers)
+            print('Last instruction: '+hex(self.cpu.last_instruction))
+            raise e
 
     def skip_boot_rom(self):
         self.cpu.registers.pc = 0x0100

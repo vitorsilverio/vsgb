@@ -296,7 +296,6 @@ class MBC1(CartridgeType):
         self.rom_bank = 1
         self.memory_mode = 0
         self.ram_enabled = False
-
       
     def read_rom_byte(self, address : int) -> int:
         # 0000-3FFF - ROM Bank 00 (Read Only)
@@ -377,7 +376,7 @@ class MBC1(CartridgeType):
         # 8KByte (at A000-BFFF), and 32KByte (in form of four 8K banks at A000-BFFF). 
         if self.ram_enabled:
             return self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)]
-        0xff
+        return 0xff
 
     def write_external_ram_byte(self, address : int, value : int):
         # A000-BFFF - RAM Bank 00-03, if any (Read/Write)

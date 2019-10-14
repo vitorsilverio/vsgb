@@ -81,6 +81,7 @@ class CPU:
         return instruction
 
     def perform_instruction(self, instruction : int):
+        self.last_instruction = instruction
         self.ticks += self.instructionPerformer.perform_instruction(instruction)
 
 
