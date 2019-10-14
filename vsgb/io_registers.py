@@ -49,6 +49,3 @@ class IO_Registers(IntEnum):
     WY = 0xff4a # Window Y Position  (R/W)
     WX = 0xff4b # Window X Position  (R/W)
     IE = 0xffff # Interrupt Enable (R/W)
-
-
- 
