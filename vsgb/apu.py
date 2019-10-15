@@ -19,10 +19,12 @@ from vsgb.mmu import MMU
 # Sound registers may be set at all times while producing sound. 
 class APU:
 
+    TICKS_PER_SEC = 4194304
+
     def __init__(self, mmu : MMU):
         self.mmu = mmu
-        self.sound_channel1 = SoundChannel1(self.mmu)
-        self.sound_channel2 = SoundChannel2(self.mmu)
+        self.pulse_channel1 = PulseChannel1(self.mmu)
+        self.pulse_channel2 = PulseChannel2(self.mmu)
         self.wave_channel = WaveChannel(self.mmu)
         self.noise_channel = NoiseChannel(self.mmu)
   
@@ -37,9 +39,9 @@ class APU:
         nr52 = self.mmu.read_byte(IO_Registers.NR_52)
         if nr52 & 0b10000000 == 0b10000000:
             if nr52 & 0b00000001 == 0b00000001:
-                self.sound_channel1.step()
+                self.pulse_channel1.step()
             if nr52 & 0b00000010 == 0b00000010:
-                self.sound_channel2.step()
+                self.pulse_channel2.step()
             if nr52 & 0b00000100 == 0b00000100:
                 self.wave_channel.step()
             if nr52 & 0b00001000 == 0b00001000:
@@ -92,7 +94,7 @@ class APU:
 #           (1=Stop output when length in NR11 expires)
 # Bit 2-0 - Frequency's higher 3 bits (x) (Write Only)
 # Frequency = 131072/(2048-x) Hz 
-class SoundChannel1:
+class PulseChannel1(SoundChannel):
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
@@ -100,7 +102,7 @@ class SoundChannel1:
     def step(self):
         pass
 
-class SoundChannel2:
+class PulseChannel2(SoundChannel):
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
@@ -109,7 +111,7 @@ class SoundChannel2:
         print('Called S Channel 2')
         pass
 
-class WaveChannel:
+class WaveChannel(SoundChannel):
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
@@ -125,7 +127,7 @@ class WaveChannel:
         wave_obj.play()
 
 
-class NoiseChannel:
+class NoiseChannel(SoundChannel):
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
@@ -133,3 +135,197 @@ class NoiseChannel:
     def step(self):
         print('Called Noise')
         pass
+
+class SoundChannel:
+
+    def __init__(self):
+        self.offset = 0
+        self.channel_enabled = False
+        self.dac_enabled = False
+        self.nr0 = 0
+        self.nr1 = 0
+        self.nr2 = 0
+        self.nr3 = 0
+        self.nr4 = 0
+
+    
+    def step(self):
+        pass
+
+
+class VolumeEnvelope:
+
+    def __init__(self):
+        self.initial_volume = 0
+        self.envelope_direction = 0
+        self.sweep = 0
+        self.volume = 0
+        self.i = 0
+        self.finished = False
+
+    def set_nr2(self, register):
+        self.initial_volume = register >> 4
+        self.envelope_direction = -1 if (register & (1 << 3)) == 0 else 1
+        self.sweep = register & 0b00000111
+
+    def is_enabled(self):
+        return self.sweep > 0
+
+    def start(self):
+        self.finished = True
+        self.i = 8192
+
+    def trigger(self):
+        self.volume = self.initial_volume
+        self.i = 0
+        self.finished = False
+
+    def step(self):
+        if self.finished: 
+            return
+        if (self.volume == 0 and self.envelope_direction == -1) or (self.volume == 15 and self.envelope_direction == 1):
+            self.finished = True
+            return
+        self.i += 1
+        if self.i == int(sweep * APU.TICKS_PER_SEC / 64):
+            self.i = 0
+            self.volume += self.envelope_direction
+        return
+
+    def get_volume(self):
+        if self.is_enabled():
+            return self.volume
+        return self.initial_volume
+
+class FrequencySweep:
+
+    DIVIDER = int(APU.TICKS_PER_SEC / 128)
+
+    def __init__(self):
+        self.period = 0
+        self.negate = False
+        self.shift = 0
+        self.timer = 0
+        self.shadow_freq = 0
+        self.nr13 = 0
+        self.nr14 = 0
+        self.i = 0
+        self.overflow = False
+        self.count_enabled = False
+        self.negging = False
+
+    def start(self):
+        self.count_enabled = False
+        self.i = 8192
+
+    def trigger(self):
+        self.negging = False
+        self.overflow = False
+        self.shadow_freq = self.nr13 | ((self.nr14 & 0b00000111) << 8)
+        self.timer = 8 if self.period == 0 else period
+        self.count_enabled = self.period != 0 or self.shift != 0
+        if self.shift > 0:
+            self.calculate()
+
+    def set_nr10(self, value):
+        self.period = (value >> 4) & 0b00000111
+        self.negate = (value & (1 << 3)) != 0
+        self.shift = value & 0b00000111
+        if self.negging and not self.negate: 
+            self.overflow = True
+
+    def set_nr14(self, value):
+        self.nr14 =  value
+        if (value & (1 << 7)) != 0:
+            self.trigger()
+
+    def step(self):
+        self.i += 1
+        if self.i == FrequencySweep.DIVIDER:
+            self.i = 0
+            if not self.count_enabled:
+                return
+            self.timer -= 1
+            if self.timer == 0:
+                self.timer = 8 if self.period == 0 else self.period
+                if self.period != 0:
+                    new_freq = self.calculate()
+                    if not self.overflow and self.shift != 0:
+                        self.shadow_freq = new_freq
+                        self.nr13 = self.shadow_freq & 0xff
+                        self.nr14 = (self.shadow_freq & 0x700) >> 8
+                        self.calculate()
+        return
+
+    def calculate(self):
+        freq = self.shadow_freq >> self.shift
+        if self.negate:
+            freq = self.shadow_freq - freq
+            self.negging = True
+        else:
+            freq = self.shadow_freq = freq
+
+        if freq > 2047:
+            self.overflow = True
+        return freq
+
+    def is_enabled(self):
+        return not self.overflow
+
+class LengthCounter:
+
+    DIVIDER = int(APU.TICKS_PER_SEC / 128)
+    
+    def __init__(self, full_length):
+        self.full_length = full_length
+        self.length = 0
+        self.i = 0
+        self.enabled = False
+
+    def start(self):
+        self.i = 8192
+
+    def step(self):
+        self.i += 1
+        if self.i == LengthCounter.DIVIDER:
+            self.i = 0
+            if self.enabled and self.length > 0:
+                self.length -= 1
+
+    def set_length(self, length):
+        if length == 0:
+            self.length = self.full_length
+        else:
+            self.length = length
+
+    def set_nr4(self, value):
+        enable = (value & (1 << 6)) != 0
+        trigger = (value & (1 << 7)) != 0
+
+        if self.enabled:
+            if self.length == 0 and trigger:
+                if enable != 0 and self.i < LengthCounter.DIVIDER / 2:
+                    self.set_length(self.full_length - 1)
+                else:
+                    self.set_length(self.full_length)
+        elif enable:
+            if (self.length > 0 and self.i < LengthCounter.DIVIDER / 2):
+                self.length -= 1
+            if (self.length == 0 and trigger and self.i < LengthCounter.DIVIDER / 2):
+                self.set_length(self.full_length - 1)
+        else:
+            if (self.length == 0 and trigger):
+                self.set_length(self.full_length)
+        this.enabled = enable
+
+    def get_value(self):
+        return self.length
+
+    def is_enabled(self):
+        return self.enabled
+
+    def reset(self):
+        self.enabled = True
+        self.i = 0
+        self.length = 0
+
