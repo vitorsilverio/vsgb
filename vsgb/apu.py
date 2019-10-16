@@ -6,7 +6,6 @@
 
 import simpleaudio as sa
 from vsgb.io_registers import IO_Registers
-from vsgb.mmu import MMU
 
 # Sound Overview
 # There are two sound channels connected to the output terminals SO1 and SO2. There is also a input terminal 
@@ -21,13 +20,57 @@ class APU:
 
     TICKS_PER_SEC = 4194304
 
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
-        self.pulse_channel1 = PulseChannel1(self.mmu)
-        self.pulse_channel2 = PulseChannel2(self.mmu)
-        self.wave_channel = WaveChannel(self.mmu)
-        self.noise_channel = NoiseChannel(self.mmu)
-  
+    def __init__(self):
+        self.registers = {
+            IO_Registers.NR_10: 0,
+            IO_Registers.NR_11: 0,
+            IO_Registers.NR_12: 0,
+            IO_Registers.NR_13: 0,
+            IO_Registers.NR_14: 0,
+            IO_Registers.NR_21: 0,
+            IO_Registers.NR_22: 0,
+            IO_Registers.NR_23: 0,
+            IO_Registers.NR_24: 0,
+            IO_Registers.NR_30: 0,
+            IO_Registers.NR_31: 0,
+            IO_Registers.NR_32: 0,
+            IO_Registers.NR_33: 0,
+            IO_Registers.NR_34: 0,
+            IO_Registers.NR_41: 0,
+            IO_Registers.NR_42: 0,
+            IO_Registers.NR_43: 0,
+            IO_Registers.NR_44: 0,
+            IO_Registers.NR_50: 0,
+            IO_Registers.NR_51: 0,
+            IO_Registers.NR_52: 0,
+            IO_Registers.WAVE_PATTERN_0: 0x00,
+            IO_Registers.WAVE_PATTERN_1: 0xff,
+            IO_Registers.WAVE_PATTERN_2: 0x00,
+            IO_Registers.WAVE_PATTERN_3: 0xff,
+            IO_Registers.WAVE_PATTERN_4: 0x00,
+            IO_Registers.WAVE_PATTERN_5: 0xff,
+            IO_Registers.WAVE_PATTERN_6: 0x00,
+            IO_Registers.WAVE_PATTERN_7: 0xff,
+            IO_Registers.WAVE_PATTERN_8: 0x00,
+            IO_Registers.WAVE_PATTERN_9: 0xff,
+            IO_Registers.WAVE_PATTERN_A: 0x00,
+            IO_Registers.WAVE_PATTERN_B: 0xff,
+            IO_Registers.WAVE_PATTERN_C: 0x00,
+            IO_Registers.WAVE_PATTERN_D: 0xff,
+            IO_Registers.WAVE_PATTERN_E: 0x00,
+            IO_Registers.WAVE_PATTERN_F: 0xff
+        }
+
+        self.pulse_channel1 = PulseChannel1()
+        self.pulse_channel2 = PulseChannel2()
+        self.wave_channel = WaveChannel()
+        self.noise_channel = NoiseChannel()
+    
+    def read_register(self, register):
+        return self.registers.get(register, 0xff)
+
+    def write_register(self, register, value):
+        self.registers[register] = value
 
     def step(self):
         # NR52 - Sound on/off
@@ -36,7 +79,7 @@ class APU:
         # Bit 2 - Sound 3 ON flag (Read Only)
         # Bit 1 - Sound 2 ON flag (Read Only)
         # Bit 0 - Sound 1 ON flag (Read Only)
-        nr52 = self.mmu.read_byte(IO_Registers.NR_52)
+        nr52 = self.register[IO_Registers.NR_52]
         if nr52 & 0b10000000 == 0b10000000:
             if nr52 & 0b00000001 == 0b00000001:
                 self.pulse_channel1.step()
@@ -46,6 +89,22 @@ class APU:
                 self.wave_channel.step()
             if nr52 & 0b00001000 == 0b00001000:
                 self.noise_channel.step()
+
+class SoundChannel:
+
+    def __init__(self):
+        self.offset = 0
+        self.channel_enabled = False
+        self.dac_enabled = False
+        self.nr0 = 0
+        self.nr1 = 0
+        self.nr2 = 0
+        self.nr3 = 0
+        self.nr4 = 0
+
+    
+    def step(self):
+        pass
 
 
 # Sound Channel 1 - Tone & Sweep
@@ -96,16 +155,10 @@ class APU:
 # Frequency = 131072/(2048-x) Hz 
 class PulseChannel1(SoundChannel):
 
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
-
     def step(self):
         pass
 
 class PulseChannel2(SoundChannel):
-
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
 
     def step(self):
         print('Called S Channel 2')
@@ -113,44 +166,19 @@ class PulseChannel2(SoundChannel):
 
 class WaveChannel(SoundChannel):
 
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
 
     def step(self):
         print('Called Wave')
-        wave = []
-        address = IO_Registers.WAVE_PATTERN_START
-        while address <= IO_Registers.WAVE_PATTERN_END:
-            wave.append(self.mmu.read_byte(address))
-            address += 1
-        wave_obj = sa.WaveObject(bytes(wave), 2, 2, 44100)
-        wave_obj.play()
-
+        pass
 
 class NoiseChannel(SoundChannel):
 
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
 
     def step(self):
         print('Called Noise')
         pass
 
-class SoundChannel:
 
-    def __init__(self):
-        self.offset = 0
-        self.channel_enabled = False
-        self.dac_enabled = False
-        self.nr0 = 0
-        self.nr1 = 0
-        self.nr2 = 0
-        self.nr3 = 0
-        self.nr4 = 0
-
-    
-    def step(self):
-        pass
 
 
 class VolumeEnvelope:

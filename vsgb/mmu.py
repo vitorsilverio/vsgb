@@ -3,6 +3,7 @@
 
 import array
 
+from vsgb.apu import APU
 from vsgb.boot_rom import boot_rom
 from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
@@ -26,9 +27,10 @@ from vsgb.cartridge import CartridgeType
 # FFFF  FFFF    Interrupts Enable Register (IE) 	
 class MMU:
 
-    def __init__(self, rom : CartridgeType, _input : Input):
+    def __init__(self, rom : CartridgeType, apu: APU, _input : Input):
         self.boot_rom  = boot_rom
         self.rom = rom
+        self.apu = apu
         self.input = _input
         self.vram = array.array('B', [0xff]*0x2000)
         self.wram = array.array('B', [0xff]*0x2000)
@@ -59,6 +61,8 @@ class MMU:
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
                 return self.input.read_input(self.io_ports[0]) & 0xff
+            if address in self.apu.registers:
+                return self.apu.read_register(address) & 0xff
             return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
             return self.hram[address - 0xff80] & 0xff
@@ -90,6 +94,8 @@ class MMU:
                     self.dma_transfer(value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
+                elif address in self.apu.registers:
+                    self.apu.write_register(address, value)
                 else:
                     self.io_ports[address - 0xff00] = value
             else:     
