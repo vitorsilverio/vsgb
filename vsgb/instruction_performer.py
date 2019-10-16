@@ -14,38 +14,38 @@ class InstructionPerformer:
         self.registers = cpu.registers
         self.stackManager = cpu.stackManager
         self.instrs = [
-            self.inst0x0, self.inst0x1, self.inst0x2, self.inst0x3, self.inst0x4, self.inst0x5, self.inst0x6, self.inst0x7, self.inst0x8, self.inst0x9, self.inst0xa, self.inst0xb, self.inst0xc, self.inst0xd, self.inst0xe, self.inst0xf, 
-            self.inst0x10, self.inst0x11, self.inst0x12, self.inst0x13, self.inst0x14, self.inst0x15, self.inst0x16, self.inst0x17, self.inst0x18, self.inst0x19, self.inst0x1a, self.inst0x1b, self.inst0x1c, self.inst0x1d, self.inst0x1e, self.inst0x1f, 
-            self.inst0x20, self.inst0x21, self.inst0x22, self.inst0x23, self.inst0x24, self.inst0x25, self.inst0x26, self.inst0x27, self.inst0x28, self.inst0x29, self.inst0x2a, self.inst0x2b, self.inst0x2c, self.inst0x2d, self.inst0x2e, self.inst0x2f, 
-            self.inst0x30, self.inst0x31, self.inst0x32, self.inst0x33, self.inst0x34, self.inst0x35, self.inst0x36, self.inst0x37, self.inst0x38, self.inst0x39, self.inst0x3a, self.inst0x3b, self.inst0x3c, self.inst0x3d, self.inst0x3e, self.inst0x3f, 
-            self.inst0x40, self.inst0x41, self.inst0x42, self.inst0x43, self.inst0x44, self.inst0x45, self.inst0x46, self.inst0x47, self.inst0x48, self.inst0x49, self.inst0x4a, self.inst0x4b, self.inst0x4c, self.inst0x4d, self.inst0x4e, self.inst0x4f, 
-            self.inst0x50, self.inst0x51, self.inst0x52, self.inst0x53, self.inst0x54, self.inst0x55, self.inst0x56, self.inst0x57, self.inst0x58, self.inst0x59, self.inst0x5a, self.inst0x5b, self.inst0x5c, self.inst0x5d, self.inst0x5e, self.inst0x5f, 
-            self.inst0x60, self.inst0x61, self.inst0x62, self.inst0x63, self.inst0x64, self.inst0x65, self.inst0x66, self.inst0x67, self.inst0x68, self.inst0x69, self.inst0x6a, self.inst0x6b, self.inst0x6c, self.inst0x6d, self.inst0x6e, self.inst0x6f, 
-            self.inst0x70, self.inst0x71, self.inst0x72, self.inst0x73, self.inst0x74, self.inst0x75, self.inst0x76, self.inst0x77, self.inst0x78, self.inst0x79, self.inst0x7a, self.inst0x7b, self.inst0x7c, self.inst0x7d, self.inst0x7e, self.inst0x7f, 
-            self.inst0x80, self.inst0x81, self.inst0x82, self.inst0x83, self.inst0x84, self.inst0x85, self.inst0x86, self.inst0x87, self.inst0x88, self.inst0x89, self.inst0x8a, self.inst0x8b, self.inst0x8c, self.inst0x8d, self.inst0x8e, self.inst0x8f, 
-            self.inst0x90, self.inst0x91, self.inst0x92, self.inst0x93, self.inst0x94, self.inst0x95, self.inst0x96, self.inst0x97, self.inst0x98, self.inst0x99, self.inst0x9a, self.inst0x9b, self.inst0x9c, self.inst0x9d, self.inst0x9e, self.inst0x9f, 
-            self.inst0xa0, self.inst0xa1, self.inst0xa2, self.inst0xa3, self.inst0xa4, self.inst0xa5, self.inst0xa6, self.inst0xa7, self.inst0xa8, self.inst0xa9, self.inst0xaa, self.inst0xab, self.inst0xac, self.inst0xad, self.inst0xae, self.inst0xaf, 
-            self.inst0xb0, self.inst0xb1, self.inst0xb2, self.inst0xb3, self.inst0xb4, self.inst0xb5, self.inst0xb6, self.inst0xb7, self.inst0xb8, self.inst0xb9, self.inst0xba, self.inst0xbb, self.inst0xbc, self.inst0xbd, self.inst0xbe, self.inst0xbf, 
-            self.inst0xc0, self.inst0xc1, self.inst0xc2, self.inst0xc3, self.inst0xc4, self.inst0xc5, self.inst0xc6, self.inst0xc7, self.inst0xc8, self.inst0xc9, self.inst0xca, None, self.inst0xcc, self.inst0xcd, self.inst0xce, self.inst0xcf, 
-            self.inst0xd0, self.inst0xd1, self.inst0xd2, None, self.inst0xd4, self.inst0xd5, self.inst0xd6, self.inst0xd7, self.inst0xd8, self.inst0xd9, self.inst0xda, None, self.inst0xdc, None, self.inst0xde, self.inst0xdf, 
-            self.inst0xe0, self.inst0xe1, self.inst0xe2, None, None, self.inst0xe5, self.inst0xe6, self.inst0xe7, self.inst0xe8, self.inst0xe9, self.inst0xea, None, None, None, self.inst0xee, self.inst0xef, 
-            self.inst0xf0, self.inst0xf1, self.inst0xf2, self.inst0xf3, None, self.inst0xf5, self.inst0xf6, self.inst0xf7, self.inst0xf8, self.inst0xf9, self.inst0xfa, self.inst0xfb, None, None, self.inst0xfe, self.inst0xff, 
-            self.inst0xcb00, self.inst0xcb01, self.inst0xcb02, self.inst0xcb03, self.inst0xcb04, self.inst0xcb05, self.inst0xcb06, self.inst0xcb07, self.inst0xcb08, self.inst0xcb09, self.inst0xcb0a, self.inst0xcb0b, self.inst0xcb0c, self.inst0xcb0d, self.inst0xcb0e, self.inst0xcb0f, 
-            self.inst0xcb10, self.inst0xcb11, self.inst0xcb12, self.inst0xcb13, self.inst0xcb14, self.inst0xcb15, self.inst0xcb16, self.inst0xcb17, self.inst0xcb18, self.inst0xcb19, self.inst0xcb1a, self.inst0xcb1b, self.inst0xcb1c, self.inst0xcb1d, self.inst0xcb1e, self.inst0xcb1f, 
-            self.inst0xcb20, self.inst0xcb21, self.inst0xcb22, self.inst0xcb23, self.inst0xcb24, self.inst0xcb25, self.inst0xcb26, self.inst0xcb27, self.inst0xcb28, self.inst0xcb29, self.inst0xcb2a, self.inst0xcb2b, self.inst0xcb2c, self.inst0xcb2d, self.inst0xcb2e, self.inst0xcb2f, 
-            self.inst0xcb30, self.inst0xcb31, self.inst0xcb32, self.inst0xcb33, self.inst0xcb34, self.inst0xcb35, self.inst0xcb36, self.inst0xcb37, self.inst0xcb38, self.inst0xcb39, self.inst0xcb3a, self.inst0xcb3b, self.inst0xcb3c, self.inst0xcb3d, self.inst0xcb3e, self.inst0xcb3f, 
-            self.inst0xcb40, self.inst0xcb41, self.inst0xcb42, self.inst0xcb43, self.inst0xcb44, self.inst0xcb45, self.inst0xcb46, self.inst0xcb47, self.inst0xcb48, self.inst0xcb49, self.inst0xcb4a, self.inst0xcb4b, self.inst0xcb4c, self.inst0xcb4d, self.inst0xcb4e, self.inst0xcb4f, 
-            self.inst0xcb50, self.inst0xcb51, self.inst0xcb52, self.inst0xcb53, self.inst0xcb54, self.inst0xcb55, self.inst0xcb56, self.inst0xcb57, self.inst0xcb58, self.inst0xcb59, self.inst0xcb5a, self.inst0xcb5b, self.inst0xcb5c, self.inst0xcb5d, self.inst0xcb5e, self.inst0xcb5f, 
-            self.inst0xcb60, self.inst0xcb61, self.inst0xcb62, self.inst0xcb63, self.inst0xcb64, self.inst0xcb65, self.inst0xcb66, self.inst0xcb67, self.inst0xcb68, self.inst0xcb69, self.inst0xcb6a, self.inst0xcb6b, self.inst0xcb6c, self.inst0xcb6d, self.inst0xcb6e, self.inst0xcb6f, 
-            self.inst0xcb70, self.inst0xcb71, self.inst0xcb72, self.inst0xcb73, self.inst0xcb74, self.inst0xcb75, self.inst0xcb76, self.inst0xcb77, self.inst0xcb78, self.inst0xcb79, self.inst0xcb7a, self.inst0xcb7b, self.inst0xcb7c, self.inst0xcb7d, self.inst0xcb7e, self.inst0xcb7f, 
-            self.inst0xcb80, self.inst0xcb81, self.inst0xcb82, self.inst0xcb83, self.inst0xcb84, self.inst0xcb85, self.inst0xcb86, self.inst0xcb87, self.inst0xcb88, self.inst0xcb89, self.inst0xcb8a, self.inst0xcb8b, self.inst0xcb8c, self.inst0xcb8d, self.inst0xcb8e, self.inst0xcb8f, 
-            self.inst0xcb90, self.inst0xcb91, self.inst0xcb92, self.inst0xcb93, self.inst0xcb94, self.inst0xcb95, self.inst0xcb96, self.inst0xcb97, self.inst0xcb98, self.inst0xcb99, self.inst0xcb9a, self.inst0xcb9b, self.inst0xcb9c, self.inst0xcb9d, self.inst0xcb9e, self.inst0xcb9f, 
-            self.inst0xcba0, self.inst0xcba1, self.inst0xcba2, self.inst0xcba3, self.inst0xcba4, self.inst0xcba5, self.inst0xcba6, self.inst0xcba7, self.inst0xcba8, self.inst0xcba9, self.inst0xcbaa, self.inst0xcbab, self.inst0xcbac, self.inst0xcbad, self.inst0xcbae, self.inst0xcbaf, 
-            self.inst0xcbb0, self.inst0xcbb1, self.inst0xcbb2, self.inst0xcbb3, self.inst0xcbb4, self.inst0xcbb5, self.inst0xcbb6, self.inst0xcbb7, self.inst0xcbb8, self.inst0xcbb9, self.inst0xcbba, self.inst0xcbbb, self.inst0xcbbc, self.inst0xcbbd, self.inst0xcbbe, self.inst0xcbbf, 
-            self.inst0xcbc0, self.inst0xcbc1, self.inst0xcbc2, self.inst0xcbc3, self.inst0xcbc4, self.inst0xcbc5, self.inst0xcbc6, self.inst0xcbc7, self.inst0xcbc8, self.inst0xcbc9, self.inst0xcbca, self.inst0xcbcb, self.inst0xcbcc, self.inst0xcbcd, self.inst0xcbce, self.inst0xcbcf, 
-            self.inst0xcbd0, self.inst0xcbd1, self.inst0xcbd2, self.inst0xcbd3, self.inst0xcbd4, self.inst0xcbd5, self.inst0xcbd6, self.inst0xcbd7, self.inst0xcbd8, self.inst0xcbd9, self.inst0xcbda, self.inst0xcbdb, self.inst0xcbdc, self.inst0xcbdd, self.inst0xcbde, self.inst0xcbdf, 
-            self.inst0xcbe0, self.inst0xcbe1, self.inst0xcbe2, self.inst0xcbe3, self.inst0xcbe4, self.inst0xcbe5, self.inst0xcbe6, self.inst0xcbe7, self.inst0xcbe8, self.inst0xcbe9, self.inst0xcbea, self.inst0xcbeb, self.inst0xcbec, self.inst0xcbed, self.inst0xcbee, self.inst0xcbef, 
-            self.inst0xcbf0, self.inst0xcbf1, self.inst0xcbf2, self.inst0xcbf3, self.inst0xcbf4, self.inst0xcbf5, self.inst0xcbf6, self.inst0xcbf7, self.inst0xcbf8, self.inst0xcbf9, self.inst0xcbfa, self.inst0xcbfb, self.inst0xcbfc, self.inst0xcbfd, self.inst0xcbfe, self.inst0xcbff 
+            self.NOP, self.LD_BC_d16, self.LD_REF_BC_A, self.INC_BC, self.INC_B, self.DEC_B, self.LD_B_d8, self.RLCA, self.LD_REF_a16_SP, self.ADD_HL_BC, self.LD_A_REF_BC, self.DEC_BC, self.INC_C, self.DEC_C, self.LD_C_d8, self.RRCA, 
+            self.STOP, self.LD_DE_d16, self.LD_REF_DE_A, self.INC_DE, self.INC_D, self.DEC_D, self.LD_D_d8, self.RLA, self.JR_r8, self.ADD_HL_DE, self.LD_A_REF_DE, self.DEC_DE, self.INC_E, self.DEC_E, self.LD_E_d8, self.RRA, 
+            self.JR_NZ_r8, self.LD_HL_d16, self.LDI_HL_A, self.INC_HL, self.INC_H, self.DEC_H, self.LD_H_d8, self.DAA, self.JR_Z_r8, self.ADD_HL_HL, self.LDI_A_HL, self.DEC_HL, self.INC_L, self.DEC_L, self.LD_L_d8, self.CPL, 
+            self.JR_NC_r8, self.LD_SP_d16, self.LDD_HL_A, self.INC_SP, self.INC_REF_HL, self.DEC_REF_HL, self.LD_REF_HL_d8, self.SCF, self.JR_C_r8, self.ADD_HL_SP, self.LDD_A_HL, self.DEC_SP, self.INC_A, self.DEC_A, self.LD_A_d8, self.CCF, 
+            self.LD_B_B, self.LD_B_C, self.LD_B_D, self.LD_B_E, self.LD_B_H, self.LD_B_L, self.LD_B_REF_HL, self.LD_B_A, self.LD_C_B, self.LD_C_C, self.LD_C_D, self.LD_C_E, self.LD_C_H, self.LD_C_L, self.LD_C_REF_HL, self.LD_C_A, 
+            self.LD_D_B, self.LD_D_C, self.LD_D_D, self.LD_D_E, self.LD_D_H, self.LD_D_L, self.LD_D_REF_HL, self.LD_D_A, self.LD_E_B, self.LD_E_C, self.LD_E_D, self.LD_E_E, self.LD_E_H, self.LD_E_L, self.LD_E_REF_HL, self.LD_E_A, 
+            self.LD_H_B, self.LD_H_C, self.LD_H_D, self.LD_H_E, self.LD_H_H, self.LD_H_L, self.LD_H_REF_HL, self.LD_H_A, self.LD_L_B, self.LD_L_C, self.LD_L_D, self.LD_L_E, self.LD_L_H, self.LD_L_L, self.LD_L_REF_HL, self.LD_L_A, 
+            self.LD_REF_HL_B, self.LD_REF_HL_C, self.LD_REF_HL_D, self.LD_REF_HL_E, self.LD_REF_HL_H, self.LD_REF_HL_L, self.HALT, self.LD_REF_HL_A, self.LD_A_B, self.LD_A_C, self.LD_A_D, self.LD_A_E, self.LD_A_H, self.LD_A_L, self.LD_A_REF_HL, self.LD_A_A, 
+            self.ADD_B, self.ADD_C, self.ADD_D, self.ADD_E, self.ADD_H, self.ADD_L, self.ADD_REF_HL, self.ADD_A, self.ADC_B, self.ADC_C, self.ADC_D, self.ADC_E, self.ADC_H, self.ADC_L, self.ADC_REF_HL, self.ADC_A, 
+            self.SUB_B, self.SUB_C, self.SUB_D, self.SUB_E, self.SUB_H, self.SUB_L, self.SUB_REF_HL, self.SUB_A, self.SBC_B, self.SBC_C, self.SBC_D, self.SBC_E, self.SBC_H, self.SBC_L, self.SBC_REF_HL, self.SBC_A, 
+            self.AND_B, self.AND_C, self.AND_D, self.AND_E, self.AND_H, self.AND_L, self.AND_REF_HL, self.AND_A, self.XOR_B, self.XOR_C, self.XOR_D, self.XOR_E, self.XOR_H, self.XOR_L, self.XOR_REF_HL, self.XOR_A, 
+            self.OR_B, self.OR_C, self.OR_D, self.OR_E, self.OR_H, self.OR_L, self.OR_REF_HL, self.OR_A, self.CP_B, self.CP_C, self.CP_D, self.CP_E, self.CP_H, self.CP_L, self.CP_REF_HL, self.CP_A, 
+            self.RET_NZ, self.POP_BC, self.JP_NZ_a16, self.JP_a16, self.CALL_NZ_a16, self.PUSH_BC, self.ADD_d8, self.RST_00H, self.RET_Z, self.RET, self.JP_Z_a16, None, self.CALL_Z_a16, self.CALL_a16, self.ADC_d8, self.RST_08H, 
+            self.RET_NC, self.POP_DE, self.JP_NC_a16, None, self.CALL_NC_a16, self.PUSH_DE, self.SUB_d8, self.RST_10H, self.RET_C, self.RETI, self.JP_C_a16, None, self.CALL_C_a16, None, self.SBC_d8, self.RST_18H, 
+            self.LDH_REF_a8_A, self.POP_HL, self.LD_REF_C_A, None, None, self.PUSH_HL, self.AND_d8, self.RST_20H, self.ADD_SP_r8, self.JP_HL, self.LD_REF_a16_A, None, None, None, self.XOR_d8, self.RST_28H, 
+            self.LDH_A_REF_a8, self.POP_AF, self.LD_A_REF_C, self.DI, None, self.PUSH_AF, self.OR_d8, self.RST_30H, self.LD_HL_SP_r8, self.LD_SP_HL, self.LD_A_a16, self.EI, None, None, self.CP_d8, self.RST_38H, 
+            self.RLC_B, self.RLC_C, self.RLC_D, self.RLC_E, self.RLC_H, self.RLC_L, self.RLC_REF_HL, self.RLC_A, self.RRC_B, self.RRC_C, self.RRC_D, self.RRC_E, self.RRC_H, self.RRC_L, self.RRC_REF_HL, self.RRC_A, 
+            self.RL_B, self.RL_C, self.RL_D, self.RL_E, self.RL_H, self.RL_L, self.RL_REF_HL, self.RL_A, self.RR_B, self.RR_C, self.RR_D, self.RR_E, self.RR_H, self.RR_L, self.RR_REF_HL, self.RR_A, 
+            self.SLA_B, self.SLA_C, self.SLA_D, self.SLA_E, self.SLA_H, self.SLA_L, self.SLA_REF_HL, self.SLA_A, self.SRA_B, self.SRA_C, self.SRA_D, self.SRA_E, self.SRA_H, self.SRA_L, self.SRA_REF_HL, self.SRA_A, 
+            self.SWAP_B, self.SWAP_C, self.SWAP_D, self.SWAP_E, self.SWAP_H, self.SWAP_L, self.SWAP_REF_HL, self.SWAP_A, self.SRL_B, self.SRL_C, self.SRL_D, self.SRL_E, self.SRL_H, self.SRL_L, self.SRL_REF_HL, self.SRL_A, 
+            self.BIT_0_B, self.BIT_0_C, self.BIT_0_D, self.BIT_0_E, self.BIT_0_H, self.BIT_0_L, self.BIT_0_REF_HL, self.BIT_0_A, self.BIT_1_B, self.BIT_1_C, self.BIT_1_D, self.BIT_1_E, self.BIT_1_H, self.BIT_1_L, self.BIT_1_REF_HL, self.BIT_1_A, 
+            self.BIT_2_B, self.BIT_2_C, self.BIT_2_D, self.BIT_2_E, self.BIT_2_H, self.BIT_2_L, self.BIT_2_REF_HL, self.BIT_2_A, self.BIT_3_B, self.BIT_3_C, self.BIT_3_D, self.BIT_3_E, self.BIT_3_H, self.BIT_3_L, self.BIT_3_REF_HL, self.BIT_3_A, 
+            self.BIT_4_B, self.BIT_4_C, self.BIT_4_D, self.BIT_4_E, self.BIT_4_H, self.BIT_4_L, self.BIT_4_REF_HL, self.BIT_4_A, self.BIT_5_B, self.BIT_5_C, self.BIT_5_D, self.BIT_5_E, self.BIT_5_H, self.BIT_5_L, self.BIT_5_REF_HL, self.BIT_5_A, 
+            self.BIT_6_B, self.BIT_6_C, self.BIT_6_D, self.BIT_6_E, self.BIT_6_H, self.BIT_6_L, self.BIT_6_REF_HL, self.BIT_6_A, self.BIT_7_B, self.BIT_7_C, self.BIT_7_D, self.BIT_7_E, self.BIT_7_H, self.BIT_7_L, self.BIT_7_REF_HL, self.BIT_7_A, 
+            self.RES_0_B, self.RES_0_C, self.RES_0_D, self.RES_0_E, self.RES_0_H, self.RES_0_L, self.RES_0_REF_HL, self.RES_0_A, self.RES_1_B, self.RES_1_C, self.RES_1_D, self.RES_1_E, self.RES_1_H, self.RES_1_L, self.RES_1_REF_HL, self.RES_1_A, 
+            self.RES_2_B, self.RES_2_C, self.RES_2_D, self.RES_2_E, self.RES_2_H, self.RES_2_L, self.RES_2_REF_HL, self.RES_2_A, self.RES_3_B, self.RES_3_C, self.RES_3_D, self.RES_3_E, self.RES_3_H, self.RES_3_L, self.RES_3_REF_HL, self.RES_3_A, 
+            self.RES_4_B, self.RES_4_C, self.RES_4_D, self.RES_4_E, self.RES_4_H, self.RES_4_L, self.RES_4_REF_HL, self.RES_4_A, self.RES_5_B, self.RES_5_C, self.RES_5_D, self.RES_5_E, self.RES_5_H, self.RES_5_L, self.RES_5_REF_HL, self.RES_5_A, 
+            self.RES_6_B, self.RES_6_C, self.RES_6_D, self.RES_6_E, self.RES_6_H, self.RES_6_L, self.RES_6_REF_HL, self.RES_6_A, self.RES_7_B, self.RES_7_C, self.RES_7_D, self.RES_7_E, self.RES_7_H, self.RES_7_L, self.RES_7_REF_HL, self.RES_7_A, 
+            self.SET_0_B, self.SET_0_C, self.SET_0_D, self.SET_0_E, self.SET_0_H, self.SET_0_L, self.SET_0_REF_HL, self.SET_0_A, self.SET_1_B, self.SET_1_C, self.SET_1_D, self.SET_1_E, self.SET_1_H, self.SET_1_L, self.SET_1_REF_HL, self.SET_1_A, 
+            self.SET_2_B, self.SET_2_C, self.SET_2_D, self.SET_2_E, self.SET_2_H, self.SET_2_L, self.SET_2_REF_HL, self.SET_2_A, self.SET_3_B, self.SET_3_C, self.SET_3_D, self.SET_3_E, self.SET_3_H, self.SET_3_L, self.SET_3_REF_HL, self.SET_3_A, 
+            self.SET_4_B, self.SET_4_C, self.SET_4_D, self.SET_4_E, self.SET_4_H, self.SET_4_L, self.SET_4_REF_HL, self.SET_4_A, self.SET_5_B, self.SET_5_C, self.SET_5_D, self.SET_5_E, self.SET_5_H, self.SET_5_L, self.SET_5_REF_HL, self.SET_5_A, 
+            self.SET_6_B, self.SET_6_C, self.SET_6_D, self.SET_6_E, self.SET_6_H, self.SET_6_L, self.SET_6_REF_HL, self.SET_6_A, self.SET_7_B, self.SET_7_C, self.SET_7_D, self.SET_7_E, self.SET_7_H, self.SET_7_L, self.SET_7_REF_HL, self.SET_7_A 
         ]
 
     def perform_instruction(self, opcode: int) -> int:
@@ -53,162 +53,162 @@ class InstructionPerformer:
             return self.instrs[opcode - 0xca00]()
         return self.instrs[opcode]()
     
-    def inst0x0(self) -> int:
+    def NOP(self) -> int:
         return 4
     
-    def inst0x1(self) -> int:
+    def LD_BC_d16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.registers.set_bc(word) 
         return 12
     
-    def inst0x2(self) -> int:
+    def LD_REF_BC_A(self) -> int:
         self.mmu.write_byte(self.registers.get_bc(), self.registers.a)
         return 8
 
-    def inst0x3(self) -> int:
+    def INC_BC(self) -> int:
         self.registers.set_bc((self.registers.get_bc() + 1) & 0xffff )
         return 8
 
-    def inst0x4(self) -> int:
+    def INC_B(self) -> int:
         self.registers.b = self.inc_byte(self.registers.b)
         return 4
 
-    def inst0x5(self) -> int:
+    def DEC_B(self) -> int:
         self.registers.b = self.dec_byte(self.registers.b)
         return 4
     
-    def inst0x6(self) -> int:
+    def LD_B_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.b = byte 
         return 8
 
-    def inst0x7(self) -> int:
+    def RLCA(self) -> int:
         self.registers.a = self.rlc(self.registers.a)
         self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         self.registers.reset_h_flag()
         return 4
     
-    def inst0x8(self) -> int:
+    def LD_REF_a16_SP(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.mmu.write_word(word, self.registers.sp)
         return 20
 
-    def inst0x9(self) -> int:
+    def ADD_HL_BC(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_bc()))
         return 8
     
-    def inst0xa(self) -> int:
+    def LD_A_REF_BC(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.get_bc())
         return 8
 
-    def inst0xb(self) -> int:
+    def DEC_BC(self) -> int:
         self.registers.set_bc((self.registers.get_bc() - 1) & 0xffff )
         return 8
 
-    def inst0xc(self) -> int:
+    def INC_C(self) -> int:
         self.registers.c = self.inc_byte(self.registers.c)
         return 4
 
-    def inst0xd(self) -> int:
+    def DEC_C(self) -> int:
         self.registers.c = self.dec_byte(self.registers.c)
         return 4
     
-    def inst0xe(self) -> int:
+    def LD_C_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.c = byte 
         return 8
 
-    def inst0xf(self) -> int:
+    def RRCA(self) -> int:
         self.registers.a = self.rrc(self.registers.a)
         self.registers.reset_h_flag()
         self.registers.reset_n_flag()
         self.registers.reset_z_flag()
         return 4  
 
-    def inst0x10(self) -> int:
+    def STOP(self) -> int:
         self.cpu.stop = True
         return 4       
     
-    def inst0x11(self) -> int:
+    def LD_DE_d16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.registers.set_de(word) 
         return 12
     
-    def inst0x12(self) -> int:
+    def LD_REF_DE_A(self) -> int:
         self.mmu.write_byte(self.registers.get_de(), self.registers.a)
         return 8
 
-    def inst0x13(self) -> int:
+    def INC_DE(self) -> int:
         self.registers.set_de((self.registers.get_de() + 1) & 0xffff )
         return 8
 
-    def inst0x14(self) -> int:
+    def INC_D(self) -> int:
         self.registers.d = self.inc_byte(self.registers.d)
         return 4
 
-    def inst0x15(self) -> int:
+    def DEC_D(self) -> int:
         self.registers.d = self.dec_byte(self.registers.d)
         return 4
     
-    def inst0x16(self) -> int:
+    def LD_D_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.d = byte 
         return 8
 
-    def inst0x17(self) -> int:
+    def RLA(self) -> int:
         self.registers.a = self.rl(self.registers.a)
         self.registers.reset_z_flag()
         self.registers.reset_n_flag()
         self.registers.reset_h_flag()
         return 4
 
-    def inst0x18(self) -> int:
+    def JR_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.pc += signed_value(byte)
         return 12
 
-    def inst0x19(self) -> int:
+    def ADD_HL_DE(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_de()))
         return 8
     
-    def inst0x1a(self) -> int:
+    def LD_A_REF_DE(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.get_de())
         return 8
 
-    def inst0x1b(self) -> int:
+    def DEC_DE(self) -> int:
         self.registers.set_de((self.registers.get_de() - 1) & 0xffff )
         return 8
 
-    def inst0x1c(self) -> int:
+    def INC_E(self) -> int:
         self.registers.e = self.inc_byte(self.registers.e)
         return 4
 
-    def inst0x1d(self) -> int:
+    def DEC_E(self) -> int:
         self.registers.e = self.dec_byte(self.registers.e)
         return 4
     
-    def inst0x1e(self) -> int:
+    def LD_E_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.e = byte 
         return 8
 
-    def inst0x1f(self) -> int:
+    def RRA(self) -> int:
         self.registers.a = self.rr(self.registers.a)
         self.registers.reset_h_flag()
         self.registers.reset_n_flag()
         self.registers.reset_z_flag()
         return 4  
 
-    def inst0x20(self) -> int:
+    def JR_NZ_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if not self.registers.is_z_flag():
@@ -216,36 +216,36 @@ class InstructionPerformer:
             return 12
         return 8
     
-    def inst0x21(self) -> int:
+    def LD_HL_d16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.registers.set_hl(word) 
         return 12
     
-    def inst0x22(self) -> int:
+    def LDI_HL_A(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
         self.registers.set_hl(self.registers.get_hl()+1)
         return 8
 
-    def inst0x23(self) -> int:
+    def INC_HL(self) -> int:
         self.registers.set_hl((self.registers.get_hl() + 1) & 0xffff )
         return 8
 
-    def inst0x24(self) -> int:
+    def INC_H(self) -> int:
         self.registers.h = self.inc_byte(self.registers.h)
         return 4
 
-    def inst0x25(self) -> int:
+    def DEC_H(self) -> int:
         self.registers.h = self.dec_byte(self.registers.h)
         return 4
     
-    def inst0x26(self) -> int:
+    def LD_H_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.h = byte 
         return 8
 
-    def inst0x27(self) -> int:
+    def DAA(self) -> int:
         temp = self.registers.a 
         if self.registers.is_n_flag():
             if self.registers.is_h_flag():
@@ -268,7 +268,7 @@ class InstructionPerformer:
         self.registers.a = temp
         return 4
 
-    def inst0x28(self) -> int:
+    def JR_Z_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if self.registers.is_z_flag():
@@ -276,40 +276,40 @@ class InstructionPerformer:
             return 12
         return 8
 
-    def inst0x29(self) -> int:
+    def ADD_HL_HL(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_hl()))
         return 8
     
-    def inst0x2a(self) -> int:
+    def LDI_A_HL(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
         self.registers.set_hl(self.registers.get_hl()+1)
         return 8
 
-    def inst0x2b(self) -> int:
+    def DEC_HL(self) -> int:
         self.registers.set_hl((self.registers.get_hl() - 1) & 0xffff )
         return 8
 
-    def inst0x2c(self) -> int:
+    def INC_L(self) -> int:
         self.registers.l = self.inc_byte(self.registers.l)
         return 4
 
-    def inst0x2d(self) -> int:
+    def DEC_L(self) -> int:
         self.registers.l = self.dec_byte(self.registers.l)
         return 4
     
-    def inst0x2e(self) -> int:
+    def LD_L_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.l = byte 
         return 8
 
-    def inst0x2f(self) -> int:
+    def CPL(self) -> int:
         self.registers.a = self.registers.a ^ 0xff
         self.registers.set_n_flag()
         self.registers.set_h_flag()
         return 4
 
-    def inst0x30(self) -> int:
+    def JR_NC_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if not self.registers.is_c_flag():
@@ -317,42 +317,42 @@ class InstructionPerformer:
             return 12
         return 8
     
-    def inst0x31(self) -> int:
+    def LD_SP_d16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.registers.sp = word
         return 12
     
-    def inst0x32(self) -> int:
+    def LDD_HL_A(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
         self.registers.set_hl(self.registers.get_hl()-1)
         return 8
 
-    def inst0x33(self) -> int:
+    def INC_SP(self) -> int:
         self.registers.sp = ((self.registers.sp + 1) & 0xffff )
         return 8
 
-    def inst0x34(self) -> int:
+    def INC_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.inc_byte(self.mmu.read_byte(self.registers.get_hl())))
         return 12
 
-    def inst0x35(self) -> int:
+    def DEC_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.dec_byte(self.mmu.read_byte(self.registers.get_hl())))
         return 12
     
-    def inst0x36(self) -> int:
+    def LD_REF_HL_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.mmu.write_byte(self.registers.get_hl(),byte)
         return 12
 
-    def inst0x37(self) -> int:
+    def SCF(self) -> int:
         self.registers.set_c_flag()
         self.registers.reset_n_flag()
         self.registers.reset_h_flag()
         return 4
 
-    def inst0x38(self) -> int:
+    def JR_C_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         if self.registers.is_c_flag():
@@ -360,34 +360,34 @@ class InstructionPerformer:
             return 12
         return 8
 
-    def inst0x39(self) -> int:
+    def ADD_HL_SP(self) -> int:
         self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.sp))
         return 8
     
-    def inst0x3a(self) -> int:
+    def LDD_A_HL(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
         self.registers.set_hl(self.registers.get_hl()-1)
         return 8
 
-    def inst0x3b(self) -> int:
+    def DEC_SP(self) -> int:
         self.registers.sp = ((self.registers.sp - 1) & 0xffff )
         return 8
 
-    def inst0x3c(self) -> int:
+    def INC_A(self) -> int:
         self.registers.a = self.inc_byte(self.registers.a)
         return 4
 
-    def inst0x3d(self) -> int:
+    def DEC_A(self) -> int:
         self.registers.a = self.dec_byte(self.registers.a)
         return 4
     
-    def inst0x3e(self) -> int:
+    def LD_A_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.a = byte
         return 8
 
-    def inst0x3f(self) -> int:
+    def CCF(self) -> int:
         if self.registers.is_c_flag():
             self.registers.reset_c_flag()
         else:
@@ -396,530 +396,530 @@ class InstructionPerformer:
         self.registers.reset_h_flag()
         return 4
     
-    def inst0x40(self) -> int:
+    def LD_B_B(self) -> int:
         return 4
     
-    def inst0x41(self) -> int:
+    def LD_B_C(self) -> int:
         self.registers.b = self.registers.c
         return 4
     
-    def inst0x42(self) -> int:
+    def LD_B_D(self) -> int:
         self.registers.b = self.registers.d
         return 4
     
-    def inst0x43(self) -> int:
+    def LD_B_E(self) -> int:
         self.registers.b = self.registers.e
         return 4
     
-    def inst0x44(self) -> int:
+    def LD_B_H(self) -> int:
         self.registers.b = self.registers.h
         return 4
     
-    def inst0x45(self) -> int:
+    def LD_B_L(self) -> int:
         self.registers.b = self.registers.l
         return 4
     
-    def inst0x46(self) -> int:
+    def LD_B_REF_HL(self) -> int:
         self.registers.b = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x47(self) -> int:
+    def LD_B_A(self) -> int:
         self.registers.b = self.registers.a
         return 4
     
-    def inst0x48(self) -> int:
+    def LD_C_B(self) -> int:
         self.registers.c = self.registers.b
         return 4
     
-    def inst0x49(self) -> int:
+    def LD_C_C(self) -> int:
         return 4
     
-    def inst0x4a(self) -> int:
+    def LD_C_D(self) -> int:
         self.registers.c = self.registers.d
         return 4
     
-    def inst0x4b(self) -> int:
+    def LD_C_E(self) -> int:
         self.registers.c = self.registers.e
         return 4
     
-    def inst0x4c(self) -> int:
+    def LD_C_H(self) -> int:
         self.registers.c = self.registers.h
         return 4
     
-    def inst0x4d(self) -> int:
+    def LD_C_L(self) -> int:
         self.registers.c = self.registers.l
         return 4
     
-    def inst0x4e(self) -> int:
+    def LD_C_REF_HL(self) -> int:
         self.registers.c = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x4f(self) -> int:
+    def LD_C_A(self) -> int:
         self.registers.c = self.registers.a
         return 4
     
-    def inst0x50(self) -> int:
+    def LD_D_B(self) -> int:
         self.registers.d = self.registers.b
         return 4
     
-    def inst0x51(self) -> int:
+    def LD_D_C(self) -> int:
         self.registers.d = self.registers.c
         return 4
     
-    def inst0x52(self) -> int:
+    def LD_D_D(self) -> int:
         return 4
     
-    def inst0x53(self) -> int:
+    def LD_D_E(self) -> int:
         self.registers.d = self.registers.e
         return 4
     
-    def inst0x54(self) -> int:
+    def LD_D_H(self) -> int:
         self.registers.d = self.registers.h
         return 4
     
-    def inst0x55(self) -> int:
+    def LD_D_L(self) -> int:
         self.registers.d = self.registers.l
         return 4
     
-    def inst0x56(self) -> int:
+    def LD_D_REF_HL(self) -> int:
         self.registers.d = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x57(self) -> int:
+    def LD_D_A(self) -> int:
         self.registers.d = self.registers.a
         return 4
     
-    def inst0x58(self) -> int:
+    def LD_E_B(self) -> int:
         self.registers.e = self.registers.b
         return 4
     
-    def inst0x59(self) -> int:
+    def LD_E_C(self) -> int:
         self.registers.e = self.registers.c
         return 4
     
-    def inst0x5a(self) -> int:
+    def LD_E_D(self) -> int:
         self.registers.e = self.registers.d
         return 4
     
-    def inst0x5b(self) -> int:
+    def LD_E_E(self) -> int:
         return 4
     
-    def inst0x5c(self) -> int:
+    def LD_E_H(self) -> int:
         self.registers.e = self.registers.h
         return 4
     
-    def inst0x5d(self) -> int:
+    def LD_E_L(self) -> int:
         self.registers.e = self.registers.l
         return 4
     
-    def inst0x5e(self) -> int:
+    def LD_E_REF_HL(self) -> int:
         self.registers.e = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x5f(self) -> int:
+    def LD_E_A(self) -> int:
         self.registers.e = self.registers.a
         return 4
     
-    def inst0x60(self) -> int:
+    def LD_H_B(self) -> int:
         self.registers.h = self.registers.b
         return 4
     
-    def inst0x61(self) -> int:
+    def LD_H_C(self) -> int:
         self.registers.h = self.registers.c
         return 4
     
-    def inst0x62(self) -> int:
+    def LD_H_D(self) -> int:
         self.registers.h = self.registers.d
         return 4
     
-    def inst0x63(self) -> int:
+    def LD_H_E(self) -> int:
         self.registers.h = self.registers.e
         return 4
     
-    def inst0x64(self) -> int:
+    def LD_H_H(self) -> int:
         return 4
     
-    def inst0x65(self) -> int:
+    def LD_H_L(self) -> int:
         self.registers.h = self.registers.l
         return 4
     
-    def inst0x66(self) -> int:
+    def LD_H_REF_HL(self) -> int:
         self.registers.h = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x67(self) -> int:
+    def LD_H_A(self) -> int:
         self.registers.h = self.registers.a
         return 4
     
-    def inst0x68(self) -> int:
+    def LD_L_B(self) -> int:
         self.registers.l = self.registers.b
         return 4
     
-    def inst0x69(self) -> int:
+    def LD_L_C(self) -> int:
         self.registers.l = self.registers.c
         return 4
     
-    def inst0x6a(self) -> int:
+    def LD_L_D(self) -> int:
         self.registers.l = self.registers.d
         return 4
     
-    def inst0x6b(self) -> int:
+    def LD_L_E(self) -> int:
         self.registers.l = self.registers.e
         return 4
     
-    def inst0x6c(self) -> int:
+    def LD_L_H(self) -> int:
         self.registers.l = self.registers.h
         return 4
     
-    def inst0x6d(self) -> int:
+    def LD_L_L(self) -> int:
         return 4
     
-    def inst0x6e(self) -> int:
+    def LD_L_REF_HL(self) -> int:
         self.registers.l = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x6f(self) -> int:
+    def LD_L_A(self) -> int:
         self.registers.l = self.registers.a
         return 4
     
-    def inst0x70(self) -> int:
+    def LD_REF_HL_B(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.b)
         return 8
     
-    def inst0x71(self) -> int:
+    def LD_REF_HL_C(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.c)
         return 8
     
-    def inst0x72(self) -> int:
+    def LD_REF_HL_D(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.d)
         return 8
     
-    def inst0x73(self) -> int:
+    def LD_REF_HL_E(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.e)
         return 8
     
-    def inst0x74(self) -> int:
+    def LD_REF_HL_H(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.h)
         return 8
     
-    def inst0x75(self) -> int:
+    def LD_REF_HL_L(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(),self.registers.l)
         return 8
 
-    def inst0x76(self) -> int:
+    def HALT(self) -> int:
         self.cpu.halted = True
         self.cpu.pending_interrupts_before_halt = self.mmu.read_byte(IO_Registers.IF)
         return 4
     
-    def inst0x77(self) -> int:
+    def LD_REF_HL_A(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
         return 8
     
-    def inst0x78(self) -> int:
+    def LD_A_B(self) -> int:
         self.registers.a = self.registers.b
         return 4
     
-    def inst0x79(self) -> int:
+    def LD_A_C(self) -> int:
         self.registers.a = self.registers.c
         return 4
     
-    def inst0x7a(self) -> int:
+    def LD_A_D(self) -> int:
         self.registers.a = self.registers.d
         return 4
     
-    def inst0x7b(self) -> int:
+    def LD_A_E(self) -> int:
         self.registers.a = self.registers.e
         return 4
     
-    def inst0x7c(self) -> int:
+    def LD_A_H(self) -> int:
         self.registers.a = self.registers.h
         return 4
     
-    def inst0x7d(self) -> int:
+    def LD_A_L(self) -> int:
         self.registers.a = self.registers.l
         return 4
     
-    def inst0x7e(self) -> int:
+    def LD_A_REF_HL(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.get_hl())
         return 8
     
-    def inst0x7f(self) -> int:
+    def LD_A_A(self) -> int:
         return 4
     
-    def inst0x80(self) -> int:
+    def ADD_B(self) -> int:
         self.add_byte(self.registers.b)
         return 4
     
-    def inst0x81(self) -> int:
+    def ADD_C(self) -> int:
         self.add_byte(self.registers.c)
         return 4
     
-    def inst0x82(self) -> int:
+    def ADD_D(self) -> int:
         self.add_byte(self.registers.d)
         return 4
     
-    def inst0x83(self) -> int:
+    def ADD_E(self) -> int:
         self.add_byte(self.registers.e)
         return 4
     
-    def inst0x84(self) -> int:
+    def ADD_H(self) -> int:
         self.add_byte(self.registers.h)
         return 4
     
-    def inst0x85(self) -> int:
+    def ADD_L(self) -> int:
         self.add_byte(self.registers.l)
         return 4
     
-    def inst0x86(self) -> int:
+    def ADD_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.add_byte(byte)
         return 8
     
-    def inst0x87(self) -> int:
+    def ADD_A(self) -> int:
         self.add_byte(self.registers.a)
         return 4
     
-    def inst0x88(self) -> int:
+    def ADC_B(self) -> int:
         self.adc(self.registers.b)
         return 4
     
-    def inst0x89(self) -> int:
+    def ADC_C(self) -> int:
         self.adc(self.registers.c)
         return 4
     
-    def inst0x8a(self) -> int:
+    def ADC_D(self) -> int:
         self.adc(self.registers.d)
         return 4
     
-    def inst0x8b(self) -> int:
+    def ADC_E(self) -> int:
         self.adc(self.registers.e)
         return 4
     
-    def inst0x8c(self) -> int:
+    def ADC_H(self) -> int:
         self.adc(self.registers.h)
         return 4
     
-    def inst0x8d(self) -> int:
+    def ADC_L(self) -> int:
         self.adc(self.registers.l)
         return 4
     
-    def inst0x8e(self) -> int:
+    def ADC_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.adc(byte)
         return 8
     
-    def inst0x8f(self) -> int:
+    def ADC_A(self) -> int:
         self.adc(self.registers.a)
         return 4
 
-    def inst0x90(self) -> int:
+    def SUB_B(self) -> int:
         self.sub(self.registers.b)
         return 4
 
-    def inst0x91(self) -> int:
+    def SUB_C(self) -> int:
         self.sub(self.registers.c)
         return 4
 
-    def inst0x92(self) -> int:
+    def SUB_D(self) -> int:
         self.sub(self.registers.d)
         return 4
 
-    def inst0x93(self) -> int:
+    def SUB_E(self) -> int:
         self.sub(self.registers.e)
         return 4
 
-    def inst0x94(self) -> int:
+    def SUB_H(self) -> int:
         self.sub(self.registers.h)
         return 4
 
-    def inst0x95(self) -> int:
+    def SUB_L(self) -> int:
         self.sub(self.registers.l)
         return 4
 
-    def inst0x96(self) -> int:
+    def SUB_REF_HL(self) -> int:
         self.sub(self.mmu.read_byte(self.registers.get_hl()))
         return 8
 
-    def inst0x97(self) -> int:
+    def SUB_A(self) -> int:
         self.sub(self.registers.a)
         return 4
 
-    def inst0x98(self) -> int:
+    def SBC_B(self) -> int:
         self.sbc(self.registers.b)
         return 4
 
-    def inst0x99(self) -> int:
+    def SBC_C(self) -> int:
         self.sbc(self.registers.c)
         return 4
 
-    def inst0x9a(self) -> int:
+    def SBC_D(self) -> int:
         self.sbc(self.registers.d)
         return 4
 
-    def inst0x9b(self) -> int:
+    def SBC_E(self) -> int:
         self.sbc(self.registers.e)
         return 4
 
-    def inst0x9c(self) -> int:
+    def SBC_H(self) -> int:
         self.sbc(self.registers.h)
         return 4
 
-    def inst0x9d(self) -> int:
+    def SBC_L(self) -> int:
         self.sbc(self.registers.l)
         return 4
 
-    def inst0x9e(self) -> int:
+    def SBC_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.sbc(byte)
         return 8
 
-    def inst0x9f(self) -> int:
+    def SBC_A(self) -> int:
         self.sbc(self.registers.a)
         return 4
 
-    def inst0xa0(self) -> int:
+    def AND_B(self) -> int:
         self._and(self.registers.b)
         return 4
 
-    def inst0xa1(self) -> int:
+    def AND_C(self) -> int:
         self._and(self.registers.c)
         return 4
 
-    def inst0xa2(self) -> int:
+    def AND_D(self) -> int:
         self._and(self.registers.d)
         return 4
 
-    def inst0xa3(self) -> int:
+    def AND_E(self) -> int:
         self._and(self.registers.e)
         return 4
 
-    def inst0xa4(self) -> int:
+    def AND_H(self) -> int:
         self._and(self.registers.h)
         return 4
 
-    def inst0xa5(self) -> int:
+    def AND_L(self) -> int:
         self._and(self.registers.l)
         return 4
 
-    def inst0xa6(self) -> int:
+    def AND_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self._and(byte)
         return 8
 
-    def inst0xa7(self) -> int:
+    def AND_A(self) -> int:
         self._and(self.registers.a)
         return 4
 
-    def inst0xa8(self) -> int:
+    def XOR_B(self) -> int:
         self.xor(self.registers.b)
         return 4
 
-    def inst0xa9(self) -> int:
+    def XOR_C(self) -> int:
         self.xor(self.registers.c)
         return 4
 
-    def inst0xaa(self) -> int:
+    def XOR_D(self) -> int:
         self.xor(self.registers.d)
         return 4
 
-    def inst0xab(self) -> int:
+    def XOR_E(self) -> int:
         self.xor(self.registers.e)
         return 4
 
-    def inst0xac(self) -> int:
+    def XOR_H(self) -> int:
         self.xor(self.registers.h)
         return 4
 
-    def inst0xad(self) -> int:
+    def XOR_L(self) -> int:
         self.xor(self.registers.l)
         return 4
 
-    def inst0xae(self) -> int:
+    def XOR_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.xor(byte)
         return 8
 
-    def inst0xaf(self) -> int:
+    def XOR_A(self) -> int:
         self.xor(self.registers.a)
         return 4
 
-    def inst0xb0(self) -> int:
+    def OR_B(self) -> int:
         self._or(self.registers.b)
         return 4
 
-    def inst0xb1(self) -> int:
+    def OR_C(self) -> int:
         self._or(self.registers.c)
         return 4
 
-    def inst0xb2(self) -> int:
+    def OR_D(self) -> int:
         self._or(self.registers.d)
         return 4
 
-    def inst0xb3(self) -> int:
+    def OR_E(self) -> int:
         self._or(self.registers.e)
         return 4
 
-    def inst0xb4(self) -> int:
+    def OR_H(self) -> int:
         self._or(self.registers.h)
         return 4
 
-    def inst0xb5(self) -> int:
+    def OR_L(self) -> int:
         self._or(self.registers.l)
         return 4
 
-    def inst0xb6(self) -> int:
+    def OR_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self._or(byte)
         return 8
 
-    def inst0xb7(self) -> int:
+    def OR_A(self) -> int:
         self._or(self.registers.a)
         return 4
 
-    def inst0xb8(self) -> int:
+    def CP_B(self) -> int:
         self.cp(self.registers.b)
         return 4
 
-    def inst0xb9(self) -> int:
+    def CP_C(self) -> int:
         self.cp(self.registers.c)
         return 4
 
-    def inst0xba(self) -> int:
+    def CP_D(self) -> int:
         self.cp(self.registers.d)
         return 4
 
-    def inst0xbb(self) -> int:
+    def CP_E(self) -> int:
         self.cp(self.registers.e)
         return 4
 
-    def inst0xbc(self) -> int:
+    def CP_H(self) -> int:
         self.cp(self.registers.h)
         return 4
 
-    def inst0xbd(self) -> int:
+    def CP_L(self) -> int:
         self.cp(self.registers.l)
         return 4
 
-    def inst0xbe(self) -> int:
+    def CP_REF_HL(self) -> int:
         byte = self.mmu.read_byte(self.registers.get_hl())
         self.cp(byte)
         return 8
 
-    def inst0xbf(self) -> int:
+    def CP_A(self) -> int:
         self.cp(self.registers.a)
         return 4
 
-    def inst0xc0(self) -> int:
+    def RET_NZ(self) -> int:
         if not self.registers.is_z_flag():
             self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
-    def inst0xc1(self) -> int:
+    def POP_BC(self) -> int:
         self.registers.set_bc(self.stackManager.pop_word())
         return 12
 
-    def inst0xc2(self) -> int:
+    def JP_NZ_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if not self.registers.is_z_flag():
@@ -927,12 +927,12 @@ class InstructionPerformer:
             return 16
         return 12
 
-    def inst0xc3(self) -> int:
+    def JP_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc = word
         return 16
 
-    def inst0xc4(self) -> int:
+    def CALL_NZ_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if not self.registers.is_z_flag():
@@ -941,32 +941,32 @@ class InstructionPerformer:
             return 24
         return 12
     
-    def inst0xc5(self) -> int:
+    def PUSH_BC(self) -> int:
         self.stackManager.push_word(self.registers.get_bc())
         return 16
     
-    def inst0xc6(self) -> int:
+    def ADD_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.add_byte(byte)
         return 8
 
-    def inst0xc7(self) -> int:
+    def RST_00H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x00
         return 16
 
-    def inst0xc8(self) -> int:
+    def RET_Z(self) -> int:
         if self.registers.is_z_flag():
             self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
-    def inst0xc9(self) -> int:
+    def RET(self) -> int:
         self.registers.pc = self.stackManager.pop_word()
         return 16
 
-    def inst0xca(self) -> int:
+    def JP_Z_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if self.registers.is_z_flag():
@@ -974,7 +974,7 @@ class InstructionPerformer:
             return 16
         return 12
 
-    def inst0xcc(self) -> int:
+    def CALL_Z_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if self.registers.is_z_flag():
@@ -983,35 +983,35 @@ class InstructionPerformer:
             return 24
         return 12
 
-    def inst0xcd(self) -> int:
+    def CALL_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = word
         return 24
     
-    def inst0xce(self) -> int:
+    def ADC_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.adc(byte)
         return 8
 
-    def inst0xcf(self) -> int:
+    def RST_08H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x08
         return 16
 
-    def inst0xd0(self) -> int:
+    def RET_NC(self) -> int:
         if not self.registers.is_c_flag():
             self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
-    def inst0xd1(self) -> int:
+    def POP_DE(self) -> int:
         self.registers.set_de(self.stackManager.pop_word())
         return 12
 
-    def inst0xd2(self) -> int:
+    def JP_NC_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if not self.registers.is_c_flag():
@@ -1019,7 +1019,7 @@ class InstructionPerformer:
             return 16
         return 12
 
-    def inst0xd4(self) -> int:
+    def CALL_NC_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if not self.registers.is_c_flag():
@@ -1028,33 +1028,33 @@ class InstructionPerformer:
             return 24
         return 12
     
-    def inst0xd5(self) -> int:
+    def PUSH_DE(self) -> int:
         self.stackManager.push_word(self.registers.get_de())
         return 16
 
-    def inst0xd6(self) -> int:
+    def SUB_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.sub(byte)
         return 8
 
-    def inst0xd7(self) -> int:
+    def RST_10H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x10
         return 16
 
-    def inst0xd8(self) -> int:
+    def RET_C(self) -> int:
         if self.registers.is_c_flag():
             self.registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
-    def inst0xd9(self) -> int:
+    def RETI(self) -> int:
         self.registers.pc = self.stackManager.pop_word()
         self.cpu.ime = True
         return 16
 
-    def inst0xda(self) -> int:
+    def JP_C_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if self.registers.is_c_flag():
@@ -1062,7 +1062,7 @@ class InstructionPerformer:
             return 16
         return 12
 
-    def inst0xdc(self) -> int:
+    def CALL_C_a16(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         if self.registers.is_c_flag():
@@ -1071,47 +1071,47 @@ class InstructionPerformer:
             return 24
         return 12
 
-    def inst0xde(self) -> int:
+    def SBC_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.sbc(byte)
         return 8
 
-    def inst0xdf(self) -> int:
+    def RST_18H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x18
         return 16
 
-    def inst0xe0(self) -> int:
+    def LDH_REF_a8_A(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.mmu.write_byte((byte + 0xff00), self.registers.a)
         return 12
     
-    def inst0xe1(self) -> int:
+    def POP_HL(self) -> int:
         self.registers.set_hl(self.stackManager.pop_word())
         return 12
 
-    def inst0xe2(self) -> int:
+    def LD_REF_C_A(self) -> int:
         self.mmu.write_byte((self.registers.c + 0xff00), self.registers.a)
         return 8
     
-    def inst0xe5(self) -> int:
+    def PUSH_HL(self) -> int:
         self.stackManager.push_word(self.registers.get_hl())
         return 16
 
-    def inst0xe6(self) -> int:
+    def AND_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self._and(byte)
         return 8
 
-    def inst0xe7(self) -> int:
+    def RST_20H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x20
         return 16
 
-    def inst0xe8(self) -> int:
+    def ADD_SP_r8(self) -> int:
         byte = signed_value(self.mmu.read_byte(self.registers.pc))
         temp = self.registers.sp + byte
         self.registers.pc += 1
@@ -1128,62 +1128,62 @@ class InstructionPerformer:
         self.registers.sp = temp
         return 16
 
-    def inst0xe9(self) -> int:
+    def JP_HL(self) -> int:
         word = self.registers.get_hl()
         self.registers.pc = word
         return 4
     
-    def inst0xea(self) -> int:
+    def LD_REF_a16_A(self) -> int:
         word = self.mmu.read_word(self.registers.pc)
         self.registers.pc += 2
         self.mmu.write_byte(word, self.registers.a)
         return 16
 
-    def inst0xee(self) -> int:
+    def XOR_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.xor(byte)
         return 8
 
-    def inst0xef(self) -> int:
+    def RST_28H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x28
         return 16
     
-    def inst0xf0(self) -> int:
+    def LDH_A_REF_a8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.registers.a = self.mmu.read_byte((byte + 0xff00))
         return 12
     
-    def inst0xf1(self) -> int:
+    def POP_AF(self) -> int:
         self.registers.set_af(self.stackManager.pop_word())
         return 12
     
-    def inst0xf2(self) -> int:
+    def LD_A_REF_C(self) -> int:
         self.registers.a = self.mmu.read_byte(self.registers.c + 0xff00)
         return 8
 
-    def inst0xf3(self) -> int:
+    def DI(self) -> int:
         self.cpu.ime = False
         return 4
     
-    def inst0xf5(self) -> int:
+    def PUSH_AF(self) -> int:
         self.stackManager.push_word(self.registers.get_af())
         return 16
 
-    def inst0xf6(self) -> int:
+    def OR_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self._or(byte)
         return 8
 
-    def inst0xf7(self) -> int:
+    def RST_30H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x30
         return 16
     
-    def inst0xf8(self) -> int:
+    def LD_HL_SP_r8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         hl = self.registers.sp + signed_value(byte)
@@ -1200,1052 +1200,1052 @@ class InstructionPerformer:
         self.registers.set_hl(hl)
         return 12
     
-    def inst0xf9(self) -> int:
+    def LD_SP_HL(self) -> int:
         self.registers.sp = self.registers.get_hl()
         return 8
     
-    def inst0xfa(self) -> int:
+    def LD_A_a16(self) -> int:
         byte = self.mmu.read_byte(self.mmu.read_word(self.registers.pc))
         self.registers.pc += 2
         self.registers.a = byte
         return 16
 
-    def inst0xfb(self) -> int:
+    def EI(self) -> int:
         self.cpu.ime = True
         return 4
 
-    def inst0xfe(self) -> int:
+    def CP_d8(self) -> int:
         byte = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
         self.cp(byte)
         return 8
 
-    def inst0xff(self) -> int:
+    def RST_38H(self) -> int:
         self.stackManager.push_word(self.registers.pc)
         self.registers.pc = 0x38
         return 16
 
-    def inst0xcb00(self) -> int:
+    def RLC_B(self) -> int:
         self.registers.b = self.rlc(self.registers.b)
         return 8
 
-    def inst0xcb01(self) -> int:
+    def RLC_C(self) -> int:
         self.registers.c = self.rlc(self.registers.c)
         return 8
 
-    def inst0xcb02(self) -> int:
+    def RLC_D(self) -> int:
         self.registers.d = self.rlc(self.registers.d)
         return 8
 
-    def inst0xcb03(self) -> int:
+    def RLC_E(self) -> int:
         self.registers.e = self.rlc(self.registers.e)
         return 8
 
-    def inst0xcb04(self) -> int:
+    def RLC_H(self) -> int:
         self.registers.h = self.rlc(self.registers.h)
         return 8
 
-    def inst0xcb05(self) -> int:
+    def RLC_L(self) -> int:
         self.registers.l = self.rlc(self.registers.l)
         return 8
 
-    def inst0xcb06(self) -> int:
+    def RLC_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.rlc(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb07(self) -> int:
+    def RLC_A(self) -> int:
         self.registers.a = self.rlc(self.registers.a)
         return 8
 
-    def inst0xcb08(self) -> int:
+    def RRC_B(self) -> int:
         self.registers.b = self.rrc(self.registers.b)
         return 8
 
-    def inst0xcb09(self) -> int:
+    def RRC_C(self) -> int:
         self.registers.c = self.rrc(self.registers.c)
         return 8
 
-    def inst0xcb0a(self) -> int:
+    def RRC_D(self) -> int:
         self.registers.d = self.rrc(self.registers.d)
         return 8
 
-    def inst0xcb0b(self) -> int:
+    def RRC_E(self) -> int:
         self.registers.e = self.rrc(self.registers.e)
         return 8
 
-    def inst0xcb0c(self) -> int:
+    def RRC_H(self) -> int:
         self.registers.h = self.rrc(self.registers.h)
         return 8
 
-    def inst0xcb0d(self) -> int:
+    def RRC_L(self) -> int:
         self.registers.l = self.rrc(self.registers.l)
         return 8
 
-    def inst0xcb0e(self) -> int:
+    def RRC_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.rrc(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb0f(self) -> int:
+    def RRC_A(self) -> int:
         self.registers.a = self.rrc(self.registers.a)
         return 8
 
-    def inst0xcb10(self) -> int:
+    def RL_B(self) -> int:
         self.registers.b = self.rl(self.registers.b)
         return 8
 
-    def inst0xcb11(self) -> int:
+    def RL_C(self) -> int:
         self.registers.c = self.rl(self.registers.c)
         return 8
 
-    def inst0xcb12(self) -> int:
+    def RL_D(self) -> int:
         self.registers.d = self.rl(self.registers.d)
         return 8
 
-    def inst0xcb13(self) -> int:
+    def RL_E(self) -> int:
         self.registers.e = self.rl(self.registers.e)
         return 8
 
-    def inst0xcb14(self) -> int:
+    def RL_H(self) -> int:
         self.registers.h = self.rl(self.registers.h)
         return 8
 
-    def inst0xcb15(self) -> int:
+    def RL_L(self) -> int:
         self.registers.l = self.rl(self.registers.l)
         return 8
 
-    def inst0xcb16(self) -> int:
+    def RL_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.rl(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb17(self) -> int:
+    def RL_A(self) -> int:
         self.registers.a = self.rl(self.registers.a)
         return 8
 
-    def inst0xcb18(self) -> int:
+    def RR_B(self) -> int:
         self.registers.b = self.rr(self.registers.b)
         return 8
 
-    def inst0xcb19(self) -> int:
+    def RR_C(self) -> int:
         self.registers.c = self.rr(self.registers.c)
         return 8
 
-    def inst0xcb1a(self) -> int:
+    def RR_D(self) -> int:
         self.registers.d = self.rr(self.registers.d)
         return 8
 
-    def inst0xcb1b(self) -> int:
+    def RR_E(self) -> int:
         self.registers.e = self.rr(self.registers.e)
         return 8
 
-    def inst0xcb1c(self) -> int:
+    def RR_H(self) -> int:
         self.registers.h = self.rr(self.registers.h)
         return 8
 
-    def inst0xcb1d(self) -> int:
+    def RR_L(self) -> int:
         self.registers.l = self.rr(self.registers.l)
         return 8
 
-    def inst0xcb1e(self) -> int:
+    def RR_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.rr(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb1f(self) -> int:
+    def RR_A(self) -> int:
         self.registers.a = self.rr(self.registers.a)
         return 8
 
-    def inst0xcb20(self) -> int:
+    def SLA_B(self) -> int:
         self.registers.b = self.sla(self.registers.b)
         return 8
 
-    def inst0xcb21(self) -> int:
+    def SLA_C(self) -> int:
         self.registers.c = self.sla(self.registers.c)
         return 8
 
-    def inst0xcb22(self) -> int:
+    def SLA_D(self) -> int:
         self.registers.d = self.sla(self.registers.d)
         return 8
 
-    def inst0xcb23(self) -> int:
+    def SLA_E(self) -> int:
         self.registers.e = self.sla(self.registers.e)
         return 8
 
-    def inst0xcb24(self) -> int:
+    def SLA_H(self) -> int:
         self.registers.h = self.sla(self.registers.h)
         return 8
 
-    def inst0xcb25(self) -> int:
+    def SLA_L(self) -> int:
         self.registers.l = self.sla(self.registers.l)
         return 8
 
-    def inst0xcb26(self) -> int:
+    def SLA_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.sla(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb27(self) -> int:
+    def SLA_A(self) -> int:
         self.registers.a = self.sla(self.registers.a)
         return 8
 
-    def inst0xcb28(self) -> int:
+    def SRA_B(self) -> int:
         self.registers.b = self.sra(self.registers.b)
         return 8
 
-    def inst0xcb29(self) -> int:
+    def SRA_C(self) -> int:
         self.registers.c = self.sra(self.registers.c)
         return 8
 
-    def inst0xcb2a(self) -> int:
+    def SRA_D(self) -> int:
         self.registers.d = self.sra(self.registers.d)
         return 8
 
-    def inst0xcb2b(self) -> int:
+    def SRA_E(self) -> int:
         self.registers.e = self.sra(self.registers.e)
         return 8
 
-    def inst0xcb2c(self) -> int:
+    def SRA_H(self) -> int:
         self.registers.h = self.sra(self.registers.h)
         return 8
 
-    def inst0xcb2d(self) -> int:
+    def SRA_L(self) -> int:
         self.registers.l = self.sra(self.registers.l)
         return 8
 
-    def inst0xcb2e(self) -> int:
+    def SRA_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.sra(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb2f(self) -> int:
+    def SRA_A(self) -> int:
         self.registers.a = self.sra(self.registers.a)
         return 8
 
-    def inst0xcb30(self) -> int:
+    def SWAP_B(self) -> int:
         self.registers.b = self.swap(self.registers.b)
         return 8
 
-    def inst0xcb31(self) -> int:
+    def SWAP_C(self) -> int:
         self.registers.c = self.swap(self.registers.c)
         return 8
 
-    def inst0xcb32(self) -> int:
+    def SWAP_D(self) -> int:
         self.registers.d = self.swap(self.registers.d)
         return 8
 
-    def inst0xcb33(self) -> int:
+    def SWAP_E(self) -> int:
         self.registers.e = self.swap(self.registers.e)
         return 8
 
-    def inst0xcb34(self) -> int:
+    def SWAP_H(self) -> int:
         self.registers.h = self.swap(self.registers.h)
         return 8
 
-    def inst0xcb35(self) -> int:
+    def SWAP_L(self) -> int:
         self.registers.l = self.swap(self.registers.l)
         return 8
 
-    def inst0xcb36(self) -> int:
+    def SWAP_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.swap(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb37(self) -> int:
+    def SWAP_A(self) -> int:
         self.registers.a = self.swap(self.registers.a)
         return 8
 
-    def inst0xcb38(self) -> int:
+    def SRL_B(self) -> int:
         self.registers.b = self.srl(self.registers.b)
         return 8
 
-    def inst0xcb39(self) -> int:
+    def SRL_C(self) -> int:
         self.registers.c = self.srl(self.registers.c)
         return 8
 
-    def inst0xcb3a(self) -> int:
+    def SRL_D(self) -> int:
         self.registers.d = self.srl(self.registers.d)
         return 8
 
-    def inst0xcb3b(self) -> int:
+    def SRL_E(self) -> int:
         self.registers.e = self.srl(self.registers.e)
         return 8
 
-    def inst0xcb3c(self) -> int:
+    def SRL_H(self) -> int:
         self.registers.h = self.srl(self.registers.h)
         return 8
 
-    def inst0xcb3d(self) -> int:
+    def SRL_L(self) -> int:
         self.registers.l = self.srl(self.registers.l)
         return 8
 
-    def inst0xcb3e(self) -> int:
+    def SRL_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.srl(self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb3f(self) -> int:
+    def SRL_A(self) -> int:
         self.registers.a = self.srl(self.registers.a)
         return 8
 
-    def inst0xcb40(self) -> int:
+    def BIT_0_B(self) -> int:
         self.bit(0, self.registers.b)
         return 8
 
-    def inst0xcb41(self) -> int:
+    def BIT_0_C(self) -> int:
         self.bit(0, self.registers.c)
         return 8
 
-    def inst0xcb42(self) -> int:
+    def BIT_0_D(self) -> int:
         self.bit(0, self.registers.d)
         return 8
 
-    def inst0xcb43(self) -> int:
+    def BIT_0_E(self) -> int:
         self.bit(0, self.registers.e)
         return 8
 
-    def inst0xcb44(self) -> int:
+    def BIT_0_H(self) -> int:
         self.bit(0, self.registers.h)
         return 8
 
-    def inst0xcb45(self) -> int:
+    def BIT_0_L(self) -> int:
         self.bit(0, self.registers.l)
         return 8
 
-    def inst0xcb46(self) -> int:
+    def BIT_0_REF_HL(self) -> int:
         self.bit(0, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb47(self) -> int:
+    def BIT_0_A(self) -> int:
         self.bit(0, self.registers.a)
         return 8
 
-    def inst0xcb48(self) -> int:
+    def BIT_1_B(self) -> int:
         self.bit(1, self.registers.b)
         return 8
 
-    def inst0xcb49(self) -> int:
+    def BIT_1_C(self) -> int:
         self.bit(1, self.registers.c)
         return 8
 
-    def inst0xcb4a(self) -> int:
+    def BIT_1_D(self) -> int:
         self.bit(1, self.registers.d)
         return 8
 
-    def inst0xcb4b(self) -> int:
+    def BIT_1_E(self) -> int:
         self.bit(1, self.registers.e)
         return 8
 
-    def inst0xcb4c(self) -> int:
+    def BIT_1_H(self) -> int:
         self.bit(1, self.registers.h)
         return 8
 
-    def inst0xcb4d(self) -> int:
+    def BIT_1_L(self) -> int:
         self.bit(1, self.registers.l)
         return 8
 
-    def inst0xcb4e(self) -> int:
+    def BIT_1_REF_HL(self) -> int:
         self.bit(1, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb4f(self) -> int:
+    def BIT_1_A(self) -> int:
         self.bit(1, self.registers.a)
         return 8
 
-    def inst0xcb50(self) -> int:
+    def BIT_2_B(self) -> int:
         self.bit(2, self.registers.b)
         return 8
 
-    def inst0xcb51(self) -> int:
+    def BIT_2_C(self) -> int:
         self.bit(2, self.registers.c)
         return 8
 
-    def inst0xcb52(self) -> int:
+    def BIT_2_D(self) -> int:
         self.bit(2, self.registers.d)
         return 8
 
-    def inst0xcb53(self) -> int:
+    def BIT_2_E(self) -> int:
         self.bit(2, self.registers.e)
         return 8
 
-    def inst0xcb54(self) -> int:
+    def BIT_2_H(self) -> int:
         self.bit(2, self.registers.h)
         return 8
 
-    def inst0xcb55(self) -> int:
+    def BIT_2_L(self) -> int:
         self.bit(2, self.registers.l)
         return 8
 
-    def inst0xcb56(self) -> int:
+    def BIT_2_REF_HL(self) -> int:
         self.bit(2, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb57(self) -> int:
+    def BIT_2_A(self) -> int:
         self.bit(2, self.registers.a)
         return 8
 
-    def inst0xcb58(self) -> int:
+    def BIT_3_B(self) -> int:
         self.bit(3, self.registers.b)
         return 8
 
-    def inst0xcb59(self) -> int:
+    def BIT_3_C(self) -> int:
         self.bit(3, self.registers.c)
         return 8
 
-    def inst0xcb5a(self) -> int:
+    def BIT_3_D(self) -> int:
         self.bit(3, self.registers.d)
         return 8
 
-    def inst0xcb5b(self) -> int:
+    def BIT_3_E(self) -> int:
         self.bit(3, self.registers.e)
         return 8
 
-    def inst0xcb5c(self) -> int:
+    def BIT_3_H(self) -> int:
         self.bit(3, self.registers.h)
         return 8
 
-    def inst0xcb5d(self) -> int:
+    def BIT_3_L(self) -> int:
         self.bit(3, self.registers.l)
         return 8
 
-    def inst0xcb5e(self) -> int:
+    def BIT_3_REF_HL(self) -> int:
         self.bit(3, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb5f(self) -> int:
+    def BIT_3_A(self) -> int:
         self.bit(3, self.registers.a)
         return 8
 
-    def inst0xcb60(self) -> int:
+    def BIT_4_B(self) -> int:
         self.bit(4, self.registers.b)
         return 8
 
-    def inst0xcb61(self) -> int:
+    def BIT_4_C(self) -> int:
         self.bit(4, self.registers.c)
         return 8
 
-    def inst0xcb62(self) -> int:
+    def BIT_4_D(self) -> int:
         self.bit(4, self.registers.d)
         return 8
 
-    def inst0xcb63(self) -> int:
+    def BIT_4_E(self) -> int:
         self.bit(4, self.registers.e)
         return 8
 
-    def inst0xcb64(self) -> int:
+    def BIT_4_H(self) -> int:
         self.bit(4, self.registers.h)
         return 8
 
-    def inst0xcb65(self) -> int:
+    def BIT_4_L(self) -> int:
         self.bit(4, self.registers.l)
         return 8
 
-    def inst0xcb66(self) -> int:
+    def BIT_4_REF_HL(self) -> int:
         self.bit(4, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb67(self) -> int:
+    def BIT_4_A(self) -> int:
         self.bit(4, self.registers.a)
         return 8
 
-    def inst0xcb68(self) -> int:
+    def BIT_5_B(self) -> int:
         self.bit(5, self.registers.b)
         return 8
 
-    def inst0xcb69(self) -> int:
+    def BIT_5_C(self) -> int:
         self.bit(5, self.registers.c)
         return 8
 
-    def inst0xcb6a(self) -> int:
+    def BIT_5_D(self) -> int:
         self.bit(5, self.registers.d)
         return 8
 
-    def inst0xcb6b(self) -> int:
+    def BIT_5_E(self) -> int:
         self.bit(5, self.registers.e)
         return 8
 
-    def inst0xcb6c(self) -> int:
+    def BIT_5_H(self) -> int:
         self.bit(5, self.registers.h)
         return 8
 
-    def inst0xcb6d(self) -> int:
+    def BIT_5_L(self) -> int:
         self.bit(5, self.registers.l)
         return 8
 
-    def inst0xcb6e(self) -> int:
+    def BIT_5_REF_HL(self) -> int:
         self.bit(5, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb6f(self) -> int:
+    def BIT_5_A(self) -> int:
         self.bit(5, self.registers.a)
         return 8
 
-    def inst0xcb70(self) -> int:
+    def BIT_6_B(self) -> int:
         self.bit(6, self.registers.b)
         return 8
 
-    def inst0xcb71(self) -> int:
+    def BIT_6_C(self) -> int:
         self.bit(6, self.registers.c)
         return 8
 
-    def inst0xcb72(self) -> int:
+    def BIT_6_D(self) -> int:
         self.bit(6, self.registers.d)
         return 8
 
-    def inst0xcb73(self) -> int:
+    def BIT_6_E(self) -> int:
         self.bit(6, self.registers.e)
         return 8
 
-    def inst0xcb74(self) -> int:
+    def BIT_6_H(self) -> int:
         self.bit(6, self.registers.h)
         return 8
 
-    def inst0xcb75(self) -> int:
+    def BIT_6_L(self) -> int:
         self.bit(6, self.registers.l)
         return 8
 
-    def inst0xcb76(self) -> int:
+    def BIT_6_REF_HL(self) -> int:
         self.bit(6, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb77(self) -> int:
+    def BIT_6_A(self) -> int:
         self.bit(6, self.registers.a)
         return 8
 
-    def inst0xcb78(self) -> int:
+    def BIT_7_B(self) -> int:
         self.bit(7, self.registers.b)
         return 8
 
-    def inst0xcb79(self) -> int:
+    def BIT_7_C(self) -> int:
         self.bit(7, self.registers.c)
         return 8
 
-    def inst0xcb7a(self) -> int:
+    def BIT_7_D(self) -> int:
         self.bit(7, self.registers.d)
         return 8
 
-    def inst0xcb7b(self) -> int:
+    def BIT_7_E(self) -> int:
         self.bit(7, self.registers.e)
         return 8
 
-    def inst0xcb7c(self) -> int:
+    def BIT_7_H(self) -> int:
         self.bit(7, self.registers.h)
         return 8
 
-    def inst0xcb7d(self) -> int:
+    def BIT_7_L(self) -> int:
         self.bit(7, self.registers.l)
         return 8
 
-    def inst0xcb7e(self) -> int:
+    def BIT_7_REF_HL(self) -> int:
         self.bit(7, self.mmu.read_byte(self.registers.get_hl()))
         return 12
 
-    def inst0xcb7f(self) -> int:
+    def BIT_7_A(self) -> int:
         self.bit(7, self.registers.a)
         return 8
 
-    def inst0xcb80(self) -> int:
+    def RES_0_B(self) -> int:
         self.registers.b = self.res(0, self.registers.b)
         return 8
 
-    def inst0xcb81(self) -> int:
+    def RES_0_C(self) -> int:
         self.registers.c = self.res(0, self.registers.c)
         return 8
 
-    def inst0xcb82(self) -> int:
+    def RES_0_D(self) -> int:
         self.registers.d = self.res(0, self.registers.d)
         return 8
 
-    def inst0xcb83(self) -> int:
+    def RES_0_E(self) -> int:
         self.registers.e = self.res(0, self.registers.e)
         return 8
 
-    def inst0xcb84(self) -> int:
+    def RES_0_H(self) -> int:
         self.registers.h = self.res(0, self.registers.h)
         return 8
 
-    def inst0xcb85(self) -> int:
+    def RES_0_L(self) -> int:
         self.registers.l = self.res(0, self.registers.l)
         return 8
 
-    def inst0xcb86(self) -> int:
+    def RES_0_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(0, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb87(self) -> int:
+    def RES_0_A(self) -> int:
         self.registers.a = self.res(0, self.registers.a)
         return 8
 
-    def inst0xcb88(self) -> int:
+    def RES_1_B(self) -> int:
         self.registers.b = self.res(1, self.registers.b)
         return 8
 
-    def inst0xcb89(self) -> int:
+    def RES_1_C(self) -> int:
         self.registers.c = self.res(1, self.registers.c)
         return 8
 
-    def inst0xcb8a(self) -> int:
+    def RES_1_D(self) -> int:
         self.registers.d = self.res(1, self.registers.d)
         return 8
 
-    def inst0xcb8b(self) -> int:
+    def RES_1_E(self) -> int:
         self.registers.e = self.res(1, self.registers.e)
         return 8
 
-    def inst0xcb8c(self) -> int:
+    def RES_1_H(self) -> int:
         self.registers.h = self.res(1, self.registers.h)
         return 8
 
-    def inst0xcb8d(self) -> int:
+    def RES_1_L(self) -> int:
         self.registers.l = self.res(1, self.registers.l)
         return 8
 
-    def inst0xcb8e(self) -> int:
+    def RES_1_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(1, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb8f(self) -> int:
+    def RES_1_A(self) -> int:
         self.registers.a = self.res(1, self.registers.a)
         return 8
 
-    def inst0xcb90(self) -> int:
+    def RES_2_B(self) -> int:
         self.registers.b = self.res(2, self.registers.b)
         return 8
 
-    def inst0xcb91(self) -> int:
+    def RES_2_C(self) -> int:
         self.registers.c = self.res(2, self.registers.c)
         return 8
 
-    def inst0xcb92(self) -> int:
+    def RES_2_D(self) -> int:
         self.registers.d = self.res(2, self.registers.d)
         return 8
 
-    def inst0xcb93(self) -> int:
+    def RES_2_E(self) -> int:
         self.registers.e = self.res(2, self.registers.e)
         return 8
 
-    def inst0xcb94(self) -> int:
+    def RES_2_H(self) -> int:
         self.registers.h = self.res(2, self.registers.h)
         return 8
 
-    def inst0xcb95(self) -> int:
+    def RES_2_L(self) -> int:
         self.registers.l = self.res(2, self.registers.l)
         return 8
 
-    def inst0xcb96(self) -> int:
+    def RES_2_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(2, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb97(self) -> int:
+    def RES_2_A(self) -> int:
         self.registers.a = self.res(2, self.registers.a)
         return 8
 
-    def inst0xcb98(self) -> int:
+    def RES_3_B(self) -> int:
         self.registers.b = self.res(3, self.registers.b)
         return 8
 
-    def inst0xcb99(self) -> int:
+    def RES_3_C(self) -> int:
         self.registers.c = self.res(3, self.registers.c)
         return 8
 
-    def inst0xcb9a(self) -> int:
+    def RES_3_D(self) -> int:
         self.registers.d = self.res(3, self.registers.d)
         return 8
 
-    def inst0xcb9b(self) -> int:
+    def RES_3_E(self) -> int:
         self.registers.e = self.res(3, self.registers.e)
         return 8
 
-    def inst0xcb9c(self) -> int:
+    def RES_3_H(self) -> int:
         self.registers.h = self.res(3, self.registers.h)
         return 8
 
-    def inst0xcb9d(self) -> int:
+    def RES_3_L(self) -> int:
         self.registers.l = self.res(3, self.registers.l)
         return 8
 
-    def inst0xcb9e(self) -> int:
+    def RES_3_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(3, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcb9f(self) -> int:
+    def RES_3_A(self) -> int:
         self.registers.a = self.res(3, self.registers.a)
         return 8
 
-    def inst0xcba0(self) -> int:
+    def RES_4_B(self) -> int:
         self.registers.b = self.res(4, self.registers.b)
         return 8
 
-    def inst0xcba1(self) -> int:
+    def RES_4_C(self) -> int:
         self.registers.c = self.res(4, self.registers.c)
         return 8
 
-    def inst0xcba2(self) -> int:
+    def RES_4_D(self) -> int:
         self.registers.d = self.res(4, self.registers.d)
         return 8
 
-    def inst0xcba3(self) -> int:
+    def RES_4_E(self) -> int:
         self.registers.e = self.res(4, self.registers.e)
         return 8
 
-    def inst0xcba4(self) -> int:
+    def RES_4_H(self) -> int:
         self.registers.h = self.res(4, self.registers.h)
         return 8
 
-    def inst0xcba5(self) -> int:
+    def RES_4_L(self) -> int:
         self.registers.l = self.res(4, self.registers.l)
         return 8
 
-    def inst0xcba6(self) -> int:
+    def RES_4_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(4, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcba7(self) -> int:
+    def RES_4_A(self) -> int:
         self.registers.a = self.res(4, self.registers.a)
         return 8
 
-    def inst0xcba8(self) -> int:
+    def RES_5_B(self) -> int:
         self.registers.b = self.res(5, self.registers.b)
         return 8
 
-    def inst0xcba9(self) -> int:
+    def RES_5_C(self) -> int:
         self.registers.c = self.res(5, self.registers.c)
         return 8
 
-    def inst0xcbaa(self) -> int:
+    def RES_5_D(self) -> int:
         self.registers.d = self.res(5, self.registers.d)
         return 8
 
-    def inst0xcbab(self) -> int:
+    def RES_5_E(self) -> int:
         self.registers.e = self.res(5, self.registers.e)
         return 8
 
-    def inst0xcbac(self) -> int:
+    def RES_5_H(self) -> int:
         self.registers.h = self.res(5, self.registers.h)
         return 8
 
-    def inst0xcbad(self) -> int:
+    def RES_5_L(self) -> int:
         self.registers.l = self.res(5, self.registers.l)
         return 8
 
-    def inst0xcbae(self) -> int:
+    def RES_5_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(5, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbaf(self) -> int:
+    def RES_5_A(self) -> int:
         self.registers.a = self.res(5, self.registers.a)
         return 8
 
-    def inst0xcbb0(self) -> int:
+    def RES_6_B(self) -> int:
         self.registers.b = self.res(6, self.registers.b)
         return 8
 
-    def inst0xcbb1(self) -> int:
+    def RES_6_C(self) -> int:
         self.registers.c = self.res(6, self.registers.c)
         return 8
 
-    def inst0xcbb2(self) -> int:
+    def RES_6_D(self) -> int:
         self.registers.d = self.res(6, self.registers.d)
         return 8
 
-    def inst0xcbb3(self) -> int:
+    def RES_6_E(self) -> int:
         self.registers.e = self.res(6, self.registers.e)
         return 8
 
-    def inst0xcbb4(self) -> int:
+    def RES_6_H(self) -> int:
         self.registers.h = self.res(6, self.registers.h)
         return 8
 
-    def inst0xcbb5(self) -> int:
+    def RES_6_L(self) -> int:
         self.registers.l = self.res(6, self.registers.l)
         return 8
 
-    def inst0xcbb6(self) -> int:
+    def RES_6_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(6, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbb7(self) -> int:
+    def RES_6_A(self) -> int:
         self.registers.a = self.res(6, self.registers.a)
         return 8
 
-    def inst0xcbb8(self) -> int:
+    def RES_7_B(self) -> int:
         self.registers.b = self.res(7, self.registers.b)
         return 8
 
-    def inst0xcbb9(self) -> int:
+    def RES_7_C(self) -> int:
         self.registers.c = self.res(7, self.registers.c)
         return 8
 
-    def inst0xcbba(self) -> int:
+    def RES_7_D(self) -> int:
         self.registers.d = self.res(7, self.registers.d)
         return 8
 
-    def inst0xcbbb(self) -> int:
+    def RES_7_E(self) -> int:
         self.registers.e = self.res(7, self.registers.e)
         return 8
 
-    def inst0xcbbc(self) -> int:
+    def RES_7_H(self) -> int:
         self.registers.h = self.res(7, self.registers.h)
         return 8
 
-    def inst0xcbbd(self) -> int:
+    def RES_7_L(self) -> int:
         self.registers.l = self.res(7, self.registers.l)
         return 8
 
-    def inst0xcbbe(self) -> int:
+    def RES_7_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), self.res(7, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbbf(self) -> int:
+    def RES_7_A(self) -> int:
         self.registers.a = self.res(7, self.registers.a)
         return 8
 
-    def inst0xcbc0(self) -> int:
+    def SET_0_B(self) -> int:
         self.registers.b = set_bit(0, self.registers.b)
         return 8
 
-    def inst0xcbc1(self) -> int:
+    def SET_0_C(self) -> int:
         self.registers.c = set_bit(0, self.registers.c)
         return 8
 
-    def inst0xcbc2(self) -> int:
+    def SET_0_D(self) -> int:
         self.registers.d = set_bit(0, self.registers.d)
         return 8
 
-    def inst0xcbc3(self) -> int:
+    def SET_0_E(self) -> int:
         self.registers.e = set_bit(0, self.registers.e)
         return 8
 
-    def inst0xcbc4(self) -> int:
+    def SET_0_H(self) -> int:
         self.registers.h = set_bit(0, self.registers.h)
         return 8
 
-    def inst0xcbc5(self) -> int:
+    def SET_0_L(self) -> int:
         self.registers.l = set_bit(0, self.registers.l)
         return 8
 
-    def inst0xcbc6(self) -> int:
+    def SET_0_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(0, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbc7(self) -> int:
+    def SET_0_A(self) -> int:
         self.registers.a = set_bit(0, self.registers.a)
         return 8
 
-    def inst0xcbc8(self) -> int:
+    def SET_1_B(self) -> int:
         self.registers.b = set_bit(1, self.registers.b)
         return 8
 
-    def inst0xcbc9(self) -> int:
+    def SET_1_C(self) -> int:
         self.registers.c = set_bit(1, self.registers.c)
         return 8
 
-    def inst0xcbca(self) -> int:
+    def SET_1_D(self) -> int:
         self.registers.d = set_bit(1, self.registers.d)
         return 8
 
-    def inst0xcbcb(self) -> int:
+    def SET_1_E(self) -> int:
         self.registers.e = set_bit(1, self.registers.e)
         return 8
 
-    def inst0xcbcc(self) -> int:
+    def SET_1_H(self) -> int:
         self.registers.h = set_bit(1, self.registers.h)
         return 8
 
-    def inst0xcbcd(self) -> int:
+    def SET_1_L(self) -> int:
         self.registers.l = set_bit(1, self.registers.l)
         return 8
 
-    def inst0xcbce(self) -> int:
+    def SET_1_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(1, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbcf(self) -> int:
+    def SET_1_A(self) -> int:
         self.registers.a = set_bit(1, self.registers.a)
         return 8
 
-    def inst0xcbd0(self) -> int:
+    def SET_2_B(self) -> int:
         self.registers.b = set_bit(2, self.registers.b)
         return 8
 
-    def inst0xcbd1(self) -> int:
+    def SET_2_C(self) -> int:
         self.registers.c = set_bit(2, self.registers.c)
         return 8
 
-    def inst0xcbd2(self) -> int:
+    def SET_2_D(self) -> int:
         self.registers.d = set_bit(2, self.registers.d)
         return 8
 
-    def inst0xcbd3(self) -> int:
+    def SET_2_E(self) -> int:
         self.registers.e = set_bit(2, self.registers.e)
         return 8
 
-    def inst0xcbd4(self) -> int:
+    def SET_2_H(self) -> int:
         self.registers.h = set_bit(2, self.registers.h)
         return 8
 
-    def inst0xcbd5(self) -> int:
+    def SET_2_L(self) -> int:
         self.registers.l = set_bit(2, self.registers.l)
         return 8
 
-    def inst0xcbd6(self) -> int:
+    def SET_2_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(2, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbd7(self) -> int:
+    def SET_2_A(self) -> int:
         self.registers.a = set_bit(2, self.registers.a)
         return 8
 
-    def inst0xcbd8(self) -> int:
+    def SET_3_B(self) -> int:
         self.registers.b = set_bit(3, self.registers.b)
         return 8
 
-    def inst0xcbd9(self) -> int:
+    def SET_3_C(self) -> int:
         self.registers.c = set_bit(3, self.registers.c)
         return 8
 
-    def inst0xcbda(self) -> int:
+    def SET_3_D(self) -> int:
         self.registers.d = set_bit(3, self.registers.d)
         return 8
 
-    def inst0xcbdb(self) -> int:
+    def SET_3_E(self) -> int:
         self.registers.e = set_bit(3, self.registers.e)
         return 8
 
-    def inst0xcbdc(self) -> int:
+    def SET_3_H(self) -> int:
         self.registers.h = set_bit(3, self.registers.h)
         return 8
 
-    def inst0xcbdd(self) -> int:
+    def SET_3_L(self) -> int:
         self.registers.l = set_bit(3, self.registers.l)
         return 8
 
-    def inst0xcbde(self) -> int:
+    def SET_3_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(3, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbdf(self) -> int:
+    def SET_3_A(self) -> int:
         self.registers.a = set_bit(3, self.registers.a)
         return 8
 
-    def inst0xcbe0(self) -> int:
+    def SET_4_B(self) -> int:
         self.registers.b = set_bit(4, self.registers.b)
         return 8
 
-    def inst0xcbe1(self) -> int:
+    def SET_4_C(self) -> int:
         self.registers.c = set_bit(4, self.registers.c)
         return 8
 
-    def inst0xcbe2(self) -> int:
+    def SET_4_D(self) -> int:
         self.registers.d = set_bit(4, self.registers.d)
         return 8
 
-    def inst0xcbe3(self) -> int:
+    def SET_4_E(self) -> int:
         self.registers.e = set_bit(4, self.registers.e)
         return 8
 
-    def inst0xcbe4(self) -> int:
+    def SET_4_H(self) -> int:
         self.registers.h = set_bit(4, self.registers.h)
         return 8
 
-    def inst0xcbe5(self) -> int:
+    def SET_4_L(self) -> int:
         self.registers.l = set_bit(4, self.registers.l)
         return 8
 
-    def inst0xcbe6(self) -> int:
+    def SET_4_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(4, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbe7(self) -> int:
+    def SET_4_A(self) -> int:
         self.registers.a = set_bit(4, self.registers.a)
         return 8
 
-    def inst0xcbe8(self) -> int:
+    def SET_5_B(self) -> int:
         self.registers.b = set_bit(5, self.registers.b)
         return 8
 
-    def inst0xcbe9(self) -> int:
+    def SET_5_C(self) -> int:
         self.registers.c = set_bit(5, self.registers.c)
         return 8
 
-    def inst0xcbea(self) -> int:
+    def SET_5_D(self) -> int:
         self.registers.d = set_bit(5, self.registers.d)
         return 8
 
-    def inst0xcbeb(self) -> int:
+    def SET_5_E(self) -> int:
         self.registers.e = set_bit(5, self.registers.e)
         return 8
 
-    def inst0xcbec(self) -> int:
+    def SET_5_H(self) -> int:
         self.registers.h = set_bit(5, self.registers.h)
         return 8
 
-    def inst0xcbed(self) -> int:
+    def SET_5_L(self) -> int:
         self.registers.l = set_bit(5, self.registers.l)
         return 8
 
-    def inst0xcbee(self) -> int:
+    def SET_5_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(5, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbef(self) -> int:
+    def SET_5_A(self) -> int:
         self.registers.a = set_bit(5, self.registers.a)
         return 8
 
-    def inst0xcbf0(self) -> int:
+    def SET_6_B(self) -> int:
         self.registers.b = set_bit(6, self.registers.b)
         return 8
 
-    def inst0xcbf1(self) -> int:
+    def SET_6_C(self) -> int:
         self.registers.c = set_bit(6, self.registers.c)
         return 8
 
-    def inst0xcbf2(self) -> int:
+    def SET_6_D(self) -> int:
         self.registers.d = set_bit(6, self.registers.d)
         return 8
 
-    def inst0xcbf3(self) -> int:
+    def SET_6_E(self) -> int:
         self.registers.e = set_bit(6, self.registers.e)
         return 8
 
-    def inst0xcbf4(self) -> int:
+    def SET_6_H(self) -> int:
         self.registers.h = set_bit(6, self.registers.h)
         return 8
 
-    def inst0xcbf5(self) -> int:
+    def SET_6_L(self) -> int:
         self.registers.l = set_bit(6, self.registers.l)
         return 8
 
-    def inst0xcbf6(self) -> int:
+    def SET_6_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(6, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbf7(self) -> int:
+    def SET_6_A(self) -> int:
         self.registers.a = set_bit(6, self.registers.a)
         return 8
 
-    def inst0xcbf8(self) -> int:
+    def SET_7_B(self) -> int:
         self.registers.b = set_bit(7, self.registers.b)
         return 8
 
-    def inst0xcbf9(self) -> int:
+    def SET_7_C(self) -> int:
         self.registers.c = set_bit(7, self.registers.c)
         return 8
 
-    def inst0xcbfa(self) -> int:
+    def SET_7_D(self) -> int:
         self.registers.d = set_bit(7, self.registers.d)
         return 8
 
-    def inst0xcbfb(self) -> int:
+    def SET_7_E(self) -> int:
         self.registers.e = set_bit(7, self.registers.e)
         return 8
 
-    def inst0xcbfc(self) -> int:
+    def SET_7_H(self) -> int:
         self.registers.h = set_bit(7, self.registers.h)
         return 8
 
-    def inst0xcbfd(self) -> int:
+    def SET_7_L(self) -> int:
         self.registers.l = set_bit(7, self.registers.l)
         return 8
 
-    def inst0xcbfe(self) -> int:
+    def SET_7_REF_HL(self) -> int:
         self.mmu.write_byte(self.registers.get_hl(), set_bit(7, self.mmu.read_byte(self.registers.get_hl())))
         return 16
 
-    def inst0xcbff(self) -> int:
+    def SET_7_A(self) -> int:
         self.registers.a = set_bit(7, self.registers.a)
         return 8
     
