@@ -5,3 +5,7 @@ tasks:
   - command: pip3 install simpleaudio
   - command: pip3 install pyopengl
   - command: cd && git clone https://github.com/retrio/gb-test-roms
+
+ports:
+  - port: 6080
+    onOpen: open-preview
