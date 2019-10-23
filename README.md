@@ -1,11 +1,12 @@
 # vsgb
 A simple gameboy emulator writen in python
+## [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vitorsilverio/pygb)
 
 ## Requirements
 - Python >= 3.6 ( i recommend to use pypy instead )
 - PyOpenGL (https://pypi.org/project/PyOpenGL/)
 - FreeGLUT (http://freeglut.sourceforge.net/)
-  
+
 
 ## Running
 The executable will be:
