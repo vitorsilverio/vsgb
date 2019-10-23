@@ -2,9 +2,7 @@ image:
   file: .gitpod.dockerfile
 
 tasks:
-  - command: pip3 install simpleaudio
-  - command: pip3 install pyopengl
-  - command: cd && git clone https://github.com/retrio/gb-test-roms
+  - command: pip3 install simpleaudio && pip3 install pyopengl && cd && git clone https://github.com/retrio/gb-test-roms && cd /workspace/vsgb && python3 main.py -sr ~/gb-test-roms/cpu_instrs/cpu_instrs.gb
 
 ports:
   - port: 6080
