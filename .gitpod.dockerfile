@@ -1,4 +1,4 @@
-FROM gitpod/workspace-full
+FROM gitpod/workspace-full-vnc
 
 RUN sudo add-apt-repository ppa:pypy/ppa \
  && sudo apt-get update \
