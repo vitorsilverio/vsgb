@@ -11,6 +11,7 @@ tasks:
   command: git clone https://github.com/retrio/gb-test-roms
   command: cd /workspace/vsgb
   command: pypy3 main.py -sr ~/gb-test-roms/cpu_instrs/cpu_instrs.gb
+
 ports:
   - port: 6080
     onOpen: open-preview
