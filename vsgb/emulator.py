@@ -38,10 +38,10 @@ class Emulator:
             last_instruction = instructions[self.cpu.last_instruction][0]
             last_instruction_size = instructions[self.cpu.last_instruction][1]
             if last_instruction_size == 1:
-                last_instruction = last_instruction.format(hex(self.mmu.read_byte(self.cpu.last_pc+1)))
+                last_instruction = last_instruction.format(self.mmu.read_byte(self.cpu.last_pc+1))
             if last_instruction_size == 2:
-                last_instruction = last_instruction.format(hex(self.mmu.read_word(self.cpu.last_pc+1)))
-            print('{}: {}'.format(hex(self.cpu.last_pc), last_instruction))
+                last_instruction = last_instruction.format(self.mmu.read_word(self.cpu.last_pc+1))
+            print('{:04x}: {}'.format(self.cpu.last_pc, last_instruction))
             raise e
 
     def skip_boot_rom(self):

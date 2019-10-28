@@ -85,12 +85,12 @@ class Registers:
         return self.f & Registers.H_FLAG == Registers.H_FLAG
 
     def __str__(self) -> str:
-        return 'A: {} F: {} BC: {} DE: {} HL: {}: SP: {} PC: {} '.format(
-           hex(self.a),
-           hex(self.f),
-           hex(self.get_bc()),
-           hex(self.get_de()),
-           hex(self.get_hl()),
-           hex(self.sp),
-           hex(self.pc)
+        return 'A: {:02x} F: {:02x} BC: {:04x} DE: {:04x} HL: {:04x}: SP: {:04x} PC: {:04x} '.format(
+           self.a,
+           self.f,
+           self.get_bc(),
+           self.get_de(),
+           self.get_hl(),
+           self.sp,
+           self.pc
         )
