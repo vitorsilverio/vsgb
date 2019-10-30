@@ -18,6 +18,9 @@ class Timer:
 
     def tick(self, cycles : int = 0):
         self.div_cycles += cycles
+        # increment again if DOUBLE SPEED MODE
+        if self.mmu.read_byte(IO_Registers.KEY1) & 0b1000000 == 0b1000000:
+            self.div_cycles += cycles
         # incremnt DIV register if its time to
         if self.div_cycles >= Timer.DIV_INC_TIME :
             self.inc_div_register()
