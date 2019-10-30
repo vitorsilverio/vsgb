@@ -39,7 +39,7 @@ class MMU:
         self.hram = array.array('B', [0xff]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_space = array.array('B', [0xff]*0x60)
-        if self.rom.is_only_cgb():
+        if self.rom.is_cgb():
             self.boot_rom  = cgb_boot_rom
         else:
             self.boot_rom  = boot_rom
