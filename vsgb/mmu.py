@@ -120,6 +120,11 @@ class MMU:
                     self.bootstrap_enabled = False
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
+                #elif address == IO_Registers.KEY1 and self.rom.is_cgb():
+                #    mode = self.io_ports[IO_Registers.KEY1 - 0xff00] & 0b10000000
+                #    self.hram[IO_Registers.IE - 0xff80] = value
+                #    self.io_ports[IO_Registers.P1 - 0xff00] = 0x30
+                #    self.io_ports[IO_Registers.KEY1 - 0xff00] = 0 if mode !=0 else 0b10000000
                 else:
                     self.io_ports[address - 0xff00] = value
             else:     

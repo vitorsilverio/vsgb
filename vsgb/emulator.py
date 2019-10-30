@@ -46,7 +46,10 @@ class Emulator:
 
     def skip_boot_rom(self):
         self.cpu.registers.pc = 0x0100
-        self.cpu.registers.set_af(0x01b0)
+        if self.mmu.rom.is_cgb():
+            self.cpu.registers.set_af(0x11b0)
+        else:
+            self.cpu.registers.set_af(0x01b0)
         self.cpu.registers.set_bc(0x0013)
         self.cpu.registers.set_de(0x00d8)
         self.cpu.registers.set_hl(0x014d)
