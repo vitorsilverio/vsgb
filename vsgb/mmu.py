@@ -4,7 +4,7 @@
 import array
 
 from vsgb.apu import APU
-from vsgb.boot_rom import boot_rom
+from vsgb.boot_rom import boot_rom, cgb_boot_rom
 from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
@@ -28,32 +28,45 @@ from vsgb.cartridge import CartridgeType
 class MMU:
 
     def __init__(self, rom : CartridgeType, apu: APU, _input : Input):
-        self.boot_rom  = boot_rom
         self.rom = rom
         self.apu = apu
         self.input = _input
-        self.vram = array.array('B', [0xff]*0x2000)
-        self.wram = array.array('B', [0xff]*0x2000)
+        self.vram = array.array('B', [0xff]*0x4000)
+        self.wram = array.array('B', [0xff]*0x8000)
         self.oam = array.array('B', [0xff]*0xa0)
         self.zero_page = array.array('B', [0xff]*0x7f)
         self.io_ports = array.array('B', [0xff]*0x80)
         self.hram = array.array('B', [0xff]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_space = array.array('B', [0xff]*0x60)
+        if self.rom.is_only_cgb():
+            self.boot_rom  = cgb_boot_rom
+        else:
+            self.boot_rom  = boot_rom
         
     def read_byte(self, address: int) -> int:
-        if 0 <= address < 0x100 and self.bootstrap_enabled:
-            return self.boot_rom[address] & 0xff
         if 0 <= address < 0x8000:
+            if self.bootstrap_enabled and address < len(self.boot_rom):
+                return self.boot_rom[address] & 0xff
             return self.rom.read_rom_byte(address) & 0xff
         if 0x8000 <= address < 0xa000:
-            return self.vram[address - 0x8000] & 0xff
+            if self.rom.is_cgb():
+                bank = self.read_byte(IO_Registers.VBK) & 0x1
+                return self.vram[(address - 0x8000)+(0x2000 * bank)] & 0xff
+            else:
+                return self.vram[address - 0x8000] & 0xff
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
         if 0xc000 <= address < 0xe000:
-            return self.wram[address - 0xc000] & 0xff
+            if self.rom.is_cgb():
+                if 0xc000 <= address < 0xd000:
+                    return self.wram[address - 0xc000] & 0xff
+                bank = self.read_byte(IO_Registers.SVBK) & 0x7
+                return self.wram[(address - 0xd000)+(bank*0x1000)] & 0xff
+            else:
+                return self.wram[address - 0xc000] & 0xff
         if 0xe000 <= address < 0xfe00:
-            return self.wram[address - 0xe000] & 0xff #Echo RAM
+            return self.read_byte(address - 0x2000) #Echo RAM
         if 0xfe00 <= address < 0xfea0:
             return self.oam[address - 0xfe00] & 0xff
         if 0xfea0 <= address < 0xff00:
@@ -73,13 +86,24 @@ class MMU:
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
         elif 0x8000 <= address < 0xa000:
-            self.vram[address - 0x8000] = value
+            if self.rom.is_cgb():
+                bank = self.read_byte(IO_Registers.VBK) & 0x1
+                self.vram[(address - 0x8000)+(0x2000 * bank)] = value
+            else:
+                self.vram[address - 0x8000] = value
         elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
         elif 0xc000 <= address < 0xe000:
-            self.wram[address - 0xc000] = value
+            if self.rom.is_cgb():
+                if 0xc000 <= address < 0xd000:
+                    self.wram[address - 0xc000] = value
+                else:
+                    bank = self.read_byte(IO_Registers.SVBK) & 0x7
+                    self.wram[(address - 0xd000)+(bank*0x1000)] = value
+            else:
+                self.wram[address - 0xc000] = value
         elif 0xe000 <= address < 0xfe00:
-            self.wram[address - 0xe000] = value # Echo RAM
+            self.write_byte(address - 0x2000, value) #Echo RAM
         elif 0xfe00 <= address < 0xfea0:
             self.oam[address - 0xfe00] = value
         elif 0xfea0 <= address < 0xff00:

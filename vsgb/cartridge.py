@@ -250,6 +250,11 @@ class CartridgeType:
             self.battery = Battery(save_file_name)
             self.ram = self.battery.load_ram(self.ram)
 
+    def is_cgb(self) -> bool:
+        return self.data[CartridgeHeader.CGB_FLAG] in [0x80, 0xc0]
+
+    def is_only_cgb(self) -> bool:
+        return self.data[CartridgeHeader.CGB_FLAG] == 0xc0
 
     def read_rom_byte(self, address : int) -> int:
         return self.data[address]
