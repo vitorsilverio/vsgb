@@ -1,7 +1,6 @@
 FROM gitpod/workspace-full-vnc
 
-RUN sudo add-apt-repository ppa:pypy/ppa \
- && sudo apt-get update \
+RUN sudo apt-get update \
  && sudo apt-get install -y \
     freeglut3-dev \
     libjack-dev \
