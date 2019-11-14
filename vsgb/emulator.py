@@ -14,13 +14,14 @@ from vsgb.instructions import instructions
 
 class Emulator:
 
-    def __init__(self, file : str):
+    def __init__(self, file : str, cgb_mode: bool):
+        self.cgb_mode = cgb_mode
         self.cartridge = Cartridge(file)
         self.apu = APU()
         self.input = Input()
-        self.mmu = MMU(self.cartridge.rom(), self.apu, self.input) 
+        self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
         self.cpu = CPU(self.mmu)
-        self.ppu = PPU(self.mmu, self.cpu.interruptManager)
+        self.ppu = PPU(self.mmu, self.cpu.interruptManager, cgb_mode)
         self.window = Window(self.input)
         self.window.start()
 
@@ -46,7 +47,7 @@ class Emulator:
 
     def skip_boot_rom(self):
         self.cpu.registers.pc = 0x0100
-        if self.mmu.rom.is_cgb():
+        if self.mmu.rom.is_cgb() and self.cgb_mode:
             self.cpu.registers.set_af(0x11b0)
         else:
             self.cpu.registers.set_af(0x01b0)

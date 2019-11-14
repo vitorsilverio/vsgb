@@ -24,7 +24,7 @@ class PPU:
     H_BLANK_TIME        = 204
     V_BLANK_TIME        = 4560
 
-    def __init__(self, mmu : MMU, interruptManager : InterruptManager):
+    def __init__(self, mmu : MMU, interruptManager : InterruptManager, cgb_mode: bool):
         self.mmu = mmu
         self.interruptManager = interruptManager
         self.lcdControlRegister = LCDControlRegister(self.mmu)
@@ -35,6 +35,7 @@ class PPU:
         self.auxillary_modeclock = 0
         self.screen_enabled = True
         self.window_line = 0   
+        self.cgb_mode = cgb_mode 
 
     def step(self, cycles : int = 1):
         self.vblank = False
