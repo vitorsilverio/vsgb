@@ -9,15 +9,15 @@ from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.registers import Registers
 from vsgb.stack_manager import StackManager
-from vsgb.timer import Timer
+
 
 class CPU:
 
-    def __init__(self,mmu: MMU):
+    def __init__(self,mmu: MMU, interrupt_manager: InterruptManager):
         self.mmu = mmu
         self.registers = Registers()
-        self.interruptManager = InterruptManager(mmu)
-        self.timer = Timer(mmu, self.interruptManager)
+        self.interruptManager = interrupt_manager
+        
         self.stackManager = StackManager(self.registers, self.mmu)
         self.instructionPerformer = InstructionPerformer(self)
         self.ticks = 0
@@ -42,7 +42,6 @@ class CPU:
             instruction = self.fetch_instruction()
             self.last_instruction = instruction
             self.perform_instruction(instruction)
-        self.timer.tick(self.ticks)
         return None
     
     def check_halted(self):

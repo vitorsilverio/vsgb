@@ -17,7 +17,6 @@ def main():
         logging.basicConfig(level=logging.DEBUG, filename='vsgb.log', filemode='w', format='%(levelname)s: %(message)s')
     else:
         logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    print(args.cgb)
     emulator = Emulator(args.rom, args.cgb)
     if args.skip:
         emulator.skip_boot_rom()

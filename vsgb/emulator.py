@@ -5,10 +5,11 @@ from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.input import Input
-from vsgb.interrupt_manager import Interrupt
+from vsgb.interrupt_manager import InterruptManager, Interrupt
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.ppu import PPU
+from vsgb.timer import Timer
 from vsgb.window import Window
 from vsgb.instructions import instructions
 
@@ -20,17 +21,20 @@ class Emulator:
         self.apu = APU()
         self.input = Input()
         self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
-        self.cpu = CPU(self.mmu)
+        self.interruptManager = InterruptManager(self.mmu)
+        self.cpu = CPU(self.mmu, self.interruptManager)
         self.ppu = PPU(self.mmu, self.cpu.interruptManager, cgb_mode)
+        self.timer = Timer(self.mmu, self.interruptManager)
         self.window = Window(self.input)
         self.window.start()
 
     def run(self):
         try:
             while True:
-            
                 self.cpu.step()
-                self.ppu.step(self.cpu.ticks)
+                ticks = self.cpu.ticks
+                self.timer.tick(ticks)
+                self.ppu.step(ticks)
                 if self.ppu.vblank:
                     self.window.render(self.ppu.framebuffer)
         except Exception as e:
