@@ -44,6 +44,9 @@ class MMU:
             self.boot_rom  = cgb_boot_rom
         else:
             self.boot_rom  = boot_rom
+
+    def set_dma(self, dma):
+        self.dma = dma
         
     def read_byte(self, address: int) -> int:
         if 0 <= address < 0x8000:
@@ -116,7 +119,7 @@ class MMU:
                 elif address == IO_Registers.DIV: # Reset div register
                     self.io_ports[address - 0xff00] = 0x00
                 elif address == IO_Registers.DMA: # Start dma transfer
-                    self.dma_transfer(value)
+                    self.dma.request_dma_transfer(value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                 elif address in self.apu.registers:
@@ -132,12 +135,6 @@ class MMU:
                 self.io_ports[address - 0xff00] = value
         elif 0xff80 <= address < 0x10000:
             self.hram[address - 0xff80] = value
-
-    def dma_transfer(self, start : int):
-        address = start << 8
-        if 0x8000 <= address < 0xe000:
-            for i in range(0xa0):
-                self.oam[i] = self.read_byte(address + i)
 
     def read_word(self, address: int) -> int:
         return (self.read_byte(address) | (self.read_byte(address + 1) << 8)) & 0xffff
