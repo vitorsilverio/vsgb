@@ -123,6 +123,8 @@ class MMU:
                     self.io_ports[address - 0xff00] = 0x00
                 elif address == IO_Registers.DMA: # Start dma transfer
                     self.dma.request_dma_transfer(value)
+                elif address == IO_Registers.HDMA5: # Start hdma transfer
+                    self.hdma.request_hdma_transfer(value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                 elif address in self.apu.registers:

@@ -81,11 +81,37 @@ Older MBC controllers (like MBC1-4) and slower ROMs are not guaranteed to suppor
 """
 class HDMA:
 
+    TYPE_GDMA = 0
+    TYPE_HDMA = 1
+
     def __init__(self, mmu: MMU):
         self.mmu = mmu
         self.mmu.set_hdma(self)
         self.ticks = 0
         self.in_progress = False
+        self.type = HDMA.TYPE_GDMA
+
+    def request_hdma_transfer(self, request: int):
+        self.in_progress = True
+        self.type = (request >> 7) & 0x01
+        self.length = ((request & 0b01111111) + 1) * 0x10
+        self.msb_source_address = self.mmu.read_byte(IO_Registers.HDMA1)
+        self.lsb_source_address = self.mmu.read_byte(IO_Registers.HDMA2) & 0b1111000
+        self.msb_destination_address = self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111
+        self.lsb_destination_address = self.mmu.read_byte(IO_Registers.HDMA4) & 0b1111000
+        self.counter = 0x00
+        self.ticks = 0
 
     def step(self):
-        pass
+        source_address = (self.msb_source_address << 8) + self.lsb_source_address + self.counter
+        destination_address = 0x80 + (self.msb_destination_address << 8) + self.lsb_destination_address + self.counter
+        self.mmu.write_byte(destination_address, self.mmu.read_byte(source_address))
+        self.counter += 1
+        self.ticks = 20
+        if self.type == HDMA.TYPE_HDMA:
+            self.mmu.write_byte(destination_address + 1, self.mmu.read_byte(source_address + 1))
+            self.counter += 1
+            self.ticks = 40
+        if self.counter == self.length:
+            self.in_progress = False
+        

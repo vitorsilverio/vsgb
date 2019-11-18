@@ -36,8 +36,11 @@ class Emulator:
             while True:
                 ticks = 0
                 if self.cgb_mode and self.hdma.in_progress:
-                    self.hdma.step()
-                    ticks = self.hdma.ticks
+                    if self.hdma.type == HDMA.TYPE_HDMA and self.ppu.mode != PPU.H_BLANK_STATE:
+                        self.hdma.in_progress = False
+                    else:
+                        self.hdma.step()
+                        ticks = self.hdma.ticks
                 elif self.dma.in_progress:
                     self.dma.step()
                     ticks = self.dma.ticks
