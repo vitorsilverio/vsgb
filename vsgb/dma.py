@@ -101,6 +101,7 @@ class HDMA:
         self.lsb_destination_address = self.mmu.read_byte(IO_Registers.HDMA4) & 0b1111000
         self.counter = 0x00
         self.ticks = 0
+        self.mmu.write_byte(IO_Registers.HDMA5, request & 0b01111111, True) #DMA in progress
 
     def step(self):
         source_address = (self.msb_source_address << 8) + self.lsb_source_address + self.counter
@@ -113,5 +114,9 @@ class HDMA:
             self.counter += 1
             self.ticks = 40
         if self.counter == self.length:
-            self.in_progress = False
+            self.stop_dma()
+
+    def stop_dma(self):
+        self.in_progress = False
+        self.mmu.write_byte(IO_Registers.HDMA5, self.mmu.read_byte(IO_Registers.HDMA5) & 0b11111111, True) #DMA is done
         

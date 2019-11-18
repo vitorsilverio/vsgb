@@ -37,7 +37,7 @@ class Emulator:
                 ticks = 0
                 if self.cgb_mode and self.hdma.in_progress:
                     if self.hdma.type == HDMA.TYPE_HDMA and self.ppu.mode != PPU.H_BLANK_STATE:
-                        self.hdma.in_progress = False
+                        self.hdma.stop_dma()
                     else:
                         self.hdma.step()
                         ticks = self.hdma.ticks
