@@ -47,6 +47,9 @@ class MMU:
 
     def set_dma(self, dma):
         self.dma = dma
+
+    def set_hdma(self, hdma):
+        self.hdma = hdma
         
     def read_byte(self, address: int) -> int:
         if 0 <= address < 0x8000:

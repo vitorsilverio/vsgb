@@ -4,7 +4,7 @@
 from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
-from vsgb.dma import DMA
+from vsgb.dma import DMA, HDMA
 from vsgb.input import Input
 from vsgb.interrupt_manager import InterruptManager, Interrupt
 from vsgb.io_registers import IO_Registers
@@ -27,6 +27,7 @@ class Emulator:
         self.ppu = PPU(self.mmu, self.cpu.interruptManager, cgb_mode)
         self.timer = Timer(self.mmu, self.interruptManager)
         self.dma = DMA(self.mmu)
+        self.hdma = HDMA(self.mmu)
         self.window = Window(self.input)
         self.window.start()
 
@@ -34,7 +35,10 @@ class Emulator:
         try:
             while True:
                 ticks = 0
-                if self.dma.in_progress:
+                if self.cgb_mode and self.hdma.in_progress:
+                    self.hdma.step()
+                    ticks = self.hdma.ticks
+                elif self.dma.in_progress:
                     self.dma.step()
                     ticks = self.dma.ticks
                 else:

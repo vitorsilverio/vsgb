@@ -66,5 +66,14 @@ class IO_Registers(IntEnum):
     #CGB Only registers
     KEY1 = 0xff4d # CGB Mode Only - Prepare Speed Switch
     VBK = 0xff4f # CGB Mode Only - VRAM Bank
+    HDMA1 = 0xff51 # CGB Mode Only - New DMA Source, High
+    HDMA2 = 0xff52 # CGB Mode Only - New DMA Source, Low
+    HDMA3 = 0xff53 # CGB Mode Only - New DMA Destination, High
+    HDMA4 = 0xff54 # CGB Mode Only - New DMA Destination, Low
+    HDMA5 = 0xff55 # CGB Mode Only - New DMA Length/Mode/Start
     RP = 0xff56 # CGB Mode Only - Infrared Communications Port
+    BGPI = 0xff68 # CGB Mode Only - Background Palette Index
+    BGPD = 0xff69 # CGB Mode Only - Background Palette Data
+    OBPI = 0xff6a # CGB Mode Only - Sprite Palette Index
+    OBPD = 0xff6b # CGB Mode Only - Sprite Palette Data
     SVBK = 0xff70 # CGB Mode Only - WRAM Bank
