@@ -52,7 +52,7 @@ class Emulator:
                 if self.ppu.vblank:
                     self.window.render(self.ppu.framebuffer)
         except Exception as e:
-            print('An error ocorried:')
+            print('An error occurred:')
             print(self.cpu.registers)
             last_instruction = instructions[self.cpu.last_instruction][0]
             last_instruction_size = instructions[self.cpu.last_instruction][1]
