@@ -10,6 +10,8 @@ import logging
 import os
 import struct
 
+from shutil import copyfile
+
 class CartridgeHeader:
     # 0100-0103 - Entry Point
     # After displaying the Nintendo Logo, the built-in boot procedure jumps to this address (100h), 
@@ -199,6 +201,13 @@ class Battery:
     def load_ram(self, ram: list):
         try:
             size = os.stat(self.save_file).st_size
+            
+            # Check if Savefile is not corrupt, if it is corrupted then try restore bkp
+            if len(ram) != size:
+                if os.path.exists(self.save_file+'.bkp'):
+                    copyfile(self.save_file  + '.bkp' ,self.save_file)
+                    size = os.stat(self.save_file).st_size
+
             with open(self.save_file,'rb') as f:
                 for i in range(size):
                     ram[i] = struct.unpack('<B', f.read(1))[0]
@@ -209,6 +218,10 @@ class Battery:
 
 
     def save_ram(self, ram: list):
+        # Lets make a backup save
+        if os.path.exists(self.save_file):
+            copyfile(self.save_file,self.save_file + '.bkp')
+
         with open(self.save_file,'wb') as f:
             f.write(bytes(ram))
             f.flush()
