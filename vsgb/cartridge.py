@@ -211,6 +211,7 @@ class Battery:
     def save_ram(self, ram: list):
         with open(self.save_file,'wb') as f:
             f.write(bytes(ram))
+            f.flush()
 
 class CartridgeType:
 
