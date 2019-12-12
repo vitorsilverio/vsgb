@@ -13,9 +13,10 @@ class Window(Thread):
 
     SCREEN_WIDTH = 160
     SCREEN_HEIGHT = 144 
-    SCALE = 4
-    WINDOW_WIDTH = SCREEN_WIDTH * SCALE
-    WINDOW_HEIGHT = SCREEN_HEIGHT * SCALE
+    V_SCALE = 4
+    H_SCALE = 4
+    WINDOW_WIDTH = SCREEN_WIDTH * H_SCALE
+    WINDOW_HEIGHT = SCREEN_HEIGHT * V_SCALE
 
     def __init__(self, _input : Input):
         super(Window, self). __init__()
@@ -34,7 +35,8 @@ class Window(Thread):
         glutKeyboardUpFunc(self._keyUp)
         glutSpecialFunc(self._spec)
         glutSpecialUpFunc(self._specUp)
-        glPixelZoom(Window.SCALE,Window.SCALE)
+        glPixelZoom(Window.H_SCALE,Window.V_SCALE)
+        glutReshapeFunc(self.resize)
         glutDisplayFunc(self.draw)
         glutIdleFunc(self.draw)
         glutMainLoop()
@@ -51,6 +53,11 @@ class Window(Thread):
             glFlush()
             glutSwapBuffers()
         self.updated = True
+
+    def resize(self, width, height):
+        new_h_scale = (width / Window.SCREEN_WIDTH)
+        new_v_scale = (height / Window.SCREEN_HEIGHT)
+        glPixelZoom(new_h_scale, new_v_scale)
 
     def request_input_interrupt(self):
         self.input.request_interrupt()
