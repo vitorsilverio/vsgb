@@ -202,7 +202,7 @@ class Battery:
         try:
             size = os.stat(self.save_file).st_size
             
-            # Check if Savefile is not corrupt, if it is corrupted then try restore bkp
+            # Check if Savefile is not corrupted, if it is corrupted then try restore bkp
             if len(ram) != size:
                 if os.path.exists(self.save_file+'.bkp'):
                     copyfile(self.save_file  + '.bkp' ,self.save_file)
@@ -260,7 +260,7 @@ class CartridgeType:
         self.ram = [0xff]*(0x2000 * self.ram_banks)
 
         if self.hasBattery:
-            save_file_name = bytes(self.data[CartridgeHeader.TITLE:(CartridgeHeader.TITLE + 15)]).decode().rstrip('\x00')+".sav"
+            save_file_name = bytes(self.data[CartridgeHeader.TITLE:(CartridgeHeader.TITLE + 15)]).decode().split('\x00')[0]+".sav"
             self.battery = Battery(save_file_name)
             self.ram = self.battery.load_ram(self.ram)
 
