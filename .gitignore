@@ -8,6 +8,7 @@ dist/
 *.so
 *.pyd
 *.sav
+*.bkp
 .vscode/
 pygb.log
 main.spec
