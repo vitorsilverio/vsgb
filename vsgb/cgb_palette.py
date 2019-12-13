@@ -51,7 +51,7 @@ class CGB_Palette:
             1-2 color
             0   byte selector (0 = Low, 1 = High)
         """
-        self.bgpi = value
+        self.bgpi = value & 0b10111111
         self.bg_autoincrement = value & 0b10000000 == 0b10000000
         self.bg_palette_index = ((value & 0b00111000) >> 3)
         self.bg_palette_color = ((value & 0b00000110) >> 1)
@@ -75,7 +75,7 @@ class CGB_Palette:
         if self.bg_autoincrement:
             self.set_bgpi(self.bgpi + 1)
 
-     def set_obpi(self, value):
+    def set_obpi(self, value):
         """
             Bit Desc
             7   Autoincrement
@@ -84,7 +84,7 @@ class CGB_Palette:
             1-2 color
             0   byte selector (0 = Low, 1 = High)
         """
-        self.obpi = value
+        self.obpi = value & 0b10111111
         self.ob_autoincrement = value & 0b10000000 == 0b10000000
         self.ob_palette_index = ((value & 0b00111000) >> 3)
         self.ob_palette_color = ((value & 0b00000110) >> 1)
@@ -117,14 +117,14 @@ class CGB_Palette:
         return self.color_5_5_5_to_rgba(self.ob_palettes[address])
 
     def color_5_5_5_to_rgba(self, color):
-        red = (color & 0b0111110000000000) >> 10
-        blue = (color & 0b0000001111100000) >> 5
-        green = (color & 0b0000000000011111)
+        blue = (color & 0b0111110000000000) >> 10
+        green = (color & 0b0000001111100000) >> 5
+        red = (color & 0b0000000000011111)
 
         # 0b11111 = 0x1F
-        red = (red / 0x1f) * 0xff
-        blue = (blue / 0x1f) * 0xff
-        green = (green / 0x1f) * 0xff 
+        red = int((red / 0x1f) * 0xff)
+        blue = int((blue / 0x1f) * 0xff)
+        green = int((green / 0x1f) * 0xff)
         alpha = 0xff
 
         rgba = 0

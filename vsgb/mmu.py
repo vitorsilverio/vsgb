@@ -5,6 +5,7 @@ import array
 
 from vsgb.apu import APU
 from vsgb.boot_rom import boot_rom, cgb_boot_rom
+from vsgb.cgb_palette import CGB_Palette
 from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
@@ -40,6 +41,7 @@ class MMU:
         self.bootstrap_enabled = True
         self.unusable_memory_space = array.array('B', [0xff]*0x60)
         self.cgb_mode = cgb_mode
+        self.cgb_palette = CGB_Palette()
         if self.rom.is_cgb() and self.cgb_mode:
             self.boot_rom  = cgb_boot_rom
         else:
@@ -83,6 +85,14 @@ class MMU:
                 return self.input.read_input(self.io_ports[0]) & 0xff
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
+            if address == IO_Registers.BGPI:
+                return self.cgb_palette.get_bgpi()
+            if address == IO_Registers.BGPD:
+                return self.cgb_palette.get_bgpd()
+            if address == IO_Registers.OBPI:
+                return self.cgb_palette.get_obpi()
+            if address == IO_Registers.OBPD:
+                return self.cgb_palette.get_obpd()
             return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
             return self.hram[address - 0xff80] & 0xff
@@ -125,6 +135,14 @@ class MMU:
                     self.dma.request_dma_transfer(value)
                 elif address == IO_Registers.HDMA5: # Start hdma transfer
                     self.hdma.request_hdma_transfer(value)
+                elif address == IO_Registers.BGPI:
+                    self.cgb_palette.set_bgpi(value)
+                elif address == IO_Registers.BGPD:
+                    self.cgb_palette.set_bgpd(value)
+                elif address == IO_Registers.OBPI:
+                    self.cgb_palette.set_obpi(value)
+                elif address == IO_Registers.OBPD:
+                    self.cgb_palette.set_obpd(value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                 elif address in self.apu.registers:

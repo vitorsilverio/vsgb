@@ -29,6 +29,8 @@ class PPU:
         self.interruptManager = interruptManager
         self.lcdControlRegister = LCDControlRegister(self.mmu)
         self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
+        self.original_color = [0]*PPU.FRAMEBUFFER_SIZE
+        self.bg_priority = [False]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
         self.modeclock = 0
         self.vblank_line = 0
@@ -207,9 +209,26 @@ class PPU:
                     tile += 128
                 else:
                     tile = self.mmu.read_byte(map_select + y_offset + x)
+
                 line_pixel_offset = x * 8
                 tile_select_offset = tile * 16
                 tile_address = tiles_select + tile_select_offset + tile_line_offset
+
+                """
+                Map Attributes (CGB Mode only)
+                In CGB Mode, an additional map of 32x32 bytes is stored in VRAM Bank 1 (each byte defines attributes for the corresponding tile-number map entry in VRAM Bank 0):
+                Bit 0-2  Background Palette number  (BGP0-7)
+                Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
+                Bit 4    Not used
+                Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
+                Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
+                Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
+                When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
+                """
+                tile_attributes = self.mmu.vram[tile_select_offset + 0x2000]
+                c_palette = tile_attributes & 0b00000111
+                bg_priority = tile_attributes & 0b10000000 == 0b10000000
+
                 byte_1 = self.mmu.read_byte(tile_address)
                 byte_2 = self.mmu.read_byte(tile_address + 1)
                 pixelx = 0
@@ -223,12 +242,19 @@ class PPU:
                     pixelx += 1
                     if 0 <= buffer_addr < Window.SCREEN_WIDTH:
                         position = line_width + buffer_addr
-                        self.framebuffer[position] = self.rgb(color)
-                        buffer_addr = ( line_pixel_offset + pixelx - scx )  
+                        if not self.cgb_mode:
+                            self.framebuffer[position] = self.rgb(color) 
+                        else:
+                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(c_palette, color)
+                            self.bg_priority[position] = bg_priority
+                        self.original_color[position] = color
+                        buffer_addr = ( line_pixel_offset + pixelx - scx )
+                            
                 x += 1
         else:
             for i in range(0, Window.SCREEN_WIDTH):
                 self.framebuffer[line_width + i] = self.rgb(0)
+                self.original_color[position] = 0
 
 
     def render_window(self, line : int):
@@ -264,6 +290,20 @@ class PPU:
             tile_select_offset = tile * 16
             tile_address = tiles_select + tile_select_offset + tile_line_offset
 
+            """
+                Map Attributes (CGB Mode only)
+                In CGB Mode, an additional map of 32x32 bytes is stored in VRAM Bank 1 (each byte defines attributes for the corresponding tile-number map entry in VRAM Bank 0):
+                Bit 0-2  Background Palette number  (BGP0-7)
+                Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
+                Bit 4    Not used
+                Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
+                Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
+                Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
+                When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
+                """
+            tile_attributes = self.mmu.vram[tile_select_offset + 0x2000]
+            c_palette = tile_attributes & 0b00000111
+
             byte_1 = self.mmu.read_byte(tile_address)
             byte_2 = self.mmu.read_byte(tile_address + 1)
 
@@ -288,7 +328,10 @@ class PPU:
                     pixel = 0
                 position = line_width + buffer_addr
                 color = (palette >> (pixel * 2)) & 0x3
-                self.framebuffer[position] = self.rgb(color)
+                if not self.cgb_mode:
+                    self.framebuffer[position] = self.rgb(color)
+                else:
+                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(c_palette, color)
 
         self.window_line += 1
 
@@ -325,6 +368,7 @@ class PPU:
             x_flip = sprite_flags & 0x20 == 0x20
             y_flip = sprite_flags & 0x40 == 0x40
             palette = sprite_flags & 0b00010000
+            c_palette = sprite_flags & 0b00000111
 
             tiles = 0x8000
             pixel_y = (15 if sprite_size == 16 else 7) - (line - sprite_y) if y_flip else line - sprite_y
@@ -371,8 +415,12 @@ class PPU:
 
                 color = (palette >> (pixel * 2)) & 0x3
 
-                if priority or self.framebuffer[position] == self.rgb(0):
-                    self.framebuffer[position] = self.rgb_sprite(color)
+                if priority or self.original_color[position] == 0 :
+                    if not self.cgb_mode:
+                        self.framebuffer[position] = self.rgb_sprite(color)
+
+                    elif not self.bg_priority[position]:
+                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(c_palette, color)
 
 
 

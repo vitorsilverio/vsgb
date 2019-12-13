@@ -15,9 +15,11 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, filename='vsgb.log', filemode='w', format='%(levelname)s: %(message)s')
+        log_level = logging.DEBUG
     else:
         logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    emulator = Emulator(args.rom, args.cgb)
+        log_level = logging.INFO
+    emulator = Emulator(args.rom, args.cgb, log_level)
     if args.skip:
         emulator.skip_boot_rom()
     emulator.run()
