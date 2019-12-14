@@ -86,11 +86,11 @@ class MMU:
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
             if address == IO_Registers.BGPI:
-                return self.cgb_palette.get_bgpi()
+                return self.cgb_palette.bgpi
             if address == IO_Registers.BGPD:
                 return self.cgb_palette.get_bgpd()
             if address == IO_Registers.OBPI:
-                return self.cgb_palette.get_obpi()
+                return self.cgb_palette.obpi
             if address == IO_Registers.OBPD:
                 return self.cgb_palette.get_obpd()
             return self.io_ports[address - 0xff00] & 0xff

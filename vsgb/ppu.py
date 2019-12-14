@@ -228,6 +228,7 @@ class PPU:
                 tile_attributes = self.mmu.vram[tile_select_offset + 0x2000]
                 c_palette = tile_attributes & 0b00000111
                 bg_priority = tile_attributes & 0b10000000 == 0b10000000
+                
 
                 byte_1 = self.mmu.read_byte(tile_address)
                 byte_2 = self.mmu.read_byte(tile_address + 1)
@@ -254,7 +255,7 @@ class PPU:
         else:
             for i in range(0, Window.SCREEN_WIDTH):
                 self.framebuffer[line_width + i] = self.rgb(0)
-                self.original_color[position] = 0
+                self.original_color[line_width + i] = 0
 
 
     def render_window(self, line : int):

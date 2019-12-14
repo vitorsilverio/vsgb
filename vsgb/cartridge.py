@@ -525,4 +525,51 @@ class MBC5(CartridgeType):
 
     def __init__(self, data: list, hasRam: bool, hasBattery: bool):
         super().__init__(data, hasRam, hasBattery)
-        logging.warning('MBC5 is not implemented')
+        self.ram_bank = 0
+        self.rom_bank = 1
+        self.ram_enabled = False
+
+    def read_rom_byte(self, address : int) -> int:
+        # 0000-3FFF - ROM Bank 00 (Read Only)
+        # Same as for MBC1. 
+        if address < 0x4000:
+            return self.data[address]
+        # 4000-7FFF - ROM Bank 01-7F (Read Only)
+        # Same as for MBC1, except that accessing up to bank 1E0h is supported now. Also, bank 0 is actually bank 0
+        return self.data[(0x4000 * (self.rom_bank % self.rom_banks)) + (address - 0x4000)]
+
+    def write_rom_byte(self, address : int, value : int):
+        # 0000-1FFF - RAM Enable (Write Only)
+        # Mostly the same as for MBC1, a value of 0Ah will enable reading and writing to external RAM. A value of 00h will disable it. 
+        if 0x0000 <= address <= 0x1fff:
+            self.ram_enabled = (value & 0x0f == 0x0a)
+            if self.hasBattery and not self.ram_enabled:
+                self.battery.save_ram(self.ram)
+
+        # 2000-2FFF - Low 8 bits of ROM Bank Number (Write Only)
+        # The lower 8 bits of the ROM bank number goes here. Writing 0 will indeed give bank 0 on MBC5, unlike other MBCs. 
+        if 0x2000 <= address <= 0x2fff:
+            self.rom_bank = (self.rom_bank & 0xff00) | ( value & 0xff )
+
+        # 3000-3FFF - High bit of ROM Bank Number (Write Only)
+        # The 9th bit of the ROM bank number goes here. 
+        if 0x3000 <= address <= 0x3fff:
+            self.rom_bank = (self.rom_bank & 0x00ff) | (( value & 0x0b00000001 ) << 8)
+
+
+        # 4000-5FFF - RAM Bank Number (Write Only)
+        # As for the MBC1s RAM Banking Mode, writing a value in range for 00h-0Fh maps the corresponding external RAM Bank (if any) into memory at A000-BFFF.
+        if 0x4000 <= address <= 0x5fff:
+            self.ram_bank = value
+        
+    def read_external_ram_byte(self, address : int) -> int:
+        # A000-BFFF - RAM Bank 00-07, if any (Read/Write)
+        # Same as for MBC1, except RAM sizes are 8KiB, 32KiB and 128KiB
+        if self.ram_enabled:
+            return self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)]
+        return 0xff
+
+    def write_external_ram_byte(self, address : int, value : int):
+        # A000-BFFF - RAM Bank 00-07, if any (Read/Write)
+        if self.ram_enabled:
+            self.ram[((self.ram_bank % self.ram_banks) * 0x2000) + (address - 0xa000)] = value
