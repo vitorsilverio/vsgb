@@ -209,6 +209,7 @@ class PPU:
                     tile += 128
                 else:
                     tile = self.mmu.read_byte(map_select + y_offset + x)
+                    
 
                 line_pixel_offset = x * 8
                 tile_select_offset = tile * 16
@@ -225,13 +226,18 @@ class PPU:
                 Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
                 When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
                 """
-                tile_attributes = self.mmu.vram[tile_select_offset + 0x2000]
+                tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
                 c_palette = tile_attributes & 0b00000111
                 bg_priority = tile_attributes & 0b10000000 == 0b10000000
+                tile_vram_bank = (tile_attributes & 0b00001000) >> 3
                 
+                if not self.cgb_mode:
+                    byte_1 = self.mmu.read_byte(tile_address)
+                    byte_2 = self.mmu.read_byte(tile_address + 1)
+                else:
+                    byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
+                    byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
 
-                byte_1 = self.mmu.read_byte(tile_address)
-                byte_2 = self.mmu.read_byte(tile_address + 1)
                 pixelx = 0
                 buffer_addr = (line_pixel_offset - scx)
                 while pixelx < 8:
@@ -287,6 +293,7 @@ class PPU:
                 tile += 128
             else:
                 tile = self.mmu.read_byte(map_select + y_offset + x)
+            
             line_pixel_offset = x * 8
             tile_select_offset = tile * 16
             tile_address = tiles_select + tile_select_offset + tile_line_offset
@@ -302,11 +309,16 @@ class PPU:
                 Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
                 When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
                 """
-            tile_attributes = self.mmu.vram[tile_select_offset + 0x2000]
+            tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
             c_palette = tile_attributes & 0b00000111
+            tile_vram_bank = (tile_attributes & 0b00001000) >> 3
 
-            byte_1 = self.mmu.read_byte(tile_address)
-            byte_2 = self.mmu.read_byte(tile_address + 1)
+            if not self.cgb_mode:
+                byte_1 = self.mmu.read_byte(tile_address)
+                byte_2 = self.mmu.read_byte(tile_address + 1)
+            else:
+                byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
+                byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
 
             palette = self.mmu.read_byte(IO_Registers.BGP)
 

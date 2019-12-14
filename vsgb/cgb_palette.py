@@ -90,6 +90,7 @@ class CGB_Palette:
         self.ob_palette_color = ((value & 0b00000110) >> 1)
         self.ob_palette_byte_selector = value & 0b00000001
 
+
     def set_obpd(self, value):
         address = (self.ob_palette_index * 4) + self.ob_palette_color
         if self.ob_palette_byte_selector == 0: # Set low byte
@@ -107,6 +108,7 @@ class CGB_Palette:
             return self.ob_palettes[address] >> 8
         if self.ob_autoincrement:
             self.set_obpi(self.obpi + 1)
+
             
     def get_bg_rgba_palette_color(self, palette, color):
         address = (palette * 4) + color
