@@ -229,6 +229,8 @@ class PPU:
                 tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
                 c_palette = tile_attributes & 0b00000111
                 bg_priority = tile_attributes & 0b10000000 == 0b10000000
+                bg_h_flip = tile_attributes & 0b00100000 == 0b00100000
+                bg_v_flip = tile_attributes & 0b01000000 == 0b01000000
                 tile_vram_bank = (tile_attributes & 0b00001000) >> 3
                 
                 if not self.cgb_mode:
@@ -237,6 +239,8 @@ class PPU:
                 else:
                     byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
                     byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
+                    if bg_h_flip:
+                        byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
                 pixelx = 0
                 buffer_addr = (line_pixel_offset - scx)
@@ -312,6 +316,9 @@ class PPU:
             tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
             c_palette = tile_attributes & 0b00000111
             tile_vram_bank = (tile_attributes & 0b00001000) >> 3
+            bg_priority = tile_attributes & 0b10000000 == 0b10000000
+            bg_h_flip = tile_attributes & 0b00100000 == 0b00100000
+            bg_v_flip = tile_attributes & 0b01000000 == 0b01000000
 
             if not self.cgb_mode:
                 byte_1 = self.mmu.read_byte(tile_address)
@@ -319,6 +326,8 @@ class PPU:
             else:
                 byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
                 byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
+                if bg_h_flip:
+                    byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
             palette = self.mmu.read_byte(IO_Registers.BGP)
 
@@ -345,6 +354,7 @@ class PPU:
                     self.framebuffer[position] = self.rgb(color)
                 else:
                     self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(c_palette, color)
+                    self.bg_priority[position] = bg_priority
 
         self.window_line += 1
 
@@ -434,6 +444,17 @@ class PPU:
 
                     elif not self.bg_priority[position]:
                         self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(c_palette, color)
+
+
+    def tile_line_h_flip(self, byte1, byte2):
+        result_b1 = 0
+        result_b2 = 0
+        src_mask = 0b11000000
+        for i in range(4):
+            result_b1 = result_b1 | (((byte2 & (src_mask >> (i*2))) >> ((3-i)*2)) << (i*2))
+            result_b2 = result_b1 | (((byte1 & (src_mask >> (i*2))) >> ((3-i)*2)) << (i*2)) 
+
+        return result_b1, result_b2
 
 
 
