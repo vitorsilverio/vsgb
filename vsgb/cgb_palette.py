@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Documentation source:
-# - http://problemkaputt.de/pandocs.htm
+# - http://bgb.bircd.org/pandocs.htm#lcdcolorpalettescgbonly
+# - https://www.chibiakumas.com/z80/platform2.php#LessonP17
 
 class CGB_Palette:
 
