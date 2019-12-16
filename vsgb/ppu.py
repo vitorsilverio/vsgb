@@ -479,21 +479,26 @@ class TileAttributes:
 
     def __init__(self, value):
         self.value = value
+        self._palette = self.value & 0b00000111
+        self._vram_bank = (self.value & 0b00001000) >> 3
+        self._horizontal_flip = self.value & 0b00100000 == 0b00100000
+        self._vertical_flip = self.value & 0b01000000 == 0b01000000
+        self._bg_priority = self.value & 0b10000000 == 0b10000000
 
     def get_palette(self):
-        return self.value & 0b00000111
+        return self._palette
 
     def get_vram_bank(self):
-        return (self.value & 0b00001000) >> 3
+        return self._vram_bank
 
     def is_horizontal_flip(self):
-        return self.value & 0b00100000 == 0b00100000
+        return self._horizontal_flip
 
     def is_vertical_flip(self):
-        return self.value & 0b01000000 == 0b01000000
+        return self._vertical_flip
 
     def is_bg_priority(self):
-        return self.value & 0b10000000 == 0b10000000
+        return self._bg_priority
     
 
 class SpriteAttributes:
@@ -511,18 +516,24 @@ class SpriteAttributes:
 
     def __init__(self, value):
         self.value = value
+        self._ob_priority = self.value & 0x80 != 0x80
+        self._horizontal_flip = self.value & 0x20 == 0x20
+        self._vertical_flip = self.value & 0x40 == 0x40
+        self._palette = (self.value & 0b00010000) >> 4
+        self._cgb_palette = self.value & 0b00000111
+
 
     def is_priority(self):
-        return self.value & 0x80 != 0x80
+        return self._ob_priority
     
     def is_horizontal_flip(self):
-        return self.value & 0x20 == 0x20
+        return self._horizontal_flip
 
     def is_vertical_flip(self):
-        return self.value & 0x40 == 0x40
+        return self._vertical_flip
 
     def get_palette(self):
-        return (self.value & 0b00010000) >> 4
+        return self._palette
     
     def get_cgb_palette(self):
-        return self.value & 0b00000111
+        return self._cgb_palette
