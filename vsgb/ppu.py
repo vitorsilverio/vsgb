@@ -215,31 +215,16 @@ class PPU:
                 tile_select_offset = tile * 16
                 tile_address = tiles_select + tile_select_offset + tile_line_offset
 
-                """
-                Map Attributes (CGB Mode only)
-                In CGB Mode, an additional map of 32x32 bytes is stored in VRAM Bank 1 (each byte defines attributes for the corresponding tile-number map entry in VRAM Bank 0):
-                Bit 0-2  Background Palette number  (BGP0-7)
-                Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
-                Bit 4    Not used
-                Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
-                Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
-                Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
-                When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
-                """
-                tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
-                c_palette = tile_attributes & 0b00000111
-                bg_priority = tile_attributes & 0b10000000 == 0b10000000
-                bg_h_flip = tile_attributes & 0b00100000 == 0b00100000
-                bg_v_flip = tile_attributes & 0b01000000 == 0b01000000
-                tile_vram_bank = (tile_attributes & 0b00001000) >> 3
                 
+                tile_attributes = TileAttributes(self.mmu.vram[map_select + y_offset + x - 0x6000])
+            
                 if not self.cgb_mode:
                     byte_1 = self.mmu.read_byte(tile_address)
                     byte_2 = self.mmu.read_byte(tile_address + 1)
                 else:
-                    byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
-                    byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
-                    if bg_h_flip:
+                    byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
+                    byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
+                    if tile_attributes.is_horizontal_flip():
                         byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
                 pixelx = 0
@@ -256,8 +241,8 @@ class PPU:
                         if not self.cgb_mode:
                             self.framebuffer[position] = self.rgb(color) 
                         else:
-                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(c_palette, color)
-                            self.bg_priority[position] = bg_priority
+                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                            self.bg_priority[position] = tile_attributes.is_bg_priority()
                         self.original_color[position] = color
                         buffer_addr = ( line_pixel_offset + pixelx - scx )
                             
@@ -302,31 +287,16 @@ class PPU:
             tile_select_offset = tile * 16
             tile_address = tiles_select + tile_select_offset + tile_line_offset
 
-            """
-                Map Attributes (CGB Mode only)
-                In CGB Mode, an additional map of 32x32 bytes is stored in VRAM Bank 1 (each byte defines attributes for the corresponding tile-number map entry in VRAM Bank 0):
-                Bit 0-2  Background Palette number  (BGP0-7)
-                Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
-                Bit 4    Not used
-                Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
-                Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
-                Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
-                When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
-                """
-            tile_attributes = self.mmu.vram[map_select + y_offset + x - 0x6000]
-            c_palette = tile_attributes & 0b00000111
-            tile_vram_bank = (tile_attributes & 0b00001000) >> 3
-            bg_priority = tile_attributes & 0b10000000 == 0b10000000
-            bg_h_flip = tile_attributes & 0b00100000 == 0b00100000
-            bg_v_flip = tile_attributes & 0b01000000 == 0b01000000
-
+           
+            tile_attributes = TileAttributes(self.mmu.vram[map_select + y_offset + x - 0x6000])
+            
             if not self.cgb_mode:
                 byte_1 = self.mmu.read_byte(tile_address)
                 byte_2 = self.mmu.read_byte(tile_address + 1)
             else:
-                byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000)]
-                byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_vram_bank == 0 else 0x2000) + 1]
-                if bg_h_flip:
+                byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
+                byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
+                if tile_attributes.is_horizontal_flip():
                     byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
             palette = self.mmu.read_byte(IO_Registers.BGP)
@@ -353,8 +323,8 @@ class PPU:
                 if not self.cgb_mode:
                     self.framebuffer[position] = self.rgb(color)
                 else:
-                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(c_palette, color)
-                    self.bg_priority[position] = bg_priority
+                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                    self.bg_priority[position] = tile_attributes.is_bg_priority()
 
         self.window_line += 1
 
@@ -378,23 +348,10 @@ class PPU:
 
             sprite_tile_offset = (self.mmu.read_byte(0xfe00 + sprite_offset + 2) & (0xfe if sprite_size == 16 else 0xff)) * 16
             
-            #  Attributes/Flags:
-            # Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
-            # (Used for both BG and Window. BG color 0 is always behind OBJ)
-            # Bit6   Y flip          (0=Normal, 1=Vertically mirrored)
-            # Bit5   X flip          (0=Normal, 1=Horizontally mirrored)
-            # Bit4   Palette number  **Non CGB Mode Only** (0=OBP0, 1=OBP1)
-            # Bit3   Tile VRAM-Bank  **CGB Mode Only**     (0=Bank 0, 1=Bank 1)
-            # Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
-            sprite_flags = self.mmu.read_byte(0xfe00 + sprite_offset + 3)
-            priority = sprite_flags & 0x80 != 0x80
-            x_flip = sprite_flags & 0x20 == 0x20
-            y_flip = sprite_flags & 0x40 == 0x40
-            palette = sprite_flags & 0b00010000
-            c_palette = sprite_flags & 0b00000111
+            sprite_attributes = SpriteAttributes(self.mmu.read_byte(0xfe00 + sprite_offset + 3))
 
             tiles = 0x8000
-            pixel_y = (15 if sprite_size == 16 else 7) - (line - sprite_y) if y_flip else line - sprite_y
+            pixel_y = (15 if sprite_size == 16 else 7) - (line - sprite_y) if sprite_attributes.is_vertical_flip() else line - sprite_y
 
             pixel_y_2 = 0
             offset = 0
@@ -412,13 +369,13 @@ class PPU:
 
             obp0 = self.mmu.read_byte(IO_Registers.OBP0)
             obp1 = self.mmu.read_byte(IO_Registers.OBP1)
-            if palette == 0:
+            if sprite_attributes.get_palette() == 0:
                 palette = obp0
             else:
                 palette = obp1
 
             for pixelx in range(0,8):
-                shift = 0x1 << (pixelx if x_flip else 7 - pixelx)
+                shift = 0x1 << (pixelx if sprite_attributes.is_horizontal_flip() else 7 - pixelx)
                 pixel = 0
 
                 if (byte_1 & shift == shift) and (byte_2 & shift == shift):
@@ -438,12 +395,12 @@ class PPU:
 
                 color = (palette >> (pixel * 2)) & 0x3
 
-                if priority or self.original_color[position] == 0 :
+                if sprite_attributes.is_priority() or self.original_color[position] == 0 :
                     if not self.cgb_mode:
                         self.framebuffer[position] = self.rgb_sprite(color)
 
                     elif not self.bg_priority[position]:
-                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(c_palette, color)
+                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
 
 
     def tile_line_h_flip(self, byte1, byte2):
@@ -460,15 +417,17 @@ class PPU:
 
 class LCDControlRegister:
 
-    # LCD Control Register
-    # Bit 7 - LCD Display Enable             (0=Off, 1=On)
-    # Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
-    # Bit 5 - Window Display Enable          (0=Off, 1=On)
-    # Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)
-    # Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)
-    # Bit 2 - OBJ (Sprite) Size              (0=8x8, 1=8x16)
-    # Bit 1 - OBJ (Sprite) Display Enable    (0=Off, 1=On)
-    # Bit 0 - BG/Window Display/Priority     (0=Off, 1=On)
+    """
+    LCD Control Register
+    Bit 7 - LCD Display Enable             (0=Off, 1=On)
+    Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+    Bit 5 - Window Display Enable          (0=Off, 1=On)
+    Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)
+    Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)
+    Bit 2 - OBJ (Sprite) Size              (0=8x8, 1=8x16)
+    Bit 1 - OBJ (Sprite) Display Enable    (0=Off, 1=On)
+    Bit 0 - BG/Window Display/Priority     (0=Off, 1=On)
+    """
 
     def __init__(self, mmu : MMU):
         self.mmu = mmu
@@ -499,4 +458,67 @@ class LCDControlRegister:
 
     def bg_window_display_priority(self) -> bool:
         return self.lcdc_status() & 0b00000001 == 0b00000001
+
+class TileAttributes:
+
+    """
+    Map Attributes (CGB Mode only)
+    In CGB Mode, an additional map of 32x32 bytes is stored in VRAM Bank 1 (each byte defines attributes for the corresponding tile-number map entry in VRAM Bank 0):
+    Bit 0-2  Background Palette number  (BGP0-7)
+    Bit 3    Tile VRAM Bank number      (0=Bank 0, 1=Bank 1)
+    Bit 4    Not used
+    Bit 5    Horizontal Flip            (0=Normal, 1=Mirror horizontally)
+    Bit 6    Vertical Flip              (0=Normal, 1=Mirror vertically)
+    Bit 7    BG-to-OAM Priority         (0=Use OAM priority bit, 1=BG Priority)
+    When Bit 7 is set, the corresponding BG tile will have priority above all OBJs (regardless of the priority bits in OAM memory). There's also an Master Priority flag in LCDC register Bit 0 which overrides all other priority bits when cleared.
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+    def get_palette(self):
+        return self.value & 0b00000111
+
+    def get_vram_bank(self):
+        return (self.value & 0b00001000) >> 3
+
+    def is_horizontal_flip(self):
+        return self.value & 0b00100000 == 0b00100000
+
+    def is_vertical_flip(self):
+        return self.value & 0b01000000 == 0b01000000
+
+    def is_bg_priority(self):
+        return self.value & 0b10000000 == 0b10000000
     
+
+class SpriteAttributes:
+
+    """
+    Attributes/Flags:
+    Bit7   OBJ-to-BG Priority (0=OBJ Above BG, 1=OBJ Behind BG color 1-3)
+    (Used for both BG and Window. BG color 0 is always behind OBJ)
+    Bit6   Y flip          (0=Normal, 1=Vertically mirrored)
+    Bit5   X flip          (0=Normal, 1=Horizontally mirrored)
+    Bit4   Palette number  **Non CGB Mode Only** (0=OBP0, 1=OBP1)
+    Bit3   Tile VRAM-Bank  **CGB Mode Only**     (0=Bank 0, 1=Bank 1)
+    Bit2-0 Palette number  **CGB Mode Only**     (OBP0-7)
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+    def is_priority(self):
+        return self.value & 0x80 != 0x80
+    
+    def is_horizontal_flip(self):
+        return self.value & 0x20 == 0x20
+
+    def is_vertical_flip(self):
+        return self.value & 0x40 == 0x40
+
+    def get_palette(self):
+        return (self.value & 0b00010000) >> 4
+    
+    def get_cgb_palette(self):
+        return self.value & 0b00000111

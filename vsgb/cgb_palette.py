@@ -19,11 +19,7 @@ class CGB_Palette:
             0,0,0,0, #BGP6
             0,0,0,0  #BGP7
         ]
-        self.bgpi = 0
-        self.bg_autoincrement = False
-        self.bg_palette_index = 0
-        self.bg_palette_color = 0
-        self.bg_palette_byte_selector = 0
+        self.bgpi = PaletteIndex()
 
         # FF68 - BCPS/BGPI - CGB Mode Only - Background Palette Index
         self.ob_palettes = [
@@ -36,78 +32,56 @@ class CGB_Palette:
             0,0,0,0, #OBP6
             0,0,0,0  #OBP7
         ]
-        self.obpi = 0
-        self.ob_autoincrement = False
-        self.ob_palette_index = 0
-        self.ob_palette_color = 0
-        self.ob_palette_byte_selector = 0
+        self.obpi = PaletteIndex()
+
 
     def set_bgpi(self, value):
-        """
-            Bit Desc
-            7   Autoincrement
-            6   -
-            3-5 palette
-            1-2 color
-            0   byte selector (0 = Low, 1 = High)
-        """
-        self.bgpi = value & 0b10111111
-        self.bg_autoincrement = value & 0b10000000 == 0b10000000
-        self.bg_palette_index = ((value & 0b00111000) >> 3)
-        self.bg_palette_color = ((value & 0b00000110) >> 1)
-        self.bg_palette_byte_selector = value & 0b00000001
+        self.bgpi.set_value(value)
+
+    def get_bgpi(self):
+        return self.bgpi.get_value()
 
     def set_bgpd(self, value):
-        address = (self.bg_palette_index * 4) + self.bg_palette_color
-        if self.bg_palette_byte_selector == 0: # Set low byte
+        address = (self.bgpi.get_palette() * 4) + self.bgpi.get_color()
+        if self.bgpi.get_byte_selector() == 0: # Set low byte
             self.bg_palettes[address] = ((self.bg_palettes[address] & 0xff00) | value)
         else: # Set high byte
             self.bg_palettes[address] = ((self.bg_palettes[address] & 0x00ff) | (value << 8))
-        if self.bg_autoincrement:
-            self.set_bgpi(self.bgpi + 1)
+        if self.bgpi.is_autoincrement():
+            self.set_bgpi(self.bgpi.get_value() + 1)
 
     def get_bgpd(self):
-        address = (self.bg_palette_index * 4) + self.bg_palette_color
-        if self.bg_palette_byte_selector == 0: # Get low byte
+        address = (self.bgpi.get_palette() * 4) + self.bgpi.get_color()
+        if self.bgpi.get_byte_selector() == 0: # Get low byte
             return self.bg_palettes[address] & 0xff
         else: # Get high byte
             return self.bg_palettes[address] >> 8
-        if self.bg_autoincrement:
-            self.set_bgpi(self.bgpi + 1)
+        if self.bgpi.is_autoincrement():
+            self.set_bgpi(self.bgpi.get_value() + 1)
 
     def set_obpi(self, value):
-        """
-            Bit Desc
-            7   Autoincrement
-            6   -
-            3-5 palette
-            1-2 color
-            0   byte selector (0 = Low, 1 = High)
-        """
-        self.obpi = value & 0b10111111
-        self.ob_autoincrement = value & 0b10000000 == 0b10000000
-        self.ob_palette_index = ((value & 0b00111000) >> 3)
-        self.ob_palette_color = ((value & 0b00000110) >> 1)
-        self.ob_palette_byte_selector = value & 0b00000001
+        self.obpi.set_value(value)
 
+    def get_obpi(self):
+        return self.obpi.get_value()
 
     def set_obpd(self, value):
-        address = (self.ob_palette_index * 4) + self.ob_palette_color
-        if self.ob_palette_byte_selector == 0: # Set low byte
+        address = (self.obpi.get_palette() * 4) + self.obpi.get_color()
+        if self.obpi.get_byte_selector() == 0: # Set low byte
             self.ob_palettes[address] = ((self.ob_palettes[address] & 0xff00) | value)
         else: # Set high byte
             self.ob_palettes[address] = ((self.ob_palettes[address] & 0x00ff) | (value << 8))
-        if self.ob_autoincrement:
-            self.set_obpi(self.obpi + 1)
+        if self.obpi.is_autoincrement():
+            self.set_obpi(self.obpi.get_value() + 1)
 
     def get_obpd(self):
-        address = (self.ob_palette_index * 4) + self.ob_palette_color
-        if self.ob_palette_byte_selector == 0: # Get low byte
+        address = (self.obpi.get_palette() * 4) + self.obpi.get_color()
+        if self.obpi.get_byte_selector() == 0: # Get low byte
             return self.ob_palettes[address] & 0xff
         else: # Get high byte
             return self.ob_palettes[address] >> 8
-        if self.ob_autoincrement:
-            self.set_obpi(self.obpi + 1)
+        if self.obpi.is_autoincrement():
+            self.set_obpi(self.obpi.get_value() + 1)
 
             
     def get_bg_rgba_palette_color(self, palette, color):
@@ -137,5 +111,34 @@ class CGB_Palette:
 
         return rgba
 
+class PaletteIndex:
 
-       
+    """
+        Bit Desc
+        7   Autoincrement
+        6   -
+        3-5 palette
+        1-2 color
+        0   byte selector (0 = Low, 1 = High)
+    """
+
+    def __init__(self):
+        self._value = 0
+
+    def set_value(self, value):
+        self._value = value & 0b10111111
+
+    def get_value(self):
+        return self._value
+
+    def is_autoincrement(self):
+        return self._value & 0b10000000 == 0b10000000
+
+    def get_palette(self):
+        return ((self._value & 0b00111000) >> 3)
+
+    def get_color(self):
+        return ((self._value & 0b00000110) >> 1)
+
+    def get_byte_selector(self):
+        return self._value & 0b00000001
