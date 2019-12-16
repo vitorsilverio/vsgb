@@ -222,6 +222,8 @@ class PPU:
                     byte_1 = self.mmu.read_byte(tile_address)
                     byte_2 = self.mmu.read_byte(tile_address + 1)
                 else:
+                    if tile_attributes.is_vertical_flip():
+                        tile_address = tile_address - tile_line_offset + ( 7 - tile_line ) * 2
                     byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
                     byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
                     if tile_attributes.is_horizontal_flip():
@@ -294,6 +296,8 @@ class PPU:
                 byte_1 = self.mmu.read_byte(tile_address)
                 byte_2 = self.mmu.read_byte(tile_address + 1)
             else:
+                if tile_attributes.is_vertical_flip():
+                    tile_address = tile_address - tile_line_offset + ( 7 - tile_line ) * 2
                 byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
                 byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
                 if tile_attributes.is_horizontal_flip():
