@@ -118,5 +118,5 @@ class HDMA:
 
     def stop_dma(self):
         self.in_progress = False
-        self.mmu.write_byte(IO_Registers.HDMA5, self.mmu.read_byte(IO_Registers.HDMA5) & 0b11111111, True) #DMA is done
+        self.mmu.write_byte(IO_Registers.HDMA5, self.mmu.read_byte(IO_Registers.HDMA5) | 0b10000000, True) #DMA is done
         
