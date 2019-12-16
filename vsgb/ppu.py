@@ -241,7 +241,7 @@ class PPU:
                         if not self.cgb_mode:
                             self.framebuffer[position] = self.rgb(color) 
                         else:
-                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
                             self.bg_priority[position] = tile_attributes.is_bg_priority()
                         self.original_color[position] = color
                         buffer_addr = ( line_pixel_offset + pixelx - scx )
@@ -323,7 +323,7 @@ class PPU:
                 if not self.cgb_mode:
                     self.framebuffer[position] = self.rgb(color)
                 else:
-                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
                     self.bg_priority[position] = tile_attributes.is_bg_priority()
 
         self.window_line += 1
@@ -400,7 +400,7 @@ class PPU:
                         self.framebuffer[position] = self.rgb_sprite(color)
 
                     elif not self.bg_priority[position]:
-                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
+                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), pixel)
 
 
     def tile_line_h_flip(self, byte1, byte2):
