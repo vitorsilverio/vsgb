@@ -19,6 +19,7 @@ The executable will be:
 - **-r/--rom** Specify the rom file
 - **-d/--debug** Set logging to DEBUG and output to file
 - **-s/--skip** Skip boot rom, let me directly to rom
+- **-c/--cgb** Gameboy Color mode
 
 ## Coverage
 - vsgb passed all cpu instruction tests
