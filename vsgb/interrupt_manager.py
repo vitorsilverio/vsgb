@@ -19,6 +19,8 @@ class InterruptManager:
         ie_register = self.mmu.read_byte(IO_Registers.IE)
         if_register = self.mmu.read_byte(IO_Registers.IF)
         pending_interrupt = ie_register & if_register
+        if pending_interrupt & 0b00011111 == 0:
+            return Interrupt.INTERRUPT_NONE # There are not pending interrupts skip test just leave
         if pending_interrupt & Interrupt.INTERRUPT_VBLANK == Interrupt.INTERRUPT_VBLANK:
             return Interrupt.INTERRUPT_VBLANK
         if pending_interrupt & Interrupt.INTERRUPT_LCDSTAT == Interrupt.INTERRUPT_LCDSTAT:
