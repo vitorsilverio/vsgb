@@ -3,7 +3,7 @@
 
 import logging
 
-from vsgb.apu import APU
+from vsgb.apu import APU, SoundDriver
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.dma import DMA, HDMA
@@ -32,6 +32,8 @@ class Emulator:
         self.hdma = HDMA(self.mmu)
         self.window = Window(self.input)
         self.window.start()
+        self.sound_driver = SoundDriver(self.apu)
+        self.sound_driver.start()
         self.debug = (log_level == logging.DEBUG)
 
     def run(self):
