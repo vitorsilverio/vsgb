@@ -36,13 +36,13 @@ class MMU:
         self.wram = array.array('B', [0xff]*0x8000)
         self.oam = array.array('B', [0xff]*0xa0)
         self.zero_page = array.array('B', [0xff]*0x7f)
-        self.io_ports = array.array('B', [0xff]*0x80)
+        self.io_ports = array.array('B', [0x01]*0x80)
         self.hram = array.array('B', [0xff]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_space = array.array('B', [0xff]*0x60)
         self.cgb_mode = cgb_mode
         self.cgb_palette = CGB_Palette()
-        if self.rom.is_cgb() and self.cgb_mode:
+        if self.cgb_mode:
             self.boot_rom  = cgb_boot_rom
         else:
             self.boot_rom  = boot_rom
@@ -59,7 +59,7 @@ class MMU:
                 return self.boot_rom[address] & 0xff
             return self.rom.read_rom_byte(address)
         if 0x8000 <= address < 0xa000:
-            if self.rom.is_cgb() and self.cgb_mode:
+            if self.cgb_mode:
                 bank = self.read_byte(IO_Registers.VBK) & 0x1
                 return self.vram[(address - 0x8000)+(0x2000 * bank)] & 0xff
             else:
@@ -67,7 +67,7 @@ class MMU:
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
         if 0xc000 <= address < 0xe000:
-            if self.rom.is_cgb() and self.cgb_mode:
+            if self.cgb_mode:
                 if 0xc000 <= address < 0xd000:
                     return self.wram[address - 0xc000] & 0xff
                 bank = self.read_byte(IO_Registers.SVBK) & 0x7
@@ -103,7 +103,7 @@ class MMU:
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
         elif 0x8000 <= address < 0xa000:
-            if self.rom.is_cgb() and self.cgb_mode:
+            if self.cgb_mode:
                 bank = self.read_byte(IO_Registers.VBK) & 0x1
                 self.vram[(address - 0x8000)+(0x2000 * bank)] = value
             else:
@@ -111,7 +111,7 @@ class MMU:
         elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
         elif 0xc000 <= address < 0xe000:
-            if self.rom.is_cgb() and self.cgb_mode:
+            if self.cgb_mode:
                 if 0xc000 <= address < 0xd000:
                     self.wram[address - 0xc000] = value
                 else:
