@@ -111,7 +111,7 @@ class PaletteIndex:
         self._vertical_flip = False
         self._palette = 0
         self._color = 0
-        self._vram_bank = 0
+        self._byte_selector = 0
 
     def set_value(self, value):
         self._value = value & 0b10111111

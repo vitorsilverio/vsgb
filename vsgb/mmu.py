@@ -55,9 +55,9 @@ class MMU:
         
     def read_byte(self, address: int) -> int:
         if 0 <= address < 0x8000:
-            if self.bootstrap_enabled and address < len(self.boot_rom):
+            if self.bootstrap_enabled and ((0 <= address <= 0xff) or (0x0200 <= address <= 0x08ff)):
                 return self.boot_rom[address] & 0xff
-            return self.rom.read_rom_byte(address) & 0xff
+            return self.rom.read_rom_byte(address)
         if 0x8000 <= address < 0xa000:
             if self.rom.is_cgb() and self.cgb_mode:
                 bank = self.read_byte(IO_Registers.VBK) & 0x1
