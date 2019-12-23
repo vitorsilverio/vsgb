@@ -89,6 +89,7 @@ class HDMA:
         self.mmu.set_hdma(self)
         self.ticks = 0
         self.in_progress = False
+        self.waiting_h_blank = False
         self.type = HDMA.TYPE_GDMA
 
     def request_hdma_transfer(self, request: int):
@@ -103,20 +104,24 @@ class HDMA:
         self.ticks = 0
         self.mmu.write_byte(IO_Registers.HDMA5, request & 0b01111111, True) #DMA in progress
 
+    
     def step(self):
         source_address = (self.msb_source_address << 8) + self.lsb_source_address + self.counter
         destination_address = 0x80 + (self.msb_destination_address << 8) + self.lsb_destination_address + self.counter
-        self.mmu.write_byte(destination_address, self.mmu.read_byte(source_address))
-        self.counter += 1
-        self.ticks = 20
-        if self.type == HDMA.TYPE_HDMA:
-            self.mmu.write_byte(destination_address + 1, self.mmu.read_byte(source_address + 1))
-            self.counter += 1
-            self.ticks = 40
-        if self.counter == self.length:
-            self.stop_dma()
+        if self.type == HDMA.TYPE_GDMA or (self.type == HDMA.TYPE_HDMA and not self.waiting_h_blank):
+            for i in range(0x10):
+                self.mmu.write_byte(destination_address + i, self.mmu.read_byte(source_address + i))
+                self.counter += 1
+            
+            self.ticks = 32
+            if self.mmu.read_byte(IO_Registers.KEY1) & 0b10000000: #double speed mode
+                self.ticks = 64
+            remaining = self.length - self.counter
+            if remaining <= 0:
+                self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is done
+                self.in_progress = False
+            else:
+                self.mmu.write_byte(IO_Registers.HDMA5, int(remaining / 0x10) , True)
+                
 
-    def stop_dma(self):
-        self.in_progress = False
-        self.mmu.write_byte(IO_Registers.HDMA5, self.mmu.read_byte(IO_Registers.HDMA5) | 0b10000000, True) #DMA is done
-        
+

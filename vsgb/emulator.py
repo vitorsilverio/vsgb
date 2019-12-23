@@ -40,12 +40,13 @@ class Emulator:
         try:
             while True and not self.cpu.stop:
                 ticks = 0
-                if self.cgb_mode and self.hdma.in_progress:
+                if self.cgb_mode and self.hdma.in_progress and not self.hdma.waiting_h_blank:
                     if self.hdma.type == HDMA.TYPE_HDMA and self.ppu.mode != PPU.H_BLANK_STATE:
-                        self.hdma.stop_dma()
-                    else:
-                        self.hdma.step()
-                        ticks = self.hdma.ticks
+                        self.hdma.waiting_h_blank = True
+                    self.hdma.step()
+                    ticks = self.hdma.ticks
+                elif self.cgb_mode and self.hdma.in_progress and self.hdma.waiting_h_blank and self.ppu.mode == PPU.H_BLANK_STATE:
+                    self.hdma.waiting_h_blank = False
                 elif self.dma.in_progress:
                     self.dma.step()
                     ticks = self.dma.ticks
