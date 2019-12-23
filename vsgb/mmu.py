@@ -70,8 +70,10 @@ class MMU:
             if self.cgb_mode:
                 if 0xc000 <= address < 0xd000:
                     return self.wram[address - 0xc000] & 0xff
-                bank = self.read_byte(IO_Registers.SVBK) & 0x7
-                return self.wram[(address - 0xd000)+(bank*0x1000)] & 0xff
+                bank = self.read_byte(IO_Registers.SVBK) & 0b00000111
+                if bank == 0:
+                    bank = 1
+                return self.wram[(address - 0xd000) + (bank  * 0x1000)] & 0xff
             else:
                 return self.wram[address - 0xc000] & 0xff
         if 0xe000 <= address < 0xfe00:
@@ -93,6 +95,14 @@ class MMU:
                 return self.cgb_palette.get_obpi()
             if address == IO_Registers.OBPD:
                 return self.cgb_palette.get_obpd()
+            if address == IO_Registers.SVBK:
+                if self.cgb_mode:
+                    return (self.io_ports[address - 0xff00] | 0b11111000) & 0xff
+                return 0xff
+            if address == IO_Registers.VBK:
+                if self.cgb_mode:
+                    return (self.io_ports[address - 0xff00] | 0b11111110) & 0xff
+                return 0xff
             return self.io_ports[address - 0xff00] & 0xff
         if 0xff80 <= address < 0x10000:
             return self.hram[address - 0xff80] & 0xff
@@ -115,8 +125,10 @@ class MMU:
                 if 0xc000 <= address < 0xd000:
                     self.wram[address - 0xc000] = value
                 else:
-                    bank = self.read_byte(IO_Registers.SVBK) & 0x7
-                    self.wram[(address - 0xd000)+(bank*0x1000)] = value
+                    bank = self.read_byte(IO_Registers.SVBK) & 0b00000111
+                    if bank == 0:
+                        bank = 1
+                    self.wram[(address - 0xd000) + ( bank * 0x1000 )] = value
             else:
                 self.wram[address - 0xc000] = value
         elif 0xe000 <= address < 0xfe00:
