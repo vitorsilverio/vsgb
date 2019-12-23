@@ -155,7 +155,7 @@ class Color:
         return self._value & 0xff
 
     def get_high_byte(self):
-        return self.value >> 8
+        return self._value >> 8
     
     def get_rgba(self):
         return self._rgba
