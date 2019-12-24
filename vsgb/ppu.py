@@ -241,11 +241,12 @@ class PPU:
                     if 0 <= buffer_addr < Window.SCREEN_WIDTH:
                         position = line_width + buffer_addr
                         if not self.cgb_mode:
-                            self.framebuffer[position] = self.rgb(color) 
+                            self.framebuffer[position] = self.rgb(color)
+                            self.original_color[position] = color 
                         else:
                             self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
                             self.bg_priority[position] = tile_attributes.is_bg_priority()
-                        self.original_color[position] = color
+                            self.original_color[position] = pixel
                         buffer_addr = ( line_pixel_offset + pixelx - scx )
                             
                 x += 1
@@ -326,9 +327,11 @@ class PPU:
                 color = (palette >> (pixel * 2)) & 0x3
                 if not self.cgb_mode:
                     self.framebuffer[position] = self.rgb(color)
+                    self.original_color[position] = color
                 else:
                     self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
                     self.bg_priority[position] = tile_attributes.is_bg_priority()
+                    self.original_color[position] = pixel
 
         self.window_line += 1
 

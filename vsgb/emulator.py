@@ -37,22 +37,26 @@ class Emulator:
         self.debug = (log_level == logging.DEBUG)
 
     def run(self):
+        last_hblank = False
         try:
             while True and not self.cpu.stop:
                 ticks = 0
-                if self.cgb_mode and self.hdma.in_progress and not self.hdma.waiting_h_blank:
-                    if self.hdma.type == HDMA.TYPE_HDMA and self.ppu.mode != PPU.H_BLANK_STATE:
-                        self.hdma.waiting_h_blank = True
+                if self.cgb_mode and self.hdma.in_progress and self.hdma.type == HDMA.TYPE_GDMA:
                     self.hdma.step()
                     ticks = self.hdma.ticks
-                elif self.cgb_mode and self.hdma.in_progress and self.hdma.waiting_h_blank and self.ppu.mode == PPU.H_BLANK_STATE:
-                    self.hdma.waiting_h_blank = False
                 elif self.dma.in_progress:
                     self.dma.step()
                     ticks = self.dma.ticks
                 else:
+                    if self.cgb_mode and self.hdma.in_progress and self.hdma.type == HDMA.TYPE_HDMA:
+                        if not last_hblank and self.ppu.mode == PPU.H_BLANK_STATE:
+                            self.hdma.step()
+                            ticks = self.hdma.ticks
+                            last_hblank = True
+                        elif self.ppu.mode != PPU.H_BLANK_STATE:
+                            last_hblank = False
                     self.cpu.step()
-                    ticks = self.cpu.ticks
+                    ticks += self.cpu.ticks
                     if self.debug:
                         logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
