@@ -58,7 +58,7 @@ class Emulator:
                                     can_exec_hdma = False
                 if self.dma.in_progress:
                     self.dma.step()
-                    ticks = self.dma.ticks
+                    ticks += self.dma.ticks
                 if ticks == 0:
                     self.cpu.step()
                     ticks = self.cpu.ticks
