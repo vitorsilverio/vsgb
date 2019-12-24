@@ -114,8 +114,6 @@ class HDMA:
         self.counter += 0x10
         
         self.ticks = 32
-        if self.mmu.read_byte(IO_Registers.KEY1) & 0b10000000: #double speed mode
-            self.ticks = 64
         remaining = self.length - self.counter
         if remaining == 0:
             self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is done
