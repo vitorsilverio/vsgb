@@ -39,13 +39,23 @@ class Emulator:
     def run(self):
         
         try:
+            can_exec_hdma = False
+            last_ppu_mode = None
             while True:
+                if last_ppu_mode != self.ppu.mode:
+                    last_ppu_mode = self.ppu.mode
+                    can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode
                 ticks = 0
                 if self.cgb_mode: 
                     if self.hdma.in_progress:
-                        if ( self.hdma.type == HDMA.TYPE_GDMA ) or (self.hdma.type == HDMA.TYPE_HDMA and self.ppu.mode == PPU.H_BLANK_STATE):
+                        if ( self.hdma.type == HDMA.TYPE_GDMA ):
                             self.hdma.step()
                             ticks = self.hdma.ticks
+                        if  (self.hdma.type == HDMA.TYPE_HDMA ) :
+                                if ( can_exec_hdma ):
+                                    self.hdma.step()
+                                    ticks = self.hdma.ticks
+                                    can_exec_hdma = False
                 if self.dma.in_progress:
                     self.dma.step()
                     ticks = self.dma.ticks
