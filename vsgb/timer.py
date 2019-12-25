@@ -26,7 +26,7 @@ class Timer:
             self.div_cycles += cycles
 
         if key1 & 1 == 1: #Prepare enable/disable double speed
-            self.mmu.write_byte(IO_Registers.KEY1, key & 0b10000000)
+            self.mmu.write_byte(IO_Registers.KEY1, key1 & 0b10000000)
             self.div_cycles += 128 * 1024 - 76
 
         # incremnt DIV register if its time to

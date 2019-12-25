@@ -371,8 +371,9 @@ class PPU:
 
             tile_address = tiles + sprite_tile_offset + pixel_y_2 + offset
 
-            byte_1 = self.mmu.read_byte(tile_address)
-            byte_2 = self.mmu.read_byte(tile_address + 1)
+            byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if sprite_attributes.get_vram_bank() == 0 else 0x2000)]
+            byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if sprite_attributes.get_vram_bank() == 0 else 0x2000) + 1]
+                
 
             obp0 = self.mmu.read_byte(IO_Registers.OBP0)
             obp1 = self.mmu.read_byte(IO_Registers.OBP1)
@@ -523,6 +524,7 @@ class SpriteAttributes:
         self._horizontal_flip = self.value & 0x20 == 0x20
         self._vertical_flip = self.value & 0x40 == 0x40
         self._palette = (self.value & 0b00010000) >> 4
+        self._bank = (self.value & 0b00001000) >> 3
         self._cgb_palette = self.value & 0b00000111
 
 
@@ -540,3 +542,6 @@ class SpriteAttributes:
     
     def get_cgb_palette(self):
         return self._cgb_palette
+
+    def get_vram_bank(self):
+        return self._bank

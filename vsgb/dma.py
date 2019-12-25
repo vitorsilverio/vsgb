@@ -92,6 +92,11 @@ class HDMA:
         self.type = HDMA.TYPE_GDMA
 
     def request_hdma_transfer(self, request: int):
+        if self.in_progress:
+            if (((request & 0b01111111) + 1) * 0x10) == self.length - self.counter:
+                print('Force finish HDMA as GDMA')
+                self.type = HDMA.TYPE_GDMA
+                return
         self.in_progress = True
         self.type = (request >> 7) & 0x01
         self.length = ((request & 0b01111111) + 1) * 0x10
