@@ -93,9 +93,11 @@ class HDMA:
 
     def request_hdma_transfer(self, request: int):
         if self.in_progress:
-            if (((request & 0b01111111) + 1) * 0x10) == self.length - self.counter:
-                print('Force finish HDMA as GDMA')
-                self.type = HDMA.TYPE_GDMA
+            stop_or_reset = (request & 0b10000000) >> 7
+            if stop_or_reset == 0:
+                self.in_progress = False
+                self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is stopped
+                print('stop HDMA requested')
                 return
         self.in_progress = True
         self.type = (request >> 7) & 0x01
@@ -118,7 +120,7 @@ class HDMA:
             self.mmu.write_byte(destination_address + i, self.mmu.read_byte(source_address + i))
         self.counter += 0x10
         
-        self.ticks = 32
+        self.ticks = 32 + (0 if self.counter != 0x10 else 4)
         remaining = self.length - self.counter
         if remaining == 0:
             self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is done
