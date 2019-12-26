@@ -4,6 +4,8 @@
 # Documentation source:
 # - http://problemkaputt.de/pandocs.htm
 
+import logging
+
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 
@@ -101,7 +103,7 @@ class HDMA:
               and self.lsb_destination_address == self.mmu.read_byte(IO_Registers.HDMA4) & 0b11110000 :
                 self.in_progress = False
                 self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is stopped
-                print('stop HDMA requested')
+                logging.debug('stop HDMA requested')
                 return
         self.in_progress = True
         self.type = (request >> 7) & 0x01
@@ -113,7 +115,7 @@ class HDMA:
         self.counter = 0x00
         self.ticks = 0
         self.mmu.write_byte(IO_Registers.HDMA5, request & 0b01111111, True) #DMA in progress
-        print('DMA REQUEST (type:{} from:{:02x}{:02x} to:{:02x}{:02x} len:{:04x})'.format(self.type, self.msb_source_address, 
+        logging.debug('DMA REQUEST (type:{} from:{:02x}{:02x} to:{:02x}{:02x} len:{:04x})'.format(self.type, self.msb_source_address, 
         self.lsb_source_address, self.msb_destination_address + 0x80, self.lsb_destination_address, self.length))
 
     

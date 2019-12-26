@@ -329,10 +329,9 @@ class PPU:
                     self.framebuffer[position] = self.rgb(color)
                     self.original_color[position] = color
                 else:
-                    if not self.bg_priority[position]:
-                        self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
-                        self.bg_priority[position] = tile_attributes.is_bg_priority()
-                        self.original_color[position] = pixel
+                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
+                    self.bg_priority[position] = tile_attributes.is_bg_priority()
+                    self.original_color[position] = pixel
 
         self.window_line += 1
 

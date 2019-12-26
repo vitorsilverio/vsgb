@@ -11,6 +11,7 @@ from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 
 from vsgb.memory.vram import VideoRam
+from vsgb.memory.wram import WorkRam
 from vsgb.memory.unused_memory_area import UnusedMemoryArea
 
 # General Memory Map
@@ -36,7 +37,7 @@ class MMU:
         self.apu = apu
         self.input = _input
         self.vram = VideoRam()
-        self.wram = array.array('B', [0x00]*0x8000)
+        self.wram = WorkRam()
         self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x7f)
         self.io_registers = IO_Registers()
@@ -72,13 +73,11 @@ class MMU:
         if 0xc000 <= address < 0xe000:
             if self.cgb_mode:
                 if 0xc000 <= address < 0xd000:
-                    return self.wram[address - 0xc000] & 0xff
+                    return self.wram.read_value(address, 0) & 0xff
                 bank = self.read_byte(IO_Registers.SVBK) & 0b00000111
-                if bank == 0:
-                    bank = 1
-                return self.wram[(address - 0xd000) + (bank  * 0x1000)] & 0xff
+                return self.wram.read_value(address, bank) & 0xff
             else:
-                return self.wram[address - 0xc000] & 0xff
+                return self.wram.read_value(address, 0) & 0xff
         if 0xe000 <= address < 0xfe00:
             return self.read_byte(address - 0x2000) #Echo RAM
         if 0xfe00 <= address < 0xfea0:
@@ -126,14 +125,12 @@ class MMU:
         elif 0xc000 <= address < 0xe000:
             if self.cgb_mode:
                 if 0xc000 <= address < 0xd000:
-                    self.wram[address - 0xc000] = value
+                    self.wram.write_value(address, 0, value)
                 else:
                     bank = self.read_byte(IO_Registers.SVBK) & 0b00000111
-                    if bank == 0:
-                        bank = 1
-                    self.wram[(address - 0xd000) + ( bank * 0x1000 )] = value
+                    self.wram.write_value(address, bank, value)
             else:
-                self.wram[address - 0xc000] = value
+                self.wram.write_value(address, 0, value)
         elif 0xe000 <= address < 0xfe00:
             self.write_byte(address - 0x2000, value) #Echo RAM
         elif 0xfe00 <= address < 0xfea0:
