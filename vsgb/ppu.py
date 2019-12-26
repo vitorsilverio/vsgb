@@ -278,7 +278,7 @@ class PPU:
         tile_line = line_adjusted % 8
         tile_line_offset = tile_line * 2
 
-        for x in range(0,32):
+        for x in range(32):
             tile = 0
             if tiles_select == 0x8800:
                 tile = signed_value(self.mmu.read_byte(map_select + y_offset + x))
@@ -381,7 +381,7 @@ class PPU:
             else:
                 palette = obp1
 
-            for pixelx in range(0,8):
+            for pixelx in range(8):
                 shift = 0x1 << (pixelx if sprite_attributes.is_horizontal_flip() else 7 - pixelx)
                 pixel = 0
 
@@ -406,7 +406,8 @@ class PPU:
                     if not self.cgb_mode:
                         self.framebuffer[position] = self.rgb_sprite(color)
 
-                    elif not self.bg_priority[position]:
+                    elif not self.bg_priority[position] \
+                        or self.original_color[position] == 0:
                         self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), pixel)
 
 
