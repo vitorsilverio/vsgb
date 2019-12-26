@@ -96,7 +96,7 @@ class HDMA:
             stop_or_reset = (request & 0b10000000) >> 7
             if stop_or_reset == 0 \
               and self.msb_source_address == self.mmu.read_byte(IO_Registers.HDMA1) \
-              and self.lsb_source_address == self.mmu.read_byte(IO_Registers.HDMA2) & 0b1111000 \
+              and self.lsb_source_address == self.mmu.read_byte(IO_Registers.HDMA2) & 0b11110000 \
               and self.msb_destination_address == self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111 \
               and self.lsb_destination_address == self.mmu.read_byte(IO_Registers.HDMA4) & 0b11110000 :
                 self.in_progress = False
@@ -107,7 +107,7 @@ class HDMA:
         self.type = (request >> 7) & 0x01
         self.length = ((request & 0b01111111) + 1) * 0x10
         self.msb_source_address = self.mmu.read_byte(IO_Registers.HDMA1)
-        self.lsb_source_address = self.mmu.read_byte(IO_Registers.HDMA2) & 0b1111000
+        self.lsb_source_address = self.mmu.read_byte(IO_Registers.HDMA2) & 0b11110000
         self.msb_destination_address = self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111
         self.lsb_destination_address = self.mmu.read_byte(IO_Registers.HDMA4) & 0b11110000
         self.counter = 0x00
