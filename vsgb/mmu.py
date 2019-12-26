@@ -11,7 +11,7 @@ from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 
 from vsgb.memory.vram import VideoRam
-from vsgb.memory.unusable_memory import UnusedMemoryArea
+from vsgb.memory.unused_memory_area import UnusedMemoryArea
 
 # General Memory Map
 # Start End     Description                      Notes
@@ -39,7 +39,7 @@ class MMU:
         self.wram = array.array('B', [0x00]*0x8000)
         self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x7f)
-        self.io_ports = array.array('B', [0x00]*0x80)
+        self.io_registers = IO_Registers()
         self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_area = UnusedMemoryArea(cgb_mode)
@@ -87,7 +87,7 @@ class MMU:
             return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
-                return self.input.read_input(self.io_ports[0]) & 0xff
+                return self.input.read_input(self.io_registers.read_value(address)) & 0xff
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
             if address == IO_Registers.BGPI:
@@ -100,13 +100,13 @@ class MMU:
                 return self.cgb_palette.get_obpd()
             if address == IO_Registers.SVBK:
                 if self.cgb_mode:
-                    return (self.io_ports[address - 0xff00] | 0b11111000) & 0xff
+                    return (self.io_registers.read_value(address) | 0b11111000) & 0xff
                 return 0xff
             if address == IO_Registers.VBK:
                 if self.cgb_mode:
-                    return (self.io_ports[address - 0xff00] | 0b11111110) & 0xff
+                    return (self.io_registers.read_value(address) | 0b11111110) & 0xff
                 return 0xff
-            return self.io_ports[address - 0xff00] & 0xff
+            return self.io_registers.read_value(address) & 0xff
         if 0xff80 <= address < 0x10000:
             return self.hram[address - 0xff80] & 0xff
         return 0xff
@@ -141,9 +141,9 @@ class MMU:
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
-                    self.io_ports[address - 0xff00] = value & 0b00110000
+                    self.io_registers.write_value(address,value & 0b00110000)
                 elif address == IO_Registers.DIV: # Reset div register
-                    self.io_ports[address - 0xff00] = 0x00
+                    self.io_registers.write_value(address,0)
                 elif address == IO_Registers.DMA: # Start dma transfer
                     self.dma.request_dma_transfer(value)
                 elif address == IO_Registers.HDMA5: # Start hdma transfer
@@ -161,9 +161,9 @@ class MMU:
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
                 else:
-                    self.io_ports[address - 0xff00] = value
+                    self.io_registers.write_value(address,value)
             else:     
-                self.io_ports[address - 0xff00] = value
+                self.io_registers.write_value(address,value)
         elif 0xff80 <= address < 0x10000:
             self.hram[address - 0xff80] = value
 

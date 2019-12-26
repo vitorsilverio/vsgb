@@ -290,7 +290,7 @@ class PPU:
             tile_select_offset = tile * 16
             tile_address = tiles_select + tile_select_offset + tile_line_offset
 
-           
+            
             tile_attributes = TileAttributes(self.mmu.vram.read_value(map_select + y_offset + x, 1))
             
             if not self.cgb_mode:
@@ -306,7 +306,7 @@ class PPU:
 
             palette = self.mmu.read_byte(IO_Registers.BGP)
 
-            for pixelx in range(0,8):
+            for pixelx in range(8):
                 buffer_addr = line_pixel_offset + pixelx + window_pos_x
 
                 if buffer_addr < 0 or buffer_addr >= Window.SCREEN_WIDTH:
@@ -329,9 +329,10 @@ class PPU:
                     self.framebuffer[position] = self.rgb(color)
                     self.original_color[position] = color
                 else:
-                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
-                    self.bg_priority[position] = tile_attributes.is_bg_priority()
-                    self.original_color[position] = pixel
+                    if not self.bg_priority[position]:
+                        self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
+                        self.bg_priority[position] = tile_attributes.is_bg_priority()
+                        self.original_color[position] = pixel
 
         self.window_line += 1
 

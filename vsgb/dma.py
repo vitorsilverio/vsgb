@@ -94,7 +94,11 @@ class HDMA:
     def request_hdma_transfer(self, request: int):
         if self.in_progress:
             stop_or_reset = (request & 0b10000000) >> 7
-            if stop_or_reset == 0:
+            if stop_or_reset == 0 \
+              and self.msb_source_address == self.mmu.read_byte(IO_Registers.HDMA1) \
+              and self.lsb_source_address == self.mmu.read_byte(IO_Registers.HDMA2) & 0b1111000 \
+              and self.msb_destination_address == self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111 \
+              and self.lsb_destination_address == self.mmu.read_byte(IO_Registers.HDMA4) & 0b11110000 :
                 self.in_progress = False
                 self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is stopped
                 print('stop HDMA requested')
@@ -105,7 +109,7 @@ class HDMA:
         self.msb_source_address = self.mmu.read_byte(IO_Registers.HDMA1)
         self.lsb_source_address = self.mmu.read_byte(IO_Registers.HDMA2) & 0b1111000
         self.msb_destination_address = self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111
-        self.lsb_destination_address = self.mmu.read_byte(IO_Registers.HDMA4) & 0b1111000
+        self.lsb_destination_address = self.mmu.read_byte(IO_Registers.HDMA4) & 0b11110000
         self.counter = 0x00
         self.ticks = 0
         self.mmu.write_byte(IO_Registers.HDMA5, request & 0b01111111, True) #DMA in progress
