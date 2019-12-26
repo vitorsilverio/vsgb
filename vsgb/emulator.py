@@ -88,13 +88,18 @@ class Emulator:
     def skip_boot_rom(self):
         self.cpu.registers.pc = 0x0100
         if self.mmu.rom.is_cgb() and self.cgb_mode:
-            self.cpu.registers.set_af(0x11b0)
+            self.cpu.registers.set_af(0x1180)
+            self.cpu.registers.set_bc(0x0000)
+            self.cpu.registers.set_de(0xff56)
+            self.cpu.registers.set_hl(0x000d)
+            self.cpu.registers.sp = 0xfffe
+            self.mmu.write_byte(IO_Registers.KEY1, 0x81)            
         else:
             self.cpu.registers.set_af(0x01b0)
-        self.cpu.registers.set_bc(0x0013)
-        self.cpu.registers.set_de(0x00d8)
-        self.cpu.registers.set_hl(0x014d)
-        self.cpu.registers.sp = 0xffff
+            self.cpu.registers.set_bc(0x0013)
+            self.cpu.registers.set_de(0x00d8)
+            self.cpu.registers.set_hl(0x014d)
+            self.cpu.registers.sp = 0xfffe
         self.mmu.write_byte(IO_Registers.NR_10, 0x80)
         self.mmu.write_byte(IO_Registers.NR_11, 0xbf)
         self.mmu.write_byte(IO_Registers.NR_12, 0xf3)

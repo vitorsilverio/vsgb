@@ -10,6 +10,9 @@ from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 
+from vsgb.memory.vram import VideoRam
+from vsgb.memory.unusable_memory import UnusedMemoryArea
+
 # General Memory Map
 # Start End     Description                      Notes
 # 0000  3FFF    16KB ROM bank 00                 From cartridge, usually a fixed bank
@@ -32,14 +35,14 @@ class MMU:
         self.rom = rom
         self.apu = apu
         self.input = _input
-        self.vram = array.array('B', [0x00]*0x4000)
+        self.vram = VideoRam()
         self.wram = array.array('B', [0x00]*0x8000)
         self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x7f)
         self.io_ports = array.array('B', [0x00]*0x80)
         self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
-        self.unusable_memory_space = array.array('B', [0xff]*0x60)
+        self.unusable_memory_area = UnusedMemoryArea(cgb_mode)
         self.cgb_mode = cgb_mode
         self.cgb_palette = CGB_Palette()
         if self.cgb_mode:
@@ -61,9 +64,9 @@ class MMU:
         if 0x8000 <= address < 0xa000:
             if self.cgb_mode:
                 bank = self.read_byte(IO_Registers.VBK) & 0x1
-                return self.vram[(address - 0x8000)+(0x2000 * bank)] & 0xff
+                return self.vram.read_value(address, bank) & 0xff
             else:
-                return self.vram[address - 0x8000] & 0xff
+                return self.vram.read_value(address, 0) & 0xff
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
         if 0xc000 <= address < 0xe000:
@@ -81,7 +84,7 @@ class MMU:
         if 0xfe00 <= address < 0xfea0:
             return self.oam[address - 0xfe00] & 0xff
         if 0xfea0 <= address < 0xff00:
-            return self.unusable_memory_space[address - 0xfea0] & 0xff
+            return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
                 return self.input.read_input(self.io_ports[0]) & 0xff
@@ -115,9 +118,9 @@ class MMU:
         elif 0x8000 <= address < 0xa000:
             if self.cgb_mode:
                 bank = self.read_byte(IO_Registers.VBK) & 0x1
-                self.vram[(address - 0x8000)+(0x2000 * bank)] = value
+                self.vram.write_value(address, bank, value)
             else:
-                self.vram[address - 0x8000] = value
+                self.vram.write_value(address, 0, value)
         elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
         elif 0xc000 <= address < 0xe000:
@@ -135,8 +138,6 @@ class MMU:
             self.write_byte(address - 0x2000, value) #Echo RAM
         elif 0xfe00 <= address < 0xfea0:
             self.oam[address - 0xfe00] = value
-        elif 0xfea0 <= address < 0xff00:
-            self.unusable_memory_space[address - 0xfea0] = value
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
@@ -159,11 +160,6 @@ class MMU:
                     self.bootstrap_enabled = False
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
-                #elif address == IO_Registers.KEY1 and self.rom.is_cgb():
-                #    mode = self.io_ports[IO_Registers.KEY1 - 0xff00] & 0b10000000
-                #    self.hram[IO_Registers.IE - 0xff80] = value
-                #    self.io_ports[IO_Registers.P1 - 0xff00] = 0x30
-                #    self.io_ports[IO_Registers.KEY1 - 0xff00] = 0 if mode !=0 else 0b10000000
                 else:
                     self.io_ports[address - 0xff00] = value
             else:     

@@ -216,7 +216,7 @@ class PPU:
                 tile_address = tiles_select + tile_select_offset + tile_line_offset
 
                 
-                tile_attributes = TileAttributes(self.mmu.vram[map_select + y_offset + x - 0x6000])
+                tile_attributes = TileAttributes(self.mmu.vram.read_value(map_select + y_offset + x, 1))
             
                 if not self.cgb_mode:
                     byte_1 = self.mmu.read_byte(tile_address)
@@ -224,8 +224,8 @@ class PPU:
                 else:
                     if tile_attributes.is_vertical_flip():
                         tile_address = tile_address - tile_line_offset + ( 7 - tile_line ) * 2
-                    byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
-                    byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
+                    byte_1 = self.mmu.vram.read_value(tile_address, tile_attributes.get_vram_bank())
+                    byte_2 = self.mmu.vram.read_value(tile_address + 1, tile_attributes.get_vram_bank())
                     if tile_attributes.is_horizontal_flip():
                         byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
@@ -291,7 +291,7 @@ class PPU:
             tile_address = tiles_select + tile_select_offset + tile_line_offset
 
            
-            tile_attributes = TileAttributes(self.mmu.vram[map_select + y_offset + x - 0x6000])
+            tile_attributes = TileAttributes(self.mmu.vram.read_value(map_select + y_offset + x, 1))
             
             if not self.cgb_mode:
                 byte_1 = self.mmu.read_byte(tile_address)
@@ -299,8 +299,8 @@ class PPU:
             else:
                 if tile_attributes.is_vertical_flip():
                     tile_address = tile_address - tile_line_offset + ( 7 - tile_line ) * 2
-                byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000)]
-                byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if tile_attributes.get_vram_bank() == 0 else 0x2000) + 1]
+                byte_1 = self.mmu.vram.read_value(tile_address, tile_attributes.get_vram_bank())
+                byte_2 = self.mmu.vram.read_value(tile_address + 1, tile_attributes.get_vram_bank())
                 if tile_attributes.is_horizontal_flip():
                     byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
 
@@ -371,9 +371,8 @@ class PPU:
 
             tile_address = tiles + sprite_tile_offset + pixel_y_2 + offset
 
-            byte_1 = self.mmu.vram[tile_address - 0x8000 + (0 if sprite_attributes.get_vram_bank() == 0 else 0x2000)]
-            byte_2 = self.mmu.vram[tile_address - 0x8000 + (0 if sprite_attributes.get_vram_bank() == 0 else 0x2000) + 1]
-                
+            byte_1 = self.mmu.vram.read_value(tile_address, sprite_attributes.get_vram_bank())
+            byte_2 = self.mmu.vram.read_value(tile_address + 1, sprite_attributes.get_vram_bank())
 
             obp0 = self.mmu.read_byte(IO_Registers.OBP0)
             obp1 = self.mmu.read_byte(IO_Registers.OBP1)
