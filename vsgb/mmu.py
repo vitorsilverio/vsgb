@@ -155,6 +155,7 @@ class MMU:
                     self.cgb_palette.set_obpd(value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
+                    print('Boot rom disabled. Starting rom...')
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
                 else:

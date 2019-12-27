@@ -205,10 +205,10 @@ class PPU:
             while x < 32:
                 tile = 0
                 if tiles_select == 0x8800:
-                    tile = signed_value(self.mmu.read_byte(map_select + y_offset + x))
+                    tile = signed_value(self.mmu.vram.read_value(map_select + y_offset + x, 0))
                     tile += 128
                 else:
-                    tile = self.mmu.read_byte(map_select + y_offset + x)
+                    tile = self.mmu.vram.read_value(map_select + y_offset + x, 0)
                     
 
                 line_pixel_offset = x * 8
@@ -281,10 +281,10 @@ class PPU:
         for x in range(32):
             tile = 0
             if tiles_select == 0x8800:
-                tile = signed_value(self.mmu.read_byte(map_select + y_offset + x))
+                tile = signed_value(self.mmu.vram.read_value(map_select + y_offset + x, 0))
                 tile += 128
             else:
-                tile = self.mmu.read_byte(map_select + y_offset + x)
+                tile = self.mmu.vram.read_value(map_select + y_offset + x, 0)
             
             line_pixel_offset = x * 8
             tile_select_offset = tile * 16
