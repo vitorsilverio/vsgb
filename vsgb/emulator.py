@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import pickle
 
 from vsgb.apu import APU, SoundDriver
 from vsgb.cartridge import Cartridge
@@ -30,11 +31,13 @@ class Emulator:
         self.timer = Timer(self.mmu, self.interruptManager)
         self.dma = DMA(self.mmu)
         self.hdma = HDMA(self.mmu)
-        self.window = Window(self.input)
+        self.window = Window(self)
         self.window.start()
         self.sound_driver = SoundDriver(self.apu)
         self.sound_driver.start()
         self.debug = (log_level == logging.DEBUG)
+        self.changing_state = False
+        self.serialize_ok = False
 
     def run(self):
         
@@ -43,6 +46,8 @@ class Emulator:
             last_ppu_mode = None
             refresh = False
             while True:
+                while self.changing_state:
+                    self.serialize_ok = True
                 if last_ppu_mode != self.ppu.mode:
                     last_ppu_mode = self.ppu.mode
                     ly = self.mmu.read_byte(IO_Registers.LY)
@@ -126,3 +131,42 @@ class Emulator:
         # unmap the boot rom
         self.mmu.write_byte(0xFF50, 0x01)
 
+    def save_state(self):
+        self.changing_state = True
+        while not self.serialize_ok:
+            self.serialize_ok = False
+        with open(self.cartridge.rom().get_game_id()+'.bin','wb') as save_state_file:
+            pickle.dump(self, save_state_file)
+        print('Saved state')
+        self.changing_state = False
+
+    def load_state(self):
+        self.changing_state = True
+        while not self.serialize_ok:
+            self.serialize_ok = False
+        with open(self.cartridge.rom().get_game_id()+'.bin','rb') as save_state_file:
+            state = pickle.load(save_state_file)
+            self.timer = state.timer
+            self.mmu = state.mmu
+            self.mmu.rom.data = self.cartridge.rom().data
+            self.mmu.input = self.input
+            self.ppu = state.ppu
+            self.hdma = state.hdma
+            self.dma = state.dma
+            self.interruptManager = state.interruptManager
+            self.cpu = state.cpu
+        print('Loaded state')
+        self.changing_state = False
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Don't pickle
+        del state["window"]
+        del state["sound_driver"]
+        del state["input"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.window = None
+        self.sound_driver = None

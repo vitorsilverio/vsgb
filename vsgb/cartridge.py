@@ -193,6 +193,12 @@ class Cartridge:
             return MBC5(self.data, True, True)
         return None
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Don't pickle
+        del state["data"]
+        return state
+
 class Battery:
 
     def __init__(self, save_file: str):
@@ -260,9 +266,12 @@ class CartridgeType:
         self.ram = [0xff]*(0x2000 * self.ram_banks)
 
         if self.hasBattery:
-            save_file_name = bytes(self.data[CartridgeHeader.TITLE:(CartridgeHeader.TITLE + 15)]).decode().split('\x00')[0]+".sav"
+            save_file_name = self.get_game_id()+".sav"
             self.battery = Battery(save_file_name)
             self.ram = self.battery.load_ram(self.ram)
+
+    def get_game_id(self) -> str:
+        return bytes(self.data[CartridgeHeader.TITLE:(CartridgeHeader.TITLE + 15)]).decode().split('\x00')[0]
 
     def is_cgb(self) -> bool:
         return self.data[CartridgeHeader.CGB_FLAG] in [0x80, 0xc0]
