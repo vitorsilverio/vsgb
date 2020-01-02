@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pickle
 
 from vsgb.apu import APU, SoundDriver
 from vsgb.cartridge import Cartridge
@@ -16,6 +15,7 @@ from vsgb.ppu import PPU
 from vsgb.timer import Timer
 from vsgb.window import Window
 from vsgb.instructions import instructions
+from vsgb.save_state_manager import SaveStateManager
 
 class Emulator:
 
@@ -38,6 +38,7 @@ class Emulator:
         self.debug = (log_level == logging.DEBUG)
         self.changing_state = False
         self.serialize_ok = False
+        self.save_state_manager = SaveStateManager()
 
     def run(self):
         
@@ -135,38 +136,12 @@ class Emulator:
         self.changing_state = True
         while not self.serialize_ok:
             self.serialize_ok = False
-        with open(self.cartridge.rom().get_game_id()+'.bin','wb') as save_state_file:
-            pickle.dump(self, save_state_file)
-        print('Saved state')
+        self.save_state_manager.create(self)
         self.changing_state = False
 
     def load_state(self):
         self.changing_state = True
         while not self.serialize_ok:
             self.serialize_ok = False
-        with open(self.cartridge.rom().get_game_id()+'.bin','rb') as save_state_file:
-            state = pickle.load(save_state_file)
-            self.timer = state.timer
-            self.mmu = state.mmu
-            self.mmu.rom.data = self.cartridge.rom().data
-            self.mmu.input = self.input
-            self.ppu = state.ppu
-            self.hdma = state.hdma
-            self.dma = state.dma
-            self.interruptManager = state.interruptManager
-            self.cpu = state.cpu
-        print('Loaded state')
+        self.save_state_manager.restore(self)
         self.changing_state = False
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        # Don't pickle
-        del state["window"]
-        del state["sound_driver"]
-        del state["input"]
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.window = None
-        self.sound_driver = None
