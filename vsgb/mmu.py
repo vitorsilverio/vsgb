@@ -9,6 +9,7 @@ from vsgb.cgb_palette import CGB_Palette
 from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
+from vsgb.game_shark import GameShark
 
 from vsgb.memory.vram import VideoRam
 from vsgb.memory.wram import WorkRam
@@ -50,6 +51,7 @@ class MMU:
             self.boot_rom  = cgb_boot_rom
         else:
             self.boot_rom  = boot_rom
+        self.game_shark = GameShark()
 
     def set_dma(self, dma):
         self.dma = dma
@@ -58,6 +60,9 @@ class MMU:
         self.hdma = hdma
         
     def read_byte(self, address: int) -> int:
+        if self.game_shark.cheats_enabled and address in self.game_shark.cheats:
+            return self.game_shark.cheats[address]
+
         if 0 <= address < 0x8000:
             if self.bootstrap_enabled and ((0 <= address <= 0xff) or (0x0200 <= address <= 0x08ff)):
                 return self.boot_rom[address] & 0xff
