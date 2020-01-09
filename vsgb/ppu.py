@@ -4,7 +4,7 @@
 # Documentation source:
 # - https://gbdev.gg8.se/wiki/articles/Video_Display
 
-from vsgb.byte_operations import signed_value
+from vsgb.byte_operations import signed_value, flip_byte
 from vsgb.interrupt_manager import Interrupt, InterruptManager
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
@@ -265,7 +265,8 @@ class PPU:
                     byte_1 = self.mmu.vram.read_value(tile_address, tile_attributes.get_vram_bank())
                     byte_2 = self.mmu.vram.read_value(tile_address + 1, tile_attributes.get_vram_bank())
                     if tile_attributes.is_horizontal_flip():
-                        byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
+                        byte_1 = flip_byte(byte_1)
+                        byte_2 = flip_byte(byte_2)
 
                 pixelx = 0
                 buffer_addr = (line_pixel_offset - scx)
@@ -342,7 +343,8 @@ class PPU:
                 byte_1 = self.mmu.vram.read_value(tile_address, tile_attributes.get_vram_bank())
                 byte_2 = self.mmu.vram.read_value(tile_address + 1, tile_attributes.get_vram_bank())
                 if tile_attributes.is_horizontal_flip():
-                    byte_1, byte_2 = self.tile_line_h_flip(byte_1, byte_2)
+                    byte_1 = flip_byte(byte_1)
+                    byte_2 = flip_byte(byte_2)
 
             palette = self.mmu.read_byte(IO_Registers.BGP)
 
@@ -453,18 +455,7 @@ class PPU:
                         if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
                             color = pixel
                         self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
-                        
-
-
-    def tile_line_h_flip(self, byte1, byte2):
-        result_b1 = 0
-        result_b2 = 0
-        src_mask = 0b11000000
-        for i in range(4):
-            result_b1 = result_b1 | (((byte2 & (src_mask >> (i*2))) >> ((3-i)*2)) << (i*2))
-            result_b2 = result_b1 | (((byte1 & (src_mask >> (i*2))) >> ((3-i)*2)) << (i*2)) 
-
-        return result_b1, result_b2
+        
 
 
 

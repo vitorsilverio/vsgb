@@ -17,3 +17,9 @@ def signed_value(byte : int) -> int:
 
 def set_bit(bit : int, value : int) -> int:
     return value | bit_mask[bit]
+
+def flip_byte(byte: int) -> int:
+    result = 0
+    for i in range(0,8):
+        result = result | ( ( ( byte & ( 1 << i ) ) << ( 7 - i ) ) >> i )
+    return result
