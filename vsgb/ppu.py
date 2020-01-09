@@ -56,6 +56,7 @@ class PPU:
                 elif self.mode == PPU.VMRAM_READ_STATE:
                     if self.modeclock >= PPU.VRAM_SCANLINE_TIME:
                         self.exec_vram()
+                self.check_lcdc_status_interrupt()
             else:
                 self.screen_enabled = True
                 self.modeclock = 0
@@ -144,6 +145,18 @@ class PPU:
         stat = self.mmu.read_byte(IO_Registers.STAT)
         new_stat = (stat & 0xfc) | (self.mode & 0x3)
         self.mmu.write_byte(IO_Registers.STAT, new_stat)
+
+    def check_lcdc_status_interrupt(self):
+        stat = self.mmu.read_byte(IO_Registers.STAT)
+        if stat & 0b01000000 != 0 and stat & 0b00000100 != 0:
+            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+        mode = stat & 0b00000011
+        if mode == 2 and stat & 0b00100000 != 0:
+            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+        if mode == 1 and stat & 0b00010000 != 0:
+            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+        if mode == 0 and stat & 0b00001000 != 0:
+            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
 
     def current_line(self):
         return self.mmu.read_byte(IO_Registers.LY)

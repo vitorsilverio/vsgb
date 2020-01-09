@@ -41,7 +41,6 @@ class Emulator:
         self.save_state_manager = SaveStateManager()
 
     def run(self):
-        
         try:
             can_exec_hdma = False
             last_ppu_mode = None
@@ -81,7 +80,7 @@ class Emulator:
         except Exception as e:
             print('An error occurred:')
             print(self.cpu.registers)
-            print(self.get_last_instruction)
+            print(self.get_last_instruction())
             raise e
 
     def get_last_instruction(self):
