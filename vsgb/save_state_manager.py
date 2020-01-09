@@ -25,16 +25,19 @@ class SaveStateManager:
         logging.info('Saved state')
 
     def restore(self, emulator):
-        with open(emulator.cartridge.rom().get_game_id()+'.bin','rb') as save_state_file:
-            state = pickle.load(save_state_file)
-            emulator.timer = state.timer
-            emulator.mmu = state.mmu
-            emulator.mmu.rom.data = emulator.cartridge.rom().data
-            emulator.mmu.input = emulator.input
-            emulator.ppu = state.ppu
-            emulator.hdma = state.hdma
-            emulator.dma = state.dma
-            emulator.interruptManager = state.interruptManager
-            emulator.cpu = state.cpu
-        logging.info('Loaded state')
+        try:
+            with open(emulator.cartridge.rom().get_game_id()+'.bin','rb') as save_state_file:
+                state = pickle.load(save_state_file)
+                emulator.timer = state.timer
+                emulator.mmu = state.mmu
+                emulator.mmu.rom.data = emulator.cartridge.rom().data
+                emulator.mmu.input = emulator.input
+                emulator.ppu = state.ppu
+                emulator.hdma = state.hdma
+                emulator.dma = state.dma
+                emulator.interruptManager = state.interruptManager
+                emulator.cpu = state.cpu
+            logging.info('Loaded state')
+        except:
+            pass
     
