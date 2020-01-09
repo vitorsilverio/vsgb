@@ -147,27 +147,38 @@ class PPU:
         stat = self.mmu.read_byte(IO_Registers.STAT)
         new_stat = (stat & 0xfc) | (self.mode & 0x3)
         self.mmu.write_byte(IO_Registers.STAT, new_stat)
-        self.check_lcdc_status_interrupt(stat, new_stat)
+        self.check_lcdc_status_interrupt(stat, new_stat, mode_change=True)
 
-    def check_lcdc_status_interrupt(self, old_status, new_status):
+    def check_lcdc_status_interrupt(self, old_status, new_status, ly_comparision = False, mode_change = False):
         #Only request interrupt if 0 becomes 1
-        
-        if (old_status & 0b01000000 == 0 and new_status & 0b01000000 == 0b01000000) \
-            or (old_status & 0b00000100 == 0 and new_status & 0b00000100 == 0b00000100) \
-            and new_status & 0b01000000 != 0 and new_status & 0b00000100 != 0:
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-            return
-        old_mode = old_status & 0b00000011
-        new_mode = new_status & 0b00000011
-        mode_changed = old_mode != new_mode
-        if new_mode == 2 and (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000):
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-            return
-        if new_mode == 1 and ((old_status & 0b00010000 == 0 and new_status & 0b00010000 == 0b00010000) or (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000)):
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-            return
-        if new_mode == 0 and (old_status & 0b00001000 == 0 and new_status & 0b00001000 == 0b00001000):
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+        if ly_comparision:
+            if (old_status & 0b01000000 == 0 and new_status & 0b01000000 == 0b01000000) \
+                or (old_status & 0b00000100 == 0 and new_status & 0b00000100 == 0b00000100) \
+                and new_status & 0b01000000 != 0 and new_status & 0b00000100 != 0:
+                self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                return
+        if mode_change:
+            old_mode = old_status & 0b00000011
+            new_mode = new_status & 0b00000011
+            mode_changed = old_mode != new_mode
+            if mode_changed:
+                if new_mode == 2 and new_status & 0b00100000 != 0:
+                    self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                    return
+                if new_mode == 1 and ( new_status & 0b00010000 != 0 or new_status & 0b00100000 != 0 ):
+                    self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                    return
+                if new_mode == 0 and new_status & 0b00001000 != 0:
+                    self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                    return
+            if new_mode == 2 and (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000):
+                self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                return
+            if new_mode == 1 and ((old_status & 0b00010000 == 0 and new_status & 0b00010000 == 0b00010000) or (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000)):
+                self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                return
+            if new_mode == 0 and (old_status & 0b00001000 == 0 and new_status & 0b00001000 == 0b00001000):
+                self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
 
     def current_line(self):
         return self.mmu.read_byte(IO_Registers.LY)
@@ -205,7 +216,7 @@ class PPU:
             else:
                 stat = stat & 0xfb
             self.mmu.write_byte(IO_Registers.STAT, stat)
-            self.check_lcdc_status_interrupt(old_stat, stat)
+            self.check_lcdc_status_interrupt(old_stat, stat, ly_comparision=True)
 
     def render_background(self, line : int):
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH
