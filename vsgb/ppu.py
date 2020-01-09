@@ -153,7 +153,7 @@ class PPU:
         mode = stat & 0b00000011
         if mode == 2 and stat & 0b00100000 != 0:
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-        if mode == 1 and stat & 0b00010000 != 0:
+        if mode == 1 and ( stat & 0b00010000 != 0 or stat & 0b00100000 != 0 ):
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
         if mode == 0 and stat & 0b00001000 != 0:
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
