@@ -29,6 +29,7 @@ class PPU:
         self.interruptManager = interruptManager
         self.lcdControlRegister = LCDControlRegister(self.mmu)
         self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
+        self.window_framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.original_color = [0]*PPU.FRAMEBUFFER_SIZE
         self.bg_priority = [False]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
@@ -56,7 +57,7 @@ class PPU:
                 elif self.mode == PPU.VMRAM_READ_STATE:
                     if self.modeclock >= PPU.VRAM_SCANLINE_TIME:
                         self.exec_vram()
-                self.check_lcdc_status_interrupt()
+                
             else:
                 self.screen_enabled = True
                 self.modeclock = 0
@@ -92,6 +93,7 @@ class PPU:
             self.vblank = True
             self.window_line = 0
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
+            self.window_framebuffer = self.framebuffer[:]
 
         self.update_stat_mode()
 
@@ -145,17 +147,26 @@ class PPU:
         stat = self.mmu.read_byte(IO_Registers.STAT)
         new_stat = (stat & 0xfc) | (self.mode & 0x3)
         self.mmu.write_byte(IO_Registers.STAT, new_stat)
+        self.check_lcdc_status_interrupt(stat, new_stat)
 
-    def check_lcdc_status_interrupt(self):
-        stat = self.mmu.read_byte(IO_Registers.STAT)
-        if stat & 0b01000000 != 0 and stat & 0b00000100 != 0:
+    def check_lcdc_status_interrupt(self, old_status, new_status):
+        #Only request interrupt if 0 becomes 1
+        
+        if (old_status & 0b01000000 == 0 and new_status & 0b01000000 == 0b01000000) \
+            or (old_status & 0b00000100 == 0 and new_status & 0b00000100 == 0b00000100) \
+            and new_status & 0b01000000 != 0 and new_status & 0b00000100 != 0:
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-        mode = stat & 0b00000011
-        if mode == 2 and stat & 0b00100000 != 0:
+            return
+        old_mode = old_status & 0b00000011
+        new_mode = new_status & 0b00000011
+        mode_changed = old_mode != new_mode
+        if new_mode == 2 and (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000):
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-        if mode == 1 and ( stat & 0b00010000 != 0 or stat & 0b00100000 != 0 ):
+            return
+        if new_mode == 1 and ((old_status & 0b00010000 == 0 and new_status & 0b00010000 == 0b00010000) or (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000)):
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-        if mode == 0 and stat & 0b00001000 != 0:
+            return
+        if new_mode == 0 and (old_status & 0b00001000 == 0 and new_status & 0b00001000 == 0b00001000):
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
 
     def current_line(self):
@@ -187,12 +198,14 @@ class PPU:
       if self.lcdControlRegister.lcd_display_enable():
             lyc = self.mmu.read_byte(IO_Registers.LYC)
             stat = self.mmu.read_byte(IO_Registers.STAT)
+            old_stat = stat
 
             if lyc == self.current_line():
                 stat = stat | 0x4
             else:
                 stat = stat & 0xfb
             self.mmu.write_byte(IO_Registers.STAT, stat)
+            self.check_lcdc_status_interrupt(old_stat, stat)
 
     def render_background(self, line : int):
         line_width = (Window.SCREEN_HEIGHT - line -1) * Window.SCREEN_WIDTH

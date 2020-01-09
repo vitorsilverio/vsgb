@@ -75,7 +75,7 @@ class Emulator:
                 self.timer.tick(ticks)
                 self.ppu.step(ticks)
                 if refresh:
-                    self.window.render(self.ppu.framebuffer)
+                    self.window.render(self.ppu.window_framebuffer)
                     refresh = False
         except Exception as e:
             print('An error occurred:')
