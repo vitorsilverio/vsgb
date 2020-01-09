@@ -150,13 +150,14 @@ class PPU:
         self.check_lcdc_status_interrupt(stat, new_stat, mode_change=True)
 
     def check_lcdc_status_interrupt(self, old_status, new_status, ly_comparision = False, mode_change = False):
-        #Only request interrupt if 0 becomes 1
+        #Only request interrupt if any 0 becomes 1
         if ly_comparision:
             if (old_status & 0b01000000 == 0 and new_status & 0b01000000 == 0b01000000) \
-                or (old_status & 0b00000100 == 0 and new_status & 0b00000100 == 0b00000100) \
-                and new_status & 0b01000000 != 0 and new_status & 0b00000100 != 0:
-                self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-                return
+                or (old_status & 0b00000100 == 0 and new_status & 0b00000100 == 0b00000100):
+
+                if new_status & 0b01000000 != 0 and new_status & 0b00000100 != 0:
+                    self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+                    return
         if mode_change:
             old_mode = old_status & 0b00000011
             new_mode = new_status & 0b00000011
