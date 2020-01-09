@@ -281,9 +281,11 @@ class PPU:
                             self.framebuffer[position] = self.rgb(color)
                             self.original_color[position] = color 
                         else:
-                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
+                            if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
+                                color = pixel
+                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                             self.bg_priority[position] = tile_attributes.is_bg_priority()
-                            self.original_color[position] = pixel
+                            self.original_color[position] = color
                         buffer_addr = ( line_pixel_offset + pixelx - scx )
                             
                 x += 1
@@ -366,9 +368,11 @@ class PPU:
                     self.framebuffer[position] = self.rgb(color)
                     self.original_color[position] = color
                 else:
-                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), pixel)
+                    if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
+                        color = pixel
+                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                     self.bg_priority[position] = tile_attributes.is_bg_priority()
-                    self.original_color[position] = pixel
+                    self.original_color[position] = color
 
         self.window_line += 1
 
@@ -445,7 +449,10 @@ class PPU:
 
                     elif not self.bg_priority[position] \
                         or self.original_color[position] == 0:
-                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), pixel)
+                        if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
+                            color = pixel
+                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
+                        
 
 
     def tile_line_h_flip(self, byte1, byte2):
