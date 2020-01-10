@@ -54,7 +54,7 @@ class APU:
             IO_Registers.WAVE_PATTERN_F: 0xff
         }
         self.sound_driver = SoundDriver()
-        self.sound_channels = [SoundChannel1(cgb_mode)]
+        self.sound_channels = [SoundChannel1(cgb_mode),SoundChannel2(cgb_mode)]
         self.channels_data = [0]*len(self.sound_channels)
         self.channels_enabled = [True]*len(self.sound_channels)
 
@@ -326,6 +326,62 @@ class SoundChannel1(AbstractSoundChannel):
         if self.channel_enabled and not self.frequency_sweep.is_enabled():
             self.channel_enabled = False
         return self.channel_enabled
+
+class SoundChannel2(AbstractSoundChannel):
+
+    def __init__(self, cgb_mode):
+        super().__init__(IO_Registers.NR_21 - 1, 64, cgb_mode)
+        self.freq_divider = 0
+        self.volume_envelope = VolumeEnvelope()
+
+    def start(self):
+        self.i = 0
+        if self.cgb_mode:
+            self.length.reset()
+        self.length.start()
+        self.volume_envelope.start()
+
+    def trigger(self):
+        self.i = 0
+        self.freq_divider = 1
+        self.volume_envelope.trigger()
+
+    def step(self):
+        self.volume_envelope.step()
+        e = self.update_length() and self.dac_enabled
+        if not e:
+            return 0
+        self.freq_divider -= 1
+        if self.freq_divider == 0:
+            self.reset_freq_divider()
+            self.last_output = (self.get_duty() & (1 >> self.i)) >> self.i
+            self.i = (self.i + 1) % 8
+        return self.last_output * self.volume_envelope.get_volume()
+
+    def set_nr0(self, value):
+        super().set_nr0(value)
+
+    def set_nr1(self, value):
+        super().set_nr1(value)
+        self.length.set_length(64 - (value & 0b00111111))
+
+    def set_nr2(self, value):
+        super().set_nr2(value)
+        self.volume_envelope.set_nr2(value)
+        self.dac_enabled = (value & 0b11111000) != 0
+
+
+    def get_duty(self):
+        return {
+            0: 0b00000001,
+            1: 0b10000001,
+            2: 0b10000111,
+            3: 0b01111110
+        }.get(self.get_nr1() >> 6)
+
+    def reset_freq_divider(self):
+        self.freq_divider = self.get_frequency() * 4
+
     
 
 class LengthCounter:
