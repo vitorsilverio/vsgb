@@ -150,6 +150,11 @@ class PPU:
         self.check_lcdc_status_interrupt(stat, new_stat, mode_change=True)
 
     def check_lcdc_status_interrupt(self, old_status, new_status, ly_comparision = False, mode_change = False):
+
+        #Do not request if it was already requested
+        if self.interruptManager.pending_interrupt() & Interrupt.INTERRUPT_LCDSTAT == Interrupt.INTERRUPT_LCDSTAT:
+            return
+
         #Only request interrupt if any 0 becomes 1
         if ly_comparision:
             if (old_status & 0b01000000 == 0 and new_status & 0b01000000 == 0b01000000) \
@@ -166,12 +171,12 @@ class PPU:
                 if new_mode == 2 and new_status & 0b00100000 != 0:
                     self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
                     return
-                if new_mode == 1 and ( new_status & 0b00010000 != 0 or new_status & 0b00100000 != 0 ):
+                if new_mode == 1 and new_status & 0b00110000 != 0:
                     self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
                     return
                 if new_mode == 0 and new_status & 0b00001000 != 0:
                     self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
-                    return
+                    return     
             if new_mode == 2 and (old_status & 0b00100000 == 0 and new_status & 0b00100000 == 0b00100000):
                 self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
                 return
@@ -180,6 +185,7 @@ class PPU:
                 return
             if new_mode == 0 and (old_status & 0b00001000 == 0 and new_status & 0b00001000 == 0b00001000):
                 self.interruptManager.request_interrupt(Interrupt.INTERRUPT_LCDSTAT)
+            
 
     def current_line(self):
         return self.mmu.read_byte(IO_Registers.LY)
