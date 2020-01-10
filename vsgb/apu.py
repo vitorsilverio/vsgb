@@ -4,17 +4,16 @@
 # Documentation source:
 # - https://gbdev.gg8.se/wiki/articles/Sound_Controller
 
+import math
+import numpy
 import simpleaudio as sa
-from threading import Thread
 from vsgb.io_registers import IO_Registers
 
 
 
 class APU:
 
-    TICKS_PER_SEC = 4194304
-
-    def __init__(self):
+    def __init__(self, cgb_mode):
         self.registers = {
             IO_Registers.NR_10: 0,
             IO_Registers.NR_11: 0,
@@ -36,7 +35,7 @@ class APU:
             IO_Registers.NR_44: 0,
             IO_Registers.NR_50: 0,
             IO_Registers.NR_51: 0,
-            IO_Registers.NR_52: 0,
+            IO_Registers.NR_52: 0b10001111,
             IO_Registers.WAVE_PATTERN_0: 0x00,
             IO_Registers.WAVE_PATTERN_1: 0xff,
             IO_Registers.WAVE_PATTERN_2: 0x00,
@@ -54,68 +53,457 @@ class APU:
             IO_Registers.WAVE_PATTERN_E: 0x00,
             IO_Registers.WAVE_PATTERN_F: 0xff
         }
+        self.sound_driver = SoundDriver()
+        self.sound_channels = [SoundChannel1(cgb_mode)]
+        self.channels_data = [0]*len(self.sound_channels)
+        self.channels_enabled = [True]*len(self.sound_channels)
 
     def read_register(self, register):
+        for sound_channel in self.sound_channels:
+            if sound_channel.accepts(register):
+                return sound_channel.read_byte(register)
         return self.registers.get(register, 0xff)
 
     def write_register(self, register, value):
+        for sound_channel in self.sound_channels:
+            if sound_channel.accepts(register):
+                return sound_channel.write_byte(register, value)
+                return
         self.registers[register] = value
 
-class SoundDriver(Thread):
+    def start(self):
+        for i in range(IO_Registers.NR_10, IO_Registers.NR_51 + 1):
+            v = 0
+            if i in [IO_Registers.NR_11, IO_Registers.NR_21, IO_Registers.NR_41]:
+                v = self.read_register(i) & 0b00111111
+            elif i == IO_Registers.NR_31:
+                v = self.read_register(i)
 
-    def __init__(self, apu : APU):
-        self.sample_rate = 44100
-        super(SoundDriver, self). __init__()
-        self.apu = apu
+            self.write_register(i, v)
+        
+        for sound_channel in self.sound_channels:
+            sound_channel.start()
+
+    def step(self):
+        
+        for i in range(len(self.sound_channels)):
+            self.channels_data[i] =  self.sound_channels[i].step()         
+
+        selection = self.read_register(IO_Registers.NR_51)
+        left = 0
+        right = 0
+
+        for i in range(len(self.sound_channels)):
+            if not self.channels_enabled[i]:
+                continue
+
+            if (selection & (1 << i + 4)) != 0:
+                left += self.channels_data[i]
+
+            if (selection & (1 << i)) != 0:
+                right += self.channels_data[i]
+
+        left = int(left / 4)
+        right = int(right / 4)
+
+        volumes = self.read_register(IO_Registers.NR_50)
+        left *= ((volumes >> 4) & 0b111)
+        right *= (volumes & 0b111)
+
+        self.sound_driver.play(left & 0xff, right & 0xff)
+
+class SoundDriver():
+
+    TICKS_PER_SEC = 4194304
+    BUFFER_SIZE = 1024
+
+    def __init__(self):
+        self.sample_rate = 22050
+        self.buffer = [0]*SoundDriver.BUFFER_SIZE
+        self.ticks = 0
+        self.div = int(SoundDriver.TICKS_PER_SEC / self.sample_rate)
+        self.i = 0
+        self.play_obj = None
 
     
-    def run(self):
-        #Sound loop
-        while True:
-            if self.sound_on(1):
-                """
-                freq = self.apu.read_register(IO_Registers.NR_13) | ((self.apu.read_register(IO_Registers.NR_14) & 0b0111) << 8)
-                samples = self.apu.read_register(IO_Registers.NR_11) & 0b00111111
-                x = np.arange(samples)
-                duty = {
-                    0: 0.125,
-                    1: 0.25,
-                    2: 0.5,
-                    3: 0.75
-                }.get((self.apu.read_register(IO_Registers.NR_11) & 0b11000000) >> 6)
-                y = 100 * self.square(2 * np.pi * freq * x / self.sample_rate , duty = duty)
-                wave_obj = sa.WaveObject(y, 2, 1, self.sample_rate)
-                play_obj = wave_obj.play()
-                print('Freq: {}, Duty: {}, len: {}'.format(freq, duty, samples))
-                """
-                pass
-                
+    def play(self, left, right):
+        if self.ticks != 0:
+            self.ticks += 1
+            self.ticks %= self.div
+            return
+        self.ticks += 1
+
+        self.buffer[self.i] = left
+        self.buffer[self.i+1] = right
+        self.i += 2
+
+        if self.i > SoundDriver.BUFFER_SIZE / 2:
+            wave_obj = sa.WaveObject(numpy.array(self.buffer),2,1,self.sample_rate)
+            self.play_obj = wave_obj.play()
+            self.i = 0
+
+    def stop(self):
+        self.buffer = [0]*SoundDriver.BUFFER_SIZE
+        if self.play_obj is not None:
+            self.play_obj.stop()
 
 
-    def sound_on(self, channel):
-        """
-        FF26 - NR52 - Sound on/off
-        If your GB programs don't use sound then write 00h to this register to save 16% or more on GB power consumption. Disabeling the sound controller by clearing Bit 7 destroys the contents of all sound registers. Also, it is not possible to access any sound registers (execpt FF26) while the sound controller is disabled.
-            Bit 7 - All sound on/off  (0: stop all sound circuits) (Read/Write)
-            Bit 3 - Sound 4 ON flag (Read Only)
-            Bit 2 - Sound 3 ON flag (Read Only)
-            Bit 1 - Sound 2 ON flag (Read Only)
-            Bit 0 - Sound 1 ON flag (Read Only)
-            Bits 0-3 of this register are read only status bits, writing to these bits does NOT enable/disable sound. The flags get set when sound output is restarted by setting the Initial flag (Bit 7 in NR14-NR44), the flag remains set until the sound length has expired (if enabled). A volume envelopes which has decreased to zero volume will NOT cause the sound flag to go off.
-        """
-        nr52 = self.apu.read_register(IO_Registers.NR_52)
-        if nr52 & 0b10000000 == 0:
-            return False
-        if channel == 1:
-            return nr52 & 0b0001 != 0
-        if channel == 1:
-            return nr52 & 0b0010 != 0
-        if channel == 1:
-            return nr52 & 0b0100 != 0
-        if channel == 1:
-            return nr52 & 0b1000 != 0
-        return False
+class AbstractSoundChannel:
 
-    def square(self, wave, duty):
+    def __init__(self, offset, length, cgb_mode):
+        self.offset = offset
+        self.length = LengthCounter(length)
+        self.cgb_mode = cgb_mode
 
-        return np.sin(wave)
+        self._nr0 = 0
+        self._nr1 = 0
+        self._nr2 = 0
+        self._nr3 = 0
+        self._nr4 = 0
+
+        self.channel_enabled = False
+        self.dac_enabled = False
+
+    def accepts(self, address):
+        return self.offset <= address < self.offset + 5
+
+    def step(self):
+        pass
+
+    def trigger(self):
+        pass
+
+    def write_byte(self, address, value):
+        address = address - self.offset
+        if address == 0:
+            self.set_nr0(value)
+            return
+        if address == 1:
+            self.set_nr1(value)
+            return
+        if address == 2:
+            self.set_nr2(value)
+            return
+        if address == 3:
+            self.set_nr3(value)
+            return
+        if address == 4:
+            self.set_nr4(value)
+            return
+
+    def read_byte(self, address):
+        address = address - self.offset
+        if address == 0:
+            return self.get_nr0()
+        if address == 1:
+            return self.get_nr1()
+        if address == 2:
+            return self.get_nr2()
+        if address == 3:
+            return self.get_nr3()
+        if address == 4:
+            return self.get_nr4()
+
+    def set_nr0(self, value):
+        self._nr0 = value
+
+    def set_nr1(self, value):
+        self._nr1 = value
+
+    def set_nr2(self, value):
+        self._nr2 = value
+
+    def set_nr3(self, value):
+        self._nr3 = value
+
+    def set_nr4(self, value):
+        self._nr4 = value
+        self.length.set_nr4(value)
+        if (value & (1 << 7)) != 0:
+            self.channel_enabled = self.dac_enabled
+            self.trigger()
+
+    def get_nr0(self):
+        return self._nr0
+
+    def get_nr1(self):
+        return self._nr1
+
+    def get_nr2(self):
+        return self._nr2
+
+    def get_nr3(self):
+        return self._nr3
+
+    def get_nr4(self):
+        return self._nr4
+
+    def get_frequency(self):
+        return 2048 - (self.get_nr3() | ((self.get_nr4() & 0b00000111) << 8))
+
+    def update_length(self):
+        self.length.step()
+        if not self.length.enabled:
+            return self.channel_enabled
+        if self.channel_enabled and self.length.length == 0:
+            self.channel_enabled = False
+        return self.channel_enabled
+    
+
+class SoundChannel1(AbstractSoundChannel):
+
+    def __init__(self, cgb_mode):
+        super().__init__(IO_Registers.NR_10, 64, cgb_mode)
+        self.freq_divider = 0
+        self.frequency_sweep = FrequencySweep()
+        self.volume_envelope = VolumeEnvelope()
+
+    def start(self):
+        self.i = 0
+        if self.cgb_mode:
+            self.length.reset()
+        self.length.start()
+        self.frequency_sweep.start()
+        self.volume_envelope.start()
+
+    def trigger(self):
+        self.i = 0
+        self.freq_divider = 1
+        self.volume_envelope.trigger()
+
+    def step(self):
+        self.volume_envelope.step()
+        e = self.update_length() and self.update_sweep() and self.dac_enabled
+        if not e:
+            return 0
+        self.freq_divider -= 1
+        if self.freq_divider == 0:
+            self.reset_freq_divider()
+            self.last_output = (self.get_duty() & (1 >> self.i)) >> self.i
+            self.i = (self.i + 1) % 8
+        return self.last_output * self.volume_envelope.get_volume()
+
+    def set_nr0(self, value):
+        super().set_nr0(value)
+        self.frequency_sweep.set_nr10(value)
+
+    def set_nr1(self, value):
+        super().set_nr1(value)
+        self.length.set_length(64 - (value & 0b00111111))
+
+    def set_nr2(self, value):
+        super().set_nr2(value)
+        self.volume_envelope.set_nr2(value)
+        self.dac_enabled = (value & 0b11111000) != 0
+
+    def set_nr3(self, value):
+        super().set_nr3(value)
+        self.frequency_sweep.set_nr13(value)
+
+    def set_nr4(self, value):
+        super().set_nr4(value)
+        self.frequency_sweep.set_nr14(value)
+
+    def get_nr3(self):
+        return self.frequency_sweep.get_nr13()
+
+    def get_nr4(self):
+        return (super().get_nr4() & 0b11111000) | (self.frequency_sweep.get_nr14() & 0b00000111)
+
+    def get_duty(self):
+        return {
+            0: 0b00000001,
+            1: 0b10000001,
+            2: 0b10000111,
+            3: 0b01111110
+        }.get(self.get_nr1() >> 6)
+
+    def reset_freq_divider(self):
+        self.freq_divider = self.get_frequency() * 4
+
+    def update_sweep(self):
+        self.frequency_sweep.step()
+        if self.channel_enabled and not self.frequency_sweep.is_enabled():
+            self.channel_enabled = False
+        return self.channel_enabled
+    
+
+class LengthCounter:
+
+    DIVIDER = int(SoundDriver.TICKS_PER_SEC / 256)
+
+    def __init__(self, full_length):
+        self.full_length = full_length
+        self.length = 0
+        self.i = 0
+        self.enabled = False
+
+    def start(self):
+        self.i = 8192
+
+    def step(self):
+        self.i += 1
+        if self.i == LengthCounter.DIVIDER:
+            self.i = 0
+            if self.enabled and self.length > 0:
+                self.length -= 1
+
+    def set_length(self, length):
+        if length == 0:
+            self.length == self.full_length
+        else:
+            self.length = length
+
+    def set_nr4(self, value):
+        enable = (value & (1 << 6)) != 0
+        trigger = (value & (1 << 7)) != 0
+
+        if self.enabled:
+            if self.length == 0 and trigger:
+                if enable and self.i < LengthCounter.DIVIDER / 2:
+                    self.set_length(self.full_length -1)
+                else:
+                    self.set_length(self.full_length)
+        elif enable:
+            if self.length > 0 and self.i < LengthCounter.DIVIDER / 2:
+                self.length -= 1
+            if self.length == 0 and trigger and self.i < LengthCounter.DIVIDER / 2:
+                self.set_length(self.full_length -1)
+        else:
+            if self.length == 0 and trigger:
+                self.set_length(self.full_length)
+        self.enabled = enable
+
+    def reset(self):
+        self.enabled = True
+        self.i = 0
+        self.length = 0
+
+class VolumeEnvelope:
+
+    def __init__(self):
+        self.i = 0
+        self.volume = 0
+        self.initial_volume = 0
+        self.sweep = 0
+        self.envelope_direction = 0
+        self.finished = False
+
+    def set_nr2(self, value):
+        self.initial_volume = value >> 4
+        self.envelope_direction = -1 if (value & 0b00001000 == 0) else 1
+        self.sweep = value & 0b00000111
+
+    def is_enabled(self):
+        return self.sweep > 0
+
+    def start(self):
+        self.finished = True
+        self.i = 8192
+
+    def trigger(self):
+        self.volume = self.initial_volume
+        self.i = 0
+        self.finished = False
+
+    def step(self):
+        if self.finished:
+            return
+
+        if (self.volume == 0 and self.envelope_direction == -1 ) or (self.volume == 15 and self.envelope_direction == 1):
+            self.finished = True
+            return
+        self.i += 1
+        if self.i == self.sweep * SoundDriver.TICKS_PER_SEC / 64:
+            self.i = 0
+            self.volume += self.envelope_direction
+
+    def get_volume(self):
+        if self.is_enabled():
+            return self.volume
+        else:
+            return self.initial_volume
+
+class FrequencySweep:
+
+    DIVIDER = int(SoundDriver.TICKS_PER_SEC / 128)
+
+    def __init__(self):
+        self.period = 0
+        self.negate = False
+        self.shift = 0
+        self.timer = 0
+        self.shadow_freq = 0
+        self._nr13 = 0
+        self._nr14 = 0
+        self.i = 0
+        self.overflow = False
+        self.counter_enabled = False
+        self.negging = False
+
+    def start(self):
+        self.counter_enabled = False
+        self.i = 8192
+
+    def trigger(self):
+        self.negging = False
+        self.overflow = False
+
+        self.shadow_freq = self._nr13 | ((self._nr14 & 0b00000111) << 8)
+        self.timer = 8 if self.period == 0 else self.period
+        self.counter_enabled = self.period != 0 or self.shift != 0
+
+        if self.shift > 0:
+            self.calculate()
+
+    def set_nr10(self, value):
+        self.period = (value >> 4) & 0b00000111
+        self.negate = (value & (1 << 3)) != 0
+        self.shift = value & 0b111
+        if self.negging and not self.negate:
+            self.overflow = True
+
+    def set_nr13(self, value):
+        self._nr13 = value
+
+    def set_nr14(self, value):
+        self._nr14 = value
+        if (value & (1 << 7)) != 0:
+            self.trigger()
+
+    def get_nr13(self):
+        return self._nr13
+
+    def get_nr14(self):
+        return self._nr14
+    
+    def step(self):
+        self.i += 1
+        if self.i == FrequencySweep.DIVIDER:
+            self.i = 0
+            if not self.counter_enabled:
+                return
+            self.timer -= 1
+            if self.timer == 0:
+                self.timer = 8 if self.period == 0 else self.period
+                if self.period != 0:
+                    new_freq = self.calculate()
+                    if not self.overflow and self.shift != 0:
+                        self.shadow_freq = new_freq
+                        self._nr13 = self.shadow_freq & 0xff
+                        self._nr14 = (self.shadow_freq & 0x700) >> 8
+                        self.calculate()
+
+    def calculate(self):
+        freq = self.shadow_freq >> self.shift
+        if self.negate:
+            freq = self.shadow_freq - freq
+            self.negging = True
+        else:
+            freq = self.shadow_freq + freq
+        if freq > 2047:
+            self.overflow = True
+        return freq
+    
+    def is_enabled(self):
+        return not self.overflow
