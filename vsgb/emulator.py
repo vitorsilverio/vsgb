@@ -3,7 +3,7 @@
 
 import logging
 
-from vsgb.apu import APU, SoundDriver
+from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.dma import DMA, HDMA
@@ -22,7 +22,8 @@ class Emulator:
     def __init__(self, file : str, cgb_mode: bool, log_level: int):
         self.cgb_mode = cgb_mode
         self.cartridge = Cartridge(file)
-        self.apu = APU()
+        self.apu = APU(cgb_mode)
+        self.apu.start()
         self.input = Input()
         self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
         self.interruptManager = InterruptManager(self.mmu)
@@ -33,8 +34,6 @@ class Emulator:
         self.hdma = HDMA(self.mmu)
         self.window = Window(self)
         self.window.start()
-        self.sound_driver = SoundDriver(self.apu)
-        self.sound_driver.start()
         self.debug = (log_level == logging.DEBUG)
         self.changing_state = False
         self.serialize_ok = False
@@ -74,6 +73,8 @@ class Emulator:
                         logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
                 self.ppu.step(ticks)
+                for i in range(int(ticks/4)):
+                    self.apu.step()
                 if refresh:
                     self.window.render(self.ppu.window_framebuffer)
                     refresh = False
