@@ -192,18 +192,18 @@ class PPU:
 
     def rgb(self, color_code : int) -> int:
         return {
-             0: 0xf0f0f0ff,
-             1: 0xc0d8a8ff,
-             2: 0x0090a8ff,
-             3: 0x000000ff
+             0: 0x7fff,
+             1: 0x421f,
+             2: 0x1cf2,
+             3: 0x0000
         }.get(color_code)
 
     def rgb_sprite(self, color_code : int) -> int:
         return {
-             0: 0xf0f0f0ff,
-             1: 0xe8a0a0ff,
-             2: 0x806050ff,
-             3: 0x000000ff
+             0: 0x7fff,
+             1: 0x1bef,
+             2: 0x0200,
+             3: 0x0000
         }.get(color_code)
 
     def compare_lylc(self):
@@ -271,24 +271,29 @@ class PPU:
                 pixelx = 0
                 buffer_addr = (line_pixel_offset - scx)
                 while pixelx < 8:
-                    buffer_addr = buffer_addr & 0xff
+
                     shift = 0x1 << (7 - pixelx)
-                    pixel = 1 if (byte_1 & shift > 0) else 0
-                    pixel |= 2 if (byte_2 & shift > 0) else 0
-                    color = (palette >> (pixel * 2)) & 0x3
                     pixelx += 1
+
+                    buffer_addr &= 0xff
+
                     if 0 <= buffer_addr < Window.SCREEN_WIDTH:
-                        position = line_width + buffer_addr
+
+                        pixel = 1 if (byte_1 & shift > 0) else 0
+                        pixel |= 2 if (byte_2 & shift > 0) else 0
+                        color = (palette >> (pixel * 2)) & 0x3
+
+                        position = line_width + buffer_addr % Window.SCREEN_WIDTH
+                        self.original_color[position] = color
                         if not self.cgb_mode:
                             self.framebuffer[position] = self.rgb(color)
-                            self.original_color[position] = color 
                         else:
                             if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
                                 color = pixel
                             self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                             self.bg_priority[position] = tile_attributes.is_bg_priority()
-                            self.original_color[position] = color
-                        buffer_addr = ( line_pixel_offset + pixelx - scx )
+                            
+                    buffer_addr = ( line_pixel_offset + pixelx - scx )
                             
                 x += 1
         else:
