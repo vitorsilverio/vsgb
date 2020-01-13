@@ -20,6 +20,18 @@ The executable is:
 - `-s` or `--skip` Skip boot rom, let you go directly to rom
 - `-c` or `--cgb` Game Boy Color mode
 
+## Controller
+- `Button A` <kbd> Z </kbd>
+- `Button B` <kbd> X </kbd>
+- `Button START` <kbd> Return ⏎ </kbd>
+- `Button SELECT` <kbd> Backspace ⌫ </kbd>
+- `Directional UP` <kbd> ↑ </kbd>
+- `Directional DOWN` <kbd> ↓ </kbd>
+- `Directional LEFT` <kbd> ← </kbd>
+- `Directional RIGHT` <kbd> → </kbd>
+- `Create Save State` <kbd> F4 </kbd>
+- `Load Save State` <kbd> F5 </kbd>
+
 ## Coverage
 - vsgb passed all cpu instruction tests
 
