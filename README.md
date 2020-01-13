@@ -17,7 +17,7 @@ The executable is:
 ### Parameters
 - `-r` or `--rom` Specify the rom file
 - `-d` or `--debug` Set logging to DEBUG and output to file
-- `-s` or `--skip` Skip boot rom, let you directly to rom
+- `-s` or `--skip` Skip boot rom, let you go directly to rom
 - `-c` or `--cgb` Game Boy Color mode
 
 ## Coverage
