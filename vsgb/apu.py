@@ -115,7 +115,7 @@ class APU:
 class SoundDriver():
 
     TICKS_PER_SEC = 4194304
-    BUFFER_SIZE = 2048
+    BUFFER_SIZE = 3000
 
     def __init__(self):
         self.sample_rate = 22050
@@ -145,6 +145,7 @@ class SoundDriver():
             except:
                 pass
             self.play_obj = wave_obj.play()
+            #self.play_obj.wait_done()
             self.i = 0
 
     def stop(self):

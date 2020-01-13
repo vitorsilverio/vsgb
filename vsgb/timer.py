@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from time import sleep, monotonic
 from vsgb.interrupt_manager import Interrupt, InterruptManager
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 
 class Timer:
+
+    TICKS_PER_SEC = 4194304
 
     DIV_INC_TIME = 256 # cycles
 
@@ -15,8 +18,10 @@ class Timer:
         self.div_cycles = 0
         self.tima_cycles = 0
         self.tima = Tima(mmu)
+        self.last_time = round(monotonic(),5)
 
     def tick(self, cycles : int = 0):
+        multiplier = 1
         self.div_cycles += cycles
 
         key1 = self.mmu.read_byte(IO_Registers.KEY1)
@@ -24,6 +29,7 @@ class Timer:
         # increment again if DOUBLE SPEED MODE
         if key1 & 0b10000000 == 0b10000000:
             self.div_cycles += cycles
+            multiplier = 2
 
         if key1 & 1 == 1: #Prepare enable/disable double speed
             self.mmu.write_byte(IO_Registers.KEY1, key1 & 0b10000000)
@@ -43,6 +49,8 @@ class Timer:
                 self.inc_tima_register()
                 self.tima_cycles -= frequency
 
+        self.real_time_delay(cycles * multiplier)
+
     def inc_tima_register(self):
         tima = self.mmu.read_byte(IO_Registers.TIMA)
         if tima == 0xff:
@@ -58,6 +66,15 @@ class Timer:
         div = ( div + 1 ) & 0xff
         self.mmu.write_byte(IO_Registers.DIV, div, True)
         self.div_cycles -= Timer.DIV_INC_TIME
+
+    def real_time_delay(self, cycles):
+        delay_required = round( cycles / Timer.TICKS_PER_SEC, 5)
+        now = round(monotonic(),5)
+        diff = round((self.last_time + delay_required) - now, 5) * 0.1
+        if diff > 0:
+            sleep(diff)
+        self.last_time = round(monotonic(),5)
+        
 
 class Tima:
 
