@@ -17,7 +17,7 @@ from vsgb.window import Window
 from vsgb.instructions import instructions
 from vsgb.save_state_manager import SaveStateManager
 import threading
-from time import sleep
+
 
 class Emulator:
 
@@ -44,7 +44,6 @@ class Emulator:
 
     def play_sound(self):
         while True:
-            sleep(0.0000000000001)
             self.apu.step()
 
     def run(self):

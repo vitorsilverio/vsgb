@@ -54,7 +54,7 @@ class APU:
             IO_Registers.WAVE_PATTERN_F: 0xff
         }
         self.sound_driver = SoundDriver()
-        self.sound_channels = [SoundChannel1(cgb_mode),SoundChannel2(cgb_mode),SoundChannel3(cgb_mode)]
+        self.sound_channels = [SoundChannel1(cgb_mode),SoundChannel2(cgb_mode),SoundChannel3(cgb_mode), SoundChannel4(cgb_mode)]
         self.channels_data = [0]*len(self.sound_channels)
         self.channels_enabled = [True]*len(self.sound_channels)
 
@@ -115,7 +115,7 @@ class APU:
 class SoundDriver():
 
     TICKS_PER_SEC = 4194304
-    BUFFER_SIZE = 1024
+    BUFFER_SIZE = 2048
 
     def __init__(self):
         self.sample_rate = 22050
@@ -137,8 +137,13 @@ class SoundDriver():
         self.buffer[self.i+1] = right
         self.i += 2
 
-        if self.i > SoundDriver.BUFFER_SIZE / 2:
-            wave_obj = sa.WaveObject(bytes(self.buffer),2,1,self.sample_rate)
+        if self.i >= SoundDriver.BUFFER_SIZE / 2:
+            wave = bytes(self.buffer)
+            wave_obj = sa.WaveObject(wave,2,1,self.sample_rate)
+            try:
+                self.play_obj.stop()
+            except:
+                pass
             self.play_obj = wave_obj.play()
             self.i = 0
 
@@ -507,6 +512,55 @@ class SoundChannel3(AbstractSoundChannel):
     def reset_freq_divider(self):
         self.freq_divider = self.get_frequency() * 4
 
+class SoundChannel4(AbstractSoundChannel):
+
+    def __init__(self, cgb_mode):
+        super().__init__(IO_Registers.NR_41 - 1, 64, cgb_mode)
+        self.volume_envelope = VolumeEnvelope()
+        self.last_result = 0
+        self.polynominal_counter = PolynomialCounter()
+        self.lfsr = Lfsr()
+
+    def start(self):
+        self.i = 0
+        if self.cgb_mode:
+            self.length.reset()
+        self.length.start()
+        self.lfsr.start()
+        self.volume_envelope.start()
+
+    def trigger(self):
+        self.lfsr.reset()
+        self.volume_envelope.trigger()
+
+    def step(self):
+        self.volume_envelope.step()
+        if not self.update_length():
+            return 0
+        if not self.dac_enabled:
+            return 0
+        
+        if self.polynominal_counter.step():
+            self.last_result = self.lfsr.next_bit((self._nr3 & (1 << 3)) != 0)
+
+        return self.last_result * self.volume_envelope.get_volume()
+
+
+    def set_nr1(self, value):
+        super().set_nr1(value)
+        self.length.set_length(64 - (value & 0b00111111))
+
+    def set_nr2(self, value):
+        super().set_nr2(value)
+        self.volume_envelope.set_nr2(value)
+        self.dac_enabled = (value & 0b11111000) != 0
+        self.channel_enabled = self.channel_enabled and self.dac_enabled
+
+    def set_nr3(self, value):
+        super().set_nr3(value)
+        self.polynominal_counter.set_nr43(value)
+
+
 class LengthCounter:
 
     DIVIDER = int(SoundDriver.TICKS_PER_SEC / 256)
@@ -686,3 +740,55 @@ class FrequencySweep:
     
     def is_enabled(self):
         return not self.overflow
+
+class Lfsr:
+
+    def __init__(self):
+        self.lfsr = 0
+
+    def start(self):
+        self.reset()
+
+    def reset(self):
+        self.lfsr = 0x7fff
+
+    def next_bit(self, with_mode7):
+        x = ((self.lfsr & 1) ^ ((self.lfsr & 2) >> 1)) != 0
+        self.lfsr = self.lfsr >> 1
+        self.lfsr = self.lfsr | ((1 << 14) if x else 0)
+        if with_mode7:
+            self.lfsr = self.lfsr | ((1 << 6) if x else 0)
+        return 1 & ~self.lfsr
+
+    def get_value(self):
+        return self.lfsr
+
+class PolynomialCounter:
+
+    def __init__(self):
+        self.i = 0
+        self.shifted_divisor = 0
+
+    def set_nr43(self,value):
+        clock_shifted = value >> 4
+        divisor = 0
+        divisor = {
+            0: 8,
+            1: 16,
+            2: 32,
+            3: 48,
+            4: 64,
+            5: 80,
+            6: 96,
+            7: 112
+        }.get(value & 0b00000111)
+        self.shifted_divisor = divisor << clock_shifted
+        self.i = 1
+
+    def step(self):
+        self.i -= 1
+        if self.i == 0:
+            self.i = self.shifted_divisor
+            return True
+        else:
+            return False

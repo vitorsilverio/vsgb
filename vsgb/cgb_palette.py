@@ -91,8 +91,6 @@ class CGB_Palette:
 
     def get_ob_rgba_palette_color(self, palette, color):
         address = (palette * 4) + color
-        if not color in [1,2,3]:
-            print('{},{},{:04x}'.format(palette, color, self.ob_palettes[address].get_rgba()))
         return self.ob_palettes[address].get_rgba()
 
 class PaletteIndex:
