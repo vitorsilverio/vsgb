@@ -107,35 +107,35 @@ class APU:
         left *= ((volumes >> 4) & 0b111)
         right *= (volumes & 0b111)
 
-        self.sound_driver.play(left & 0xff, right & 0xff)
+        self.sound_driver.play(left & 0xff, right & 0xff, ticks)
 
 class SoundDriver():
 
     TICKS_PER_SEC = 4194304 / 4
-    BUFFER_SIZE = int( 22050 * 0.20) 
+    BUFFER_SIZE = int( 22050 * 0.2) 
 
     def __init__(self):
         self.sample_rate = 22050
         self.buffer = [0]*SoundDriver.BUFFER_SIZE
         self.ticks = 0
-        self.div = int(SoundDriver.TICKS_PER_SEC / (self.sample_rate))
+        self.div = int(SoundDriver.TICKS_PER_SEC / (self.sample_rate ))
         self.i = 0
         self.play_obj = None
 
     
-    def play(self, left, right):
+    def play(self, left, right, ticks):
         if self.ticks != 0:
-            self.ticks += 1
+            self.ticks += ticks
             self.ticks %= self.div
             return
-        self.ticks += 1
+        self.ticks += ticks
 
         self.buffer[self.i] = left
         self.buffer[self.i+1] = right
         self.i += 2
 
         if self.i >= SoundDriver.BUFFER_SIZE / 2:
-            wave = bytes(self.buffer + self.buffer[0:int(SoundDriver.BUFFER_SIZE/4)])
+            wave = bytes(self.buffer)
             wave_obj = sa.WaveObject(wave,2,1,self.sample_rate)
             try:
                 self.play_obj.stop()
