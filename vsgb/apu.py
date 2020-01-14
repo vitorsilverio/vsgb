@@ -5,11 +5,8 @@
 # - https://gbdev.gg8.se/wiki/articles/Sound_Controller
 
 import math
-#import numpy
 import simpleaudio as sa
 from vsgb.io_registers import IO_Registers
-
-
 
 class APU:
 
@@ -54,7 +51,7 @@ class APU:
             IO_Registers.WAVE_PATTERN_F: 0xff
         }
         self.sound_driver = SoundDriver()
-        self.sound_channels = [SoundChannel1(cgb_mode),SoundChannel2(cgb_mode),SoundChannel3(cgb_mode), SoundChannel4(cgb_mode)]
+        self.sound_channels = [SoundChannel1(cgb_mode), SoundChannel2(cgb_mode), SoundChannel3(cgb_mode), SoundChannel4(cgb_mode)]
         self.channels_data = [0]*len(self.sound_channels)
         self.channels_enabled = [True]*len(self.sound_channels)
 
@@ -84,8 +81,8 @@ class APU:
         for sound_channel in self.sound_channels:
             sound_channel.start()
 
-    def step(self):
-        
+    def step(self, ticks):
+
         for i in range(len(self.sound_channels)):
             self.channels_data[i] =  self.sound_channels[i].step()         
 
@@ -114,14 +111,14 @@ class APU:
 
 class SoundDriver():
 
-    TICKS_PER_SEC = 4194304
-    BUFFER_SIZE = 3000
+    TICKS_PER_SEC = 4194304 / 4
+    BUFFER_SIZE = int( 22050 * 0.20) 
 
     def __init__(self):
         self.sample_rate = 22050
         self.buffer = [0]*SoundDriver.BUFFER_SIZE
         self.ticks = 0
-        self.div = int(SoundDriver.TICKS_PER_SEC / self.sample_rate)
+        self.div = int(SoundDriver.TICKS_PER_SEC / (self.sample_rate))
         self.i = 0
         self.play_obj = None
 
@@ -138,7 +135,7 @@ class SoundDriver():
         self.i += 2
 
         if self.i >= SoundDriver.BUFFER_SIZE / 2:
-            wave = bytes(self.buffer)
+            wave = bytes(self.buffer + self.buffer[0:int(SoundDriver.BUFFER_SIZE/4)])
             wave_obj = sa.WaveObject(wave,2,1,self.sample_rate)
             try:
                 self.play_obj.stop()
