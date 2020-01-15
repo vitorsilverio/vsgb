@@ -83,14 +83,14 @@ class APU:
 
     def step(self, ticks):
 
-        for i in range(len(self.sound_channels)):
-            self.channels_data[i] =  self.sound_channels[i].step()         
+        for i in range(4):
+            self.channels_data[i] =  self.sound_channels[i].step(ticks)         
 
         selection = self.read_register(IO_Registers.NR_51)
         left = 0
         right = 0
 
-        for i in range(len(self.sound_channels)):
+        for i in range(4):
             if not self.channels_enabled[i]:
                 continue
 
@@ -111,7 +111,7 @@ class APU:
 
 class SoundDriver():
 
-    TICKS_PER_SEC = 4194304 / 4
+    TICKS_PER_SEC = 4194304
     BUFFER_SIZE = int( 22050 * 0.2) 
 
     def __init__(self):
@@ -124,11 +124,12 @@ class SoundDriver():
 
     
     def play(self, left, right, ticks):
-        if self.ticks != 0:
-            self.ticks += ticks
-            self.ticks %= self.div
-            return
+        
         self.ticks += ticks
+        if self.ticks <= self.div:
+            return
+            
+        self.ticks = 0
 
         self.buffer[self.i] = left
         self.buffer[self.i+1] = right
@@ -170,7 +171,7 @@ class AbstractSoundChannel:
     def accepts(self, address):
         return self.offset <= address < self.offset + 5
 
-    def step(self):
+    def step(self, ticks):
         pass
 
     def trigger(self):
@@ -247,8 +248,8 @@ class AbstractSoundChannel:
     def get_frequency(self):
         return 2048 - (self.get_nr3() | ((self.get_nr4() & 0b00000111) << 8))
 
-    def update_length(self):
-        self.length.step()
+    def update_length(self, ticks):
+        self.length.step(ticks)
         if not self.length.enabled:
             return self.channel_enabled
         if self.channel_enabled and self.length.length == 0:
@@ -277,16 +278,16 @@ class SoundChannel1(AbstractSoundChannel):
         self.freq_divider = 1
         self.volume_envelope.trigger()
 
-    def step(self):
-        self.volume_envelope.step()
-        e = self.update_length() and self.update_sweep() and self.dac_enabled
+    def step(self, ticks):
+        self.volume_envelope.step(ticks)
+        e = self.update_length(ticks) and self.update_sweep(ticks) and self.dac_enabled
         if not e:
             return 0
         self.freq_divider -= 1
         if self.freq_divider == 0:
             self.reset_freq_divider()
             self.last_output = (self.get_duty() & (1 >> self.i)) >> self.i
-            self.i = (self.i + 1) % 8
+            self.i = (self.i + ticks) % 8
         return self.last_output * self.volume_envelope.get_volume()
 
     def set_nr0(self, value):
@@ -327,8 +328,8 @@ class SoundChannel1(AbstractSoundChannel):
     def reset_freq_divider(self):
         self.freq_divider = self.get_frequency() * 4
 
-    def update_sweep(self):
-        self.frequency_sweep.step()
+    def update_sweep(self, ticks):
+        self.frequency_sweep.step(ticks)
         if self.channel_enabled and not self.frequency_sweep.is_enabled():
             self.channel_enabled = False
         return self.channel_enabled
@@ -352,16 +353,16 @@ class SoundChannel2(AbstractSoundChannel):
         self.freq_divider = 1
         self.volume_envelope.trigger()
 
-    def step(self):
-        self.volume_envelope.step()
-        e = self.update_length() and self.dac_enabled
+    def step(self, ticks):
+        self.volume_envelope.step(ticks)
+        e = self.update_length(ticks) and self.dac_enabled
         if not e:
             return 0
         self.freq_divider -= 1
         if self.freq_divider == 0:
             self.reset_freq_divider()
             self.last_output = (self.get_duty() & (1 >> self.i)) >> self.i
-            self.i = (self.i + 1) % 8
+            self.i = (self.i + ticks) % 8
         return self.last_output * self.volume_envelope.get_volume()
 
     def set_nr0(self, value):
@@ -445,9 +446,9 @@ class SoundChannel3(AbstractSoundChannel):
         if self.cgb_mode:
             self.get_wave_entry()
 
-    def step(self):
-        self.ticks_since_read += 1
-        if not self.update_length():
+    def step(self, ticks):
+        self.ticks_since_read += ticks
+        if not self.update_length(ticks):
             return 0
         if not self.dac_enabled:
             return 0
@@ -461,7 +462,7 @@ class SoundChannel3(AbstractSoundChannel):
                 self.triggered = False
             else:
                 self.last_output = self.get_wave_entry()
-            self.i = (self.i + 1) % 32
+            self.i = (self.i + ticks) % 32
         return self.last_output
 
     def get_volume(self):
@@ -531,14 +532,14 @@ class SoundChannel4(AbstractSoundChannel):
         self.lfsr.reset()
         self.volume_envelope.trigger()
 
-    def step(self):
-        self.volume_envelope.step()
-        if not self.update_length():
+    def step(self, ticks):
+        self.volume_envelope.step(ticks)
+        if not self.update_length(ticks):
             return 0
         if not self.dac_enabled:
             return 0
         
-        if self.polynominal_counter.step():
+        if self.polynominal_counter.step(ticks):
             self.last_result = self.lfsr.next_bit((self._nr3 & (1 << 3)) != 0)
 
         return self.last_result * self.volume_envelope.get_volume()
@@ -572,12 +573,12 @@ class LengthCounter:
     def start(self):
         self.i = 8192
 
-    def step(self):
-        self.i += 1
-        if self.i == LengthCounter.DIVIDER:
+    def step(self, ticks):
+        self.i += ticks
+        if self.i >= LengthCounter.DIVIDER:
             self.i = 0
             if self.enabled and self.length > 0:
-                self.length -= 1
+                self.length -= ticks
 
     def set_length(self, length):
         if length == 0:
@@ -637,15 +638,15 @@ class VolumeEnvelope:
         self.i = 0
         self.finished = False
 
-    def step(self):
+    def step(self, ticks):
         if self.finished:
             return
 
         if (self.volume == 0 and self.envelope_direction == -1 ) or (self.volume == 15 and self.envelope_direction == 1):
             self.finished = True
             return
-        self.i += 1
-        if self.i == self.sweep * SoundDriver.TICKS_PER_SEC / 64:
+        self.i += ticks
+        if self.i >= self.sweep * SoundDriver.TICKS_PER_SEC / 64:
             self.i = 0
             self.volume += self.envelope_direction
 
@@ -708,9 +709,9 @@ class FrequencySweep:
     def get_nr14(self):
         return self._nr14
     
-    def step(self):
-        self.i += 1
-        if self.i == FrequencySweep.DIVIDER:
+    def step(self, ticks):
+        self.i += ticks
+        if self.i >= FrequencySweep.DIVIDER:
             self.i = 0
             if not self.counter_enabled:
                 return
@@ -783,9 +784,9 @@ class PolynomialCounter:
         self.shifted_divisor = divisor << clock_shifted
         self.i = 1
 
-    def step(self):
-        self.i -= 1
-        if self.i == 0:
+    def step(self, ticks):
+        self.i -= ticks
+        if self.i <= 0:
             self.i = self.shifted_divisor
             return True
         else:
