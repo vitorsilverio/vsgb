@@ -4,18 +4,11 @@
 # Documentation source:
 # - https://gbdev.gg8.se/wiki/articles/Sound_Controller
 
-import math
-import simpleaudio as sa
-from vsgb.audio.abstract_sound_channel import AbstractSoundChannel
-from vsgb.audio.frequency_sweep import FrequencySweep
-from vsgb.audio.lfsr import Lfsr
-from vsgb.audio.polynomial_counter import PolynomialCounter
 from vsgb.audio.sound_channel1 import SoundChannel1
 from vsgb.audio.sound_channel2 import SoundChannel2
 from vsgb.audio.sound_channel3 import SoundChannel3
 from vsgb.audio.sound_channel4 import SoundChannel4
 from vsgb.audio.sound_driver import SoundDriver
-from vsgb.audio.volume_envelope import VolumeEnvelope
 from vsgb.io_registers import IO_Registers
 
 class APU:
