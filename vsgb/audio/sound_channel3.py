@@ -117,7 +117,7 @@ class SoundChannel3(AbstractSoundChannel):
     def set_nr4(self, value):
         if not self.cgb_mode and (value & (1 << 7)) != 0:
             if self.is_enabled() and self.freq_divider == 2:
-                pos = self.i / 2
+                pos = self.i // 2
                 if pos < 4:
                     self.wave_ram[0] = self.wave_ram[pos]
                 else:
