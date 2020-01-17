@@ -31,5 +31,4 @@ class PolynomialCounter:
         if self.i <= 0:
             self.i = self.shifted_divisor
             return True
-        else:
-            return False
+        return False

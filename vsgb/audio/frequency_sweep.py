@@ -89,3 +89,4 @@ class FrequencySweep:
     
     def is_enabled(self):
         return not self.overflow
+        

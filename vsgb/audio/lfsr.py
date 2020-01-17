@@ -25,3 +25,4 @@ class Lfsr:
 
     def get_value(self):
         return self.lfsr
+        

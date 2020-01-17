@@ -85,3 +85,4 @@ class SoundChannel1(AbstractSoundChannel):
         if self.channel_enabled and not self.frequency_sweep.is_enabled():
             self.channel_enabled = False
         return self.channel_enabled
+        

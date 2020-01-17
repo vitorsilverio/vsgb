@@ -48,5 +48,4 @@ class VolumeEnvelope:
     def get_volume(self):
         if self.is_enabled():
             return self.volume
-        else:
-            return self.initial_volume
+        return self.initial_volume

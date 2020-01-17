@@ -28,7 +28,7 @@ class LengthCounter:
 
     def set_length(self, length):
         if length == 0:
-            self.length == self.full_length
+            self.length = self.full_length
         else:
             self.length = length
 

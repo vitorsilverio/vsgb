@@ -62,3 +62,4 @@ class SoundChannel2(AbstractSoundChannel):
 
     def reset_freq_divider(self):
         self.freq_divider = self.get_frequency() * 4
+        

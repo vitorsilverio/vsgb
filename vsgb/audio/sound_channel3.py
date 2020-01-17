@@ -36,7 +36,7 @@ class SoundChannel3(AbstractSoundChannel):
         if IO_Registers.WAVE_PATTERN_0 <= address <= IO_Registers.WAVE_PATTERN_F:
             if not self.is_enabled():
                 return self.wave_ram[address - IO_Registers.WAVE_PATTERN_0]
-            elif IO_Registers.WAVE_PATTERN_0 <= self.last_read_addr <= IO_Registers.WAVE_PATTERN_F and (self.cgb_mode or self.ticks_since_read < 2):
+            if IO_Registers.WAVE_PATTERN_0 <= self.last_read_addr <= IO_Registers.WAVE_PATTERN_F and (self.cgb_mode or self.ticks_since_read < 2):
                 return self.wave_ram[self.last_read_addr - IO_Registers.WAVE_PATTERN_0]
         return super().read_byte(address)
 
@@ -45,7 +45,7 @@ class SoundChannel3(AbstractSoundChannel):
             if not self.is_enabled():
                 self.wave_ram[address - IO_Registers.WAVE_PATTERN_0] = value
                 return
-            elif IO_Registers.WAVE_PATTERN_0 <= self.last_read_addr <= IO_Registers.WAVE_PATTERN_F and (self.cgb_mode or self.ticks_since_read < 2):
+            if IO_Registers.WAVE_PATTERN_0 <= self.last_read_addr <= IO_Registers.WAVE_PATTERN_F and (self.cgb_mode or self.ticks_since_read < 2):
                 self.wave_ram[self.last_read_addr - IO_Registers.WAVE_PATTERN_0] = value
                 return
         super().write_byte(address, value)
