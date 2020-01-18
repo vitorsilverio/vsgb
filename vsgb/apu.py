@@ -10,6 +10,7 @@ from vsgb.audio.sound_channel3 import SoundChannel3
 from vsgb.audio.sound_channel4 import SoundChannel4
 from vsgb.audio.sound_driver import SoundDriver
 from vsgb.io_registers import IO_Registers
+import time
 
 class APU:
 
@@ -55,7 +56,6 @@ class APU:
         }
         self.sound_driver = SoundDriver()
         self.sound_channels = [SoundChannel1(cgb_mode), SoundChannel2(cgb_mode), SoundChannel3(cgb_mode), SoundChannel4(cgb_mode)]
-        self.channels_data = [0]*len(self.sound_channels)
         self.channels_enabled = [True]*len(self.sound_channels)
 
     def read_register(self, register):
@@ -86,28 +86,30 @@ class APU:
 
     def step(self, ticks):
 
-        for i in range(4):
-            self.channels_data[i] =  self.sound_channels[i].step(ticks)         
-
         selection = self.read_register(IO_Registers.NR_51)
         left = 0
         right = 0
+        i = 0
+        while i < 4:
+            channels_data =  self.sound_channels[i].step(ticks)  
 
-        for i in range(4):
             if not self.channels_enabled[i]:
+                i += 1
                 continue
 
             if (selection & (1 << i + 4)) != 0:
-                left += self.channels_data[i]
+                left += channels_data
 
             if (selection & (1 << i)) != 0:
-                right += self.channels_data[i]
+                right += channels_data
 
-        left = int(left / 4)
-        right = int(right / 4)
+            i += 1
+
+        left = left // 4
+        right = right // 4
 
         volumes = self.read_register(IO_Registers.NR_50)
         left *= ((volumes >> 4) & 0b111)
         right *= (volumes & 0b111)
-
+        
         self.sound_driver.play(left & 0xff, right & 0xff, ticks)

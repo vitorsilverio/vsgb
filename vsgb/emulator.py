@@ -73,8 +73,9 @@ class Emulator:
                     if self.debug:
                         logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
-                self.apu.step(ticks)
                 self.ppu.step(ticks)
+                for i in range(0,ticks,4):
+                    self.apu.step(4)
                 
                 if refresh:
                     self.window.render(self.ppu.window_framebuffer)

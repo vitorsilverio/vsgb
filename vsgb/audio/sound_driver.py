@@ -9,13 +9,13 @@ import simpleaudio as sa
 class SoundDriver():
 
     TICKS_PER_SEC = 4194304
-    BUFFER_SIZE = int( 22050 * 0.2) 
+    BUFFER_SIZE = int(22050 * 0.6)
 
     def __init__(self):
         self.sample_rate = 22050
-        self.buffer = [0]*SoundDriver.BUFFER_SIZE
+        self.buffer = bytearray([0]*(SoundDriver.BUFFER_SIZE))
         self.ticks = 0
-        self.div = int(SoundDriver.TICKS_PER_SEC / (self.sample_rate ))
+        self.div = SoundDriver.TICKS_PER_SEC // (self.sample_rate )
         self.i = 0
         self.play_obj = None
 
@@ -29,12 +29,13 @@ class SoundDriver():
         self.ticks = 0
 
         self.buffer[self.i] = left
-        self.buffer[self.i+1] = right
-        self.i += 2
+        #self.buffer[self.i+1] = right
+        #self.i += 2
+        self.i += 1
 
-        if self.i >= SoundDriver.BUFFER_SIZE / 2:
-            wave = bytes(self.buffer)
-            wave_obj = sa.WaveObject(wave,2,1,self.sample_rate)
+        if self.i >= SoundDriver.BUFFER_SIZE:
+            wave = (self.buffer)
+            wave_obj = sa.WaveObject(wave,1,1,self.sample_rate)
             try:
                 self.play_obj.stop()
             except:
