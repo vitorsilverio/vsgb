@@ -66,21 +66,21 @@ class SoundChannel3(AbstractSoundChannel):
 
     def step(self, ticks):
         self.ticks_since_read += ticks
-        if not self.update_length(ticks):
+        if not self.update_length(ticks // 4):
             return 0
         if not self.dac_enabled:
             return 0
         if (self.get_nr0() & (1 << 7)) == 0:
             return 0
-        self.freq_divider -= 1
-        if self.freq_divider == 0:
+        self.freq_divider -= ticks
+        if self.freq_divider <= 0:
             self.reset_freq_divider()
             if self.triggered:
                 self.last_output = (self.buffer >> 4) & 0x0f
                 self.triggered = False
             else:
                 self.last_output = self.get_wave_entry()
-            self.i = (self.i + ticks) % 32
+            self.i = (self.i + (ticks // 4)) % 32
         return self.last_output
 
     def get_volume(self):
@@ -88,8 +88,8 @@ class SoundChannel3(AbstractSoundChannel):
 
     def get_wave_entry(self):
         self.ticks_since_read = 0
-        self.last_read_addr = IO_Registers.WAVE_PATTERN_0 + int(self.i / 2)
-        self.buffer = self.wave_ram[self.last_read_addr-IO_Registers.WAVE_PATTERN_0]
+        self.last_read_addr = IO_Registers.WAVE_PATTERN_0 + self.i // 2
+        self.buffer = self.wave_ram[self.last_read_addr - IO_Registers.WAVE_PATTERN_0]
         b = self.buffer
         if self.i % 2 == 0:
             b = (b >> 4) & 0x0f
@@ -98,8 +98,8 @@ class SoundChannel3(AbstractSoundChannel):
         return {
             0: 0,
             1: b,
-            2: b >> 1,
-            3: b >> 2
+            2: (b >> 1),
+            3: (b >> 2)
         }.get(self.get_volume())
 
     def set_nr0(self, value):
