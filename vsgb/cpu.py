@@ -28,6 +28,7 @@ class CPU:
         self.last_pc = 0
         self.last_instruction = 0
 
+    
     def step(self):
         self.ticks = 0
         if self.stop:

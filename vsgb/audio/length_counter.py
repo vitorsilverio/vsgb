@@ -24,7 +24,7 @@ class LengthCounter:
         if self.i >= LengthCounter.DIVIDER:
             self.i = 0
             if self.enabled and self.length > 0:
-                self.length -= ticks
+                self.length -= 1
 
     def set_length(self, length):
         if length == 0:

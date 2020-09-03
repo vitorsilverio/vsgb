@@ -53,6 +53,9 @@ class MMU:
             self.boot_rom  = boot_rom
         self.game_shark = GameShark()
 
+    def set_video_stat(self, video_stat_interrupt):
+        self.set_video_stat = video_stat_interrupt
+
     def set_dma(self, dma):
         self.dma = dma
 
@@ -158,6 +161,10 @@ class MMU:
                     self.cgb_palette.set_obpi(value)
                 elif address == IO_Registers.OBPD:
                     self.cgb_palette.set_obpd(value)
+                elif address == IO_Registers.STAT:
+                    old_stat = self.io_registers.read_value(address)
+                    self.set_video_stat.check_stat(old_stat,value)
+                    self.io_registers.write_value(address, value & 0b111)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                     print('Boot rom disabled. Starting rom...')

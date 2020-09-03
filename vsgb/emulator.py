@@ -16,6 +16,7 @@ from vsgb.timer import Timer
 from vsgb.window import Window
 from vsgb.instructions import instructions
 from vsgb.save_state_manager import SaveStateManager
+from vsgb.video_stat_interrupt import VideoStatInterrupt
 
 
 class Emulator:
@@ -39,6 +40,9 @@ class Emulator:
         self.changing_state = False
         self.serialize_ok = False
         self.save_state_manager = SaveStateManager()
+
+        video_stat_interrupt = VideoStatInterrupt(self.interruptManager)
+        self.mmu.set_video_stat(video_stat_interrupt)
 
     def run(self):
         try:
@@ -74,8 +78,8 @@ class Emulator:
                         logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
                 self.ppu.step(ticks)
-                for i in range(0,ticks,4):
-                    self.apu.step(4)
+                #for i in range(0,ticks,4):
+                    #self.apu.step(4)
                 
                 if refresh:
                     self.window.render(self.ppu.window_framebuffer)
@@ -85,6 +89,9 @@ class Emulator:
             print(self.cpu.registers)
             print(self.get_last_instruction())
             raise e
+
+
+       
 
     def get_last_instruction(self):
         last_instruction = instructions[self.cpu.last_instruction][0]

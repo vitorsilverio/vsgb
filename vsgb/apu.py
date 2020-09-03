@@ -56,7 +56,6 @@ class APU:
         }
         self.sound_driver = SoundDriver()
         self.sound_channels = [SoundChannel1(cgb_mode), SoundChannel2(cgb_mode), SoundChannel3(cgb_mode), SoundChannel4(cgb_mode)]
-        self.channels_enabled = [True]*len(self.sound_channels)
 
     def read_register(self, register):
         for sound_channel in self.sound_channels:
@@ -93,23 +92,19 @@ class APU:
         while i < 4:
             channels_data =  self.sound_channels[i].step(ticks)  
 
-            if not self.channels_enabled[i]:
-                i += 1
-                continue
-
             if (selection & (1 << i + 4)) != 0:
                 left += channels_data
 
-            if (selection & (1 << i)) != 0:
-                right += channels_data
+            #if (selection & (1 << i)) != 0:
+            #    right += channels_data
 
             i += 1
 
-        left = left // 4
-        right = right // 4
+        #left = left // 4
+        #right = right // 4
 
         volumes = self.read_register(IO_Registers.NR_50)
         left *= ((volumes >> 4) & 0b111)
-        right *= (volumes & 0b111)
+        #right *= (volumes & 0b111)
         
         self.sound_driver.play(left & 0xff, right & 0xff, ticks)
