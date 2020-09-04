@@ -19,17 +19,17 @@ class InterruptManager:
         ie_register = self.mmu.read_byte(IO_Registers.IE)
         if_register = self.mmu.read_byte(IO_Registers.IF)
         pending_interrupt = ie_register & if_register
-        if pending_interrupt & 0b00011111 == 0:
+        if 0 == pending_interrupt & 0b00011111:
             return Interrupt.INTERRUPT_NONE # There are not pending interrupts skip test just leave
-        if pending_interrupt & Interrupt.INTERRUPT_VBLANK == Interrupt.INTERRUPT_VBLANK:
+        if Interrupt.INTERRUPT_VBLANK == Interrupt.INTERRUPT_VBLANK & pending_interrupt:
             return Interrupt.INTERRUPT_VBLANK
-        if pending_interrupt & Interrupt.INTERRUPT_LCDSTAT == Interrupt.INTERRUPT_LCDSTAT:
+        if Interrupt.INTERRUPT_LCDSTAT == Interrupt.INTERRUPT_LCDSTAT & pending_interrupt:
             return Interrupt.INTERRUPT_LCDSTAT 
-        if pending_interrupt & Interrupt.INTERRUPT_TIMER == Interrupt.INTERRUPT_TIMER:
+        if Interrupt.INTERRUPT_TIMER == Interrupt.INTERRUPT_TIMER & pending_interrupt:
             return Interrupt.INTERRUPT_TIMER
-        if pending_interrupt & Interrupt.INTERRUPT_SERIAL == Interrupt.INTERRUPT_SERIAL:
+        if Interrupt.INTERRUPT_SERIAL == Interrupt.INTERRUPT_SERIAL & pending_interrupt:
             return Interrupt.INTERRUPT_SERIAL
-        if pending_interrupt & Interrupt.INTERRUPT_JOYPAD == Interrupt.INTERRUPT_JOYPAD:
+        if Interrupt.INTERRUPT_JOYPAD == Interrupt.INTERRUPT_JOYPAD & pending_interrupt:
             return Interrupt.INTERRUPT_JOYPAD
         return Interrupt.INTERRUPT_NONE
 

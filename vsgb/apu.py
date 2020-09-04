@@ -66,7 +66,7 @@ class APU:
     def write_register(self, register, value):
         for sound_channel in self.sound_channels:
             if sound_channel.accepts(register):
-                return sound_channel.write_byte(register, value)
+                sound_channel.write_byte(register, value)
                 return
         self.registers[register] = value
 
@@ -89,18 +89,17 @@ class APU:
         left = 0
         right = 0
         i = 0
-        while i < 4:
+        for i in range(4):
             channels_data =  self.sound_channels[i].step(ticks)  
 
-            if (selection & (1 << i + 4)) != 0:
+            if 0 != (selection & (1 << (i + 4))):
                 left += channels_data
-
-            #if (selection & (1 << i)) != 0:
+            
+            #if 0!= (selection & (1 << i)):
             #    right += channels_data
 
-            i += 1
 
-        #left = left // 4
+        left = left // 4
         #right = right // 4
 
         volumes = self.read_register(IO_Registers.NR_50)

@@ -33,7 +33,7 @@ class Input:
 
     def read_input(self, joyp : int) -> int:
         _input = 0x0f
-        if joyp & 0b00100000 == 0b0:
+        if 0 == joyp & 0b00100000:
             if self.BUTTON_START:
                 _input ^= 0b1000
             if self.BUTTON_SELECT:
@@ -42,7 +42,7 @@ class Input:
                 _input ^= 0b0010
             if self.BUTTON_A:
                 _input ^= 0b0001
-        elif joyp & 0b00010000 == 0b0:
+        elif 0 == joyp & 0b00010000:
             if self.BUTTON_DOWN:
                 _input ^= 0b1000
             if self.BUTTON_UP:

@@ -23,11 +23,11 @@ class Timer:
         key1 = self.mmu.read_byte(IO_Registers.KEY1)
 
         # increment again if DOUBLE SPEED MODE
-        if key1 & 0b10000000 == 0b10000000:
+        if key1 & 0b10000000:
             self.div_cycles += cycles
             multiplier = 2
 
-        if key1 & 1 == 1: #Prepare enable/disable double speed
+        if key1 & 1: #Prepare enable/disable double speed
             self.mmu.write_byte(IO_Registers.KEY1, key1 & 0b10000000)
             self.div_cycles += 128 * 1024 - 76
 
@@ -47,7 +47,7 @@ class Timer:
 
     def inc_tima_register(self):
         tima = self.mmu.read_byte(IO_Registers.TIMA)
-        if tima == 0xff:
+        if 0xff == tima:
             tima = self.mmu.read_byte(IO_Registers.TMA)
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
         else:

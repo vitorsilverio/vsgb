@@ -49,7 +49,7 @@ class InstructionPerformer:
         ]
 
     def perform_instruction(self, opcode: int) -> int:
-        if opcode >= 0xcb00:
+        if 0xcb00 <= opcode :
             return self.instrs[opcode - 0xca00]()
         return self.instrs[opcode]()
     

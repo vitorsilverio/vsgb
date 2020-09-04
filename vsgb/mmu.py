@@ -63,7 +63,7 @@ class MMU:
         self.hdma = hdma
         
     def read_byte(self, address: int) -> int:
-        if self.game_shark.cheats_enabled and address in self.game_shark.cheats:
+        if self.game_shark.cheats_enabled and (address in self.game_shark.cheats):
             return self.game_shark.cheats[address]
 
         if 0 <= address < 0x8000:
@@ -164,7 +164,7 @@ class MMU:
                 elif address == IO_Registers.STAT:
                     old_stat = self.io_registers.read_value(address)
                     self.set_video_stat.check_stat(old_stat,value)
-                    self.io_registers.write_value(address, value & 0b111)
+                    self.io_registers.write_value(address, value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                     print('Boot rom disabled. Starting rom...')

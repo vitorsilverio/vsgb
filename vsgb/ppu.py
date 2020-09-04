@@ -29,7 +29,6 @@ class PPU:
         self.interruptManager = interruptManager
         self.lcdControlRegister = LCDControlRegister(self.mmu)
         self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
-        self.window_framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.original_color = [0]*PPU.FRAMEBUFFER_SIZE
         self.bg_priority = [False]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
@@ -93,7 +92,6 @@ class PPU:
             self.vblank = True
             self.window_line = 0
             self.interruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
-            self.window_framebuffer = self.framebuffer[:]
 
         self.update_stat_mode()
 

@@ -44,7 +44,7 @@ class CGB_Palette:
 
     def set_bgpd(self, value):
         address = (self.bgpi.get_palette() * 4) + self.bgpi.get_color()
-        if self.bgpi.get_byte_selector() == 0: # Set low byte
+        if 0 == self.bgpi.get_byte_selector(): # Set low byte
             self.bg_palettes[address].set_low_byte(value)
         else: # Set high byte
             self.bg_palettes[address].set_high_byte(value)
@@ -68,7 +68,7 @@ class CGB_Palette:
 
     def set_obpd(self, value):
         address = (self.obpi.get_palette() * 4) + self.obpi.get_color()
-        if self.obpi.get_byte_selector() == 0: # Set low byte
+        if 0 == self.obpi.get_byte_selector(): # Set low byte
             self.ob_palettes[address].set_low_byte(value)
         else: # Set high byte
             self.ob_palettes[address].set_high_byte(value)

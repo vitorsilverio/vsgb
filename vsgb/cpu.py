@@ -34,7 +34,7 @@ class CPU:
         if self.stop:
             return None
         self.check_halted()
-        if self.ime or self.pending_interrupts_before_halt != 0:
+        if self.ime or 0 != self.pending_interrupts_before_halt:
             self.serve_interrupt()
         if self.halted:
             self.ticks += 4
@@ -80,7 +80,7 @@ class CPU:
     def fetch_instruction(self, prefix: bool = False) -> int:
         instruction = self.mmu.read_byte(self.registers.pc)
         self.registers.pc += 1
-        if instruction == 0xcb and not prefix:
+        if 0xcb == instruction and not prefix:
             return 0xcb00 + self.fetch_instruction(True)
         return instruction
 

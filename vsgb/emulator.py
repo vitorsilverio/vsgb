@@ -17,6 +17,7 @@ from vsgb.window import Window
 from vsgb.instructions import instructions
 from vsgb.save_state_manager import SaveStateManager
 from vsgb.video_stat_interrupt import VideoStatInterrupt
+import threading
 
 
 class Emulator:
@@ -56,7 +57,7 @@ class Emulator:
                     last_ppu_mode = self.ppu.mode
                     ly = self.mmu.read_byte(IO_Registers.LY)
                     can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode and ly < 143
-                    refresh = PPU.V_BLANK_STATE == last_ppu_mode
+                refresh = (ly == 143)
                 ticks = 0
                 if self.cgb_mode: 
                     if self.hdma.in_progress:
@@ -71,18 +72,20 @@ class Emulator:
                 if self.dma.in_progress:
                     self.dma.step()
                     ticks += self.dma.ticks
-                if ticks == 0:
+                if 0 == ticks:
                     self.cpu.step()
                     ticks = self.cpu.ticks
                     if self.debug:
                         logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
                 self.ppu.step(ticks)
-                #for i in range(0,ticks,4):
-                    #self.apu.step(4)
+
+                for i in range(0,self.cpu.ticks,4):
+                    self.apu.step(4)
+
                 
                 if refresh:
-                    self.window.render(self.ppu.window_framebuffer)
+                    self.window.render(self.ppu.framebuffer)
                     refresh = False
         except Exception as e:
             print('An error occurred:')
@@ -90,8 +93,6 @@ class Emulator:
             print(self.get_last_instruction())
             raise e
 
-
-       
 
     def get_last_instruction(self):
         last_instruction = instructions[self.cpu.last_instruction][0]

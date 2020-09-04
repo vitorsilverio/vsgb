@@ -50,7 +50,7 @@ class DMA:
             self.mmu.write_byte(destination_address, self.mmu.read_byte(source_address))
             self.counter += 1
             self.ticks = 20
-            if self.counter == 0xa0:
+            if 0xa0 == self.counter:
                 self.in_progress = False
 
 """
@@ -96,7 +96,7 @@ class HDMA:
     def request_hdma_transfer(self, request: int):
         if self.in_progress:
             stop_or_reset = (request & 0b10000000) >> 7
-            if stop_or_reset == 0 \
+            if 0 == stop_or_reset \
               and self.msb_source_address == self.mmu.read_byte(IO_Registers.HDMA1) \
               and self.lsb_source_address == self.mmu.read_byte(IO_Registers.HDMA2) & 0b11110000 \
               and self.msb_destination_address == self.mmu.read_byte(IO_Registers.HDMA3) & 0b00011111 \
@@ -128,7 +128,7 @@ class HDMA:
         
         self.ticks = 32 + (0 if self.counter != 0x10 else 4)
         remaining = self.length - self.counter
-        if remaining == 0:
+        if 0 == remaining:
             self.mmu.write_byte(IO_Registers.HDMA5, 0xff, True) # HDMA is done
             self.in_progress = False
         else:

@@ -66,7 +66,7 @@ class SoundChannel3(AbstractSoundChannel):
 
     def step(self, ticks):
         self.ticks_since_read += ticks
-        if not self.update_length(ticks // 4):
+        if not self.update_length(ticks):
             return 0
         if not self.dac_enabled:
             return 0
@@ -80,7 +80,7 @@ class SoundChannel3(AbstractSoundChannel):
                 self.triggered = False
             else:
                 self.last_output = self.get_wave_entry()
-            self.i = (self.i + (ticks // 4)) % 32
+            self.i = (self.i + (ticks)) % 32
         return self.last_output
 
     def get_volume(self):
