@@ -13,10 +13,8 @@ from vsgb.stack_manager import StackManager
 
 class CPU:
 
-    def __init__(self,mmu: MMU, interrupt_manager: InterruptManager):
-        self.mmu = mmu
-        self.interruptManager = interrupt_manager
-        
+    def __init__(self, mmu: MMU):
+        self.mmu = mmu        
         self.stackManager = StackManager(self.mmu)
         self.instructionPerformer = InstructionPerformer(self)
         self.ticks = 0
@@ -45,34 +43,33 @@ class CPU:
         return None
     
     def check_halted(self):
-        if self.halted and self.pending_interrupts_before_halt != self.mmu.read_byte(IO_Registers.IF):
+        if self.halted and self.pending_interrupts_before_halt != InterruptManager.if_register:
             self.ticks += 4
             self.halted = False
 
     def serve_interrupt(self):
-        interrupt = self.interruptManager.pending_interrupt()
+        interrupt = InterruptManager.pending_interrupt()
         if interrupt == Interrupt.INTERRUPT_NONE:
             return None
         self.ime = False
         if self.halted:
             self.halted = False
         self.stackManager.push_word(Registers.pc)
-        if_register = self.mmu.read_byte(IO_Registers.IF)
         if interrupt == Interrupt.INTERRUPT_VBLANK:
             Registers.pc = 0x40 #RST 40H
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111110)
-        if interrupt == Interrupt.INTERRUPT_LCDSTAT:
+            InterruptManager.if_register &= 0b11111110
+        elif interrupt == Interrupt.INTERRUPT_LCDSTAT:
             Registers.pc = 0x48 #RST 48H
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111101)
-        if interrupt == Interrupt.INTERRUPT_TIMER:
+            InterruptManager.if_register &= 0b11111101
+        elif interrupt == Interrupt.INTERRUPT_TIMER:
             Registers.pc = 0x50 #RST 50H
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111011)
-        if interrupt == Interrupt.INTERRUPT_SERIAL:
+            InterruptManager.if_register &= 0b11111011
+        elif interrupt == Interrupt.INTERRUPT_SERIAL:
             Registers.pc = 0x58 #RST 58H
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11110111)
-        if interrupt == Interrupt.INTERRUPT_JOYPAD:
+            InterruptManager.if_register &= 0b11110111
+        elif interrupt == Interrupt.INTERRUPT_JOYPAD:
             Registers.pc = 0x60 #RST 60H
-            self.mmu.write_byte(IO_Registers.IF, if_register & 0b11101111)
+            InterruptManager.if_register &= 0b11101111
         self.ticks += 20
         return None
 

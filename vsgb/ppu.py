@@ -24,9 +24,8 @@ class PPU:
     H_BLANK_TIME        = 204
     V_BLANK_TIME        = 4560
 
-    def __init__(self, mmu : MMU, interruptManager : InterruptManager, cgb_mode: bool):
+    def __init__(self, mmu : MMU, cgb_mode: bool):
         self.mmu = mmu
-        self.interruptManager = interruptManager
         self.lcdControlRegister = LCDControlRegister(self.mmu)
         self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.original_color = [0]*PPU.FRAMEBUFFER_SIZE
@@ -91,7 +90,7 @@ class PPU:
             self.auxillary_modeclock = self.modeclock
             self.vblank = True
             self.window_line = 0
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
+            InterruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
 
         self.update_stat_mode()
 

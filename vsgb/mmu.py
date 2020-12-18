@@ -10,6 +10,7 @@ from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 from vsgb.game_shark import GameShark
+from vsgb.interrupt_manager import InterruptManager
 
 from vsgb.memory.vram import VideoRam
 from vsgb.memory.wram import WorkRam
@@ -113,8 +114,14 @@ class MMU:
                 if self.cgb_mode:
                     return (self.io_registers.read_value(address) | 0b11111110) & 0xff
                 return 0xff
+            
+            if address == IO_Registers.IF:
+                return InterruptManager.if_register & 0xff
             return self.io_registers.read_value(address) & 0xff
+            
         if 0xff80 <= address < 0x10000:
+            if address == IO_Registers.IE:
+                return InterruptManager.ie_register & 0xff
             return self.hram[address - 0xff80] & 0xff
         return 0xff
 
@@ -170,11 +177,15 @@ class MMU:
                     print('Boot rom disabled. Starting rom...')
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
+                elif address == IO_Registers.IF:
+                    InterruptManager.if_register = value & 0xff
                 else:
                     self.io_registers.write_value(address,value)
             else:     
                 self.io_registers.write_value(address,value)
         elif 0xff80 <= address < 0x10000:
+            if address == IO_Registers.IE:
+                InterruptManager.ie_register = value & 0xff
             self.hram[address - 0xff80] = value
 
     def read_word(self, address: int) -> int:

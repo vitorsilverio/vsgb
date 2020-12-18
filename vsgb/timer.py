@@ -9,9 +9,8 @@ class Timer:
 
     DIV_INC_TIME = 256 # cycles
 
-    def __init__(self, mmu : MMU, interruptManager : InterruptManager):
+    def __init__(self, mmu : MMU):
         self.mmu = mmu
-        self.interruptManager = interruptManager
         self.div_cycles = 0
         self.tima_cycles = 0
         self.tima = Tima(mmu)
@@ -49,7 +48,7 @@ class Timer:
         tima = self.mmu.read_byte(IO_Registers.TIMA)
         if 0xff == tima:
             tima = self.mmu.read_byte(IO_Registers.TMA)
-            self.interruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
+            InterruptManager.request_interrupt(Interrupt.INTERRUPT_TIMER)
         else:
             tima += 1
             tima &= 0xff

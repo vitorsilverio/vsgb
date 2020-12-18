@@ -8,7 +8,6 @@ from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.dma import DMA, HDMA
 from vsgb.input import Input
-from vsgb.interrupt_manager import InterruptManager, Interrupt
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.ppu import PPU
@@ -30,10 +29,9 @@ class Emulator:
         self.apu.start()
         self.input = Input()
         self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
-        self.interruptManager = InterruptManager(self.mmu)
-        self.cpu = CPU(self.mmu, self.interruptManager)
-        self.ppu = PPU(self.mmu, self.cpu.interruptManager, cgb_mode)
-        self.timer = Timer(self.mmu, self.interruptManager)
+        self.cpu = CPU(self.mmu)
+        self.ppu = PPU(self.mmu, cgb_mode)
+        self.timer = Timer(self.mmu)
         self.dma = DMA(self.mmu)
         self.hdma = HDMA(self.mmu)
         self.window = Window(self)
@@ -42,9 +40,7 @@ class Emulator:
         self.changing_state = False
         self.serialize_ok = False
         self.save_state_manager = SaveStateManager()
-
-        video_stat_interrupt = VideoStatInterrupt(self.interruptManager)
-        self.mmu.set_video_stat(video_stat_interrupt)
+        self.mmu.set_video_stat(VideoStatInterrupt())
 
     def run(self):
         try:

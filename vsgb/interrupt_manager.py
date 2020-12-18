@@ -3,22 +3,18 @@
 
 from enum import IntEnum
 
-from vsgb.io_registers import IO_Registers
-from vsgb.mmu import MMU
-
 class InterruptManager:
 
-    def __init__(self, mmu : MMU):
-        self.mmu = mmu
+    ie_register: int = 0xff
+    if_register: int = 0xff
 
-    def request_interrupt(self, interrupt : int):
-        if_register = self.mmu.read_byte(IO_Registers.IF)
-        self.mmu.write_byte(IO_Registers.IF, (if_register | interrupt))
+    @classmethod
+    def request_interrupt(cls, interrupt : int):
+        cls.if_register |= interrupt
 
-    def pending_interrupt(self) -> int:
-        ie_register = self.mmu.read_byte(IO_Registers.IE)
-        if_register = self.mmu.read_byte(IO_Registers.IF)
-        pending_interrupt = ie_register & if_register
+    @classmethod
+    def pending_interrupt(cls) -> int:
+        pending_interrupt = cls.ie_register & cls.if_register
         if 0 == pending_interrupt & 0b00011111:
             return Interrupt.INTERRUPT_NONE # There are not pending interrupts skip test just leave
         if Interrupt.INTERRUPT_VBLANK == Interrupt.INTERRUPT_VBLANK & pending_interrupt:
