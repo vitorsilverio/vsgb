@@ -43,7 +43,6 @@ class MMU:
         self.wram = WorkRam()
         self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x7f)
-        self.io_registers = IO_Registers()
         self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
         self.unusable_memory_area = UnusedMemoryArea(cgb_mode)
@@ -93,7 +92,7 @@ class MMU:
             return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
             if address == IO_Registers.P1:
-                return self.input.read_input(self.io_registers.read_value(address)) & 0xff
+                return self.input.read_input(IO_Registers.read_value(address)) & 0xff
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
             if address == IO_Registers.BGPI:
@@ -106,16 +105,16 @@ class MMU:
                 return self.cgb_palette.get_obpd()
             if address == IO_Registers.SVBK:
                 if self.cgb_mode:
-                    return (self.io_registers.read_value(address) | 0b11111000) & 0xff
+                    return (IO_Registers.read_value(address) | 0b11111000) & 0xff
                 return 0xff
             if address == IO_Registers.VBK:
                 if self.cgb_mode:
-                    return (self.io_registers.read_value(address) | 0b11111110) & 0xff
+                    return (IO_Registers.read_value(address) | 0b11111110) & 0xff
                 return 0xff
             
             if address == IO_Registers.IF:
                 return InterruptManager.if_register & 0xff
-            return self.io_registers.read_value(address) & 0xff
+            return IO_Registers.read_value(address) & 0xff
             
         if 0xff80 <= address < 0x10000:
             if address == IO_Registers.IE:
@@ -151,9 +150,9 @@ class MMU:
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
-                    self.io_registers.write_value(address,value & 0b00110000)
+                    IO_Registers.write_value(address,value & 0b00110000)
                 elif address == IO_Registers.DIV: # Reset div register
-                    self.io_registers.write_value(address,0)
+                    IO_Registers.write_value(address,0)
                 elif address == IO_Registers.DMA: # Start dma transfer
                     self.dma.request_dma_transfer(value)
                 elif address == IO_Registers.HDMA5: # Start hdma transfer
@@ -167,9 +166,9 @@ class MMU:
                 elif address == IO_Registers.OBPD:
                     self.cgb_palette.set_obpd(value)
                 elif address == IO_Registers.STAT:
-                    old_stat = self.io_registers.read_value(address)
+                    old_stat = IO_Registers.read_value(address)
                     VideoStatInterrupt.check_stat(old_stat,value)
-                    self.io_registers.write_value(address, value)
+                    IO_Registers.write_value(address, value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                     print('Boot rom disabled. Starting rom...')
@@ -178,9 +177,9 @@ class MMU:
                 elif address == IO_Registers.IF:
                     InterruptManager.if_register = value & 0xff
                 else:
-                    self.io_registers.write_value(address,value)
+                    IO_Registers.write_value(address,value)
             else:     
-                self.io_registers.write_value(address,value)
+                IO_Registers.write_value(address,value)
         elif 0xff80 <= address < 0x10000:
             if address == IO_Registers.IE:
                 InterruptManager.ie_register = value & 0xff
