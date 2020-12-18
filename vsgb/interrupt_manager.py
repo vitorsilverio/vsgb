@@ -17,15 +17,15 @@ class InterruptManager:
         pending_interrupt = cls.ie_register & cls.if_register
         if 0 == pending_interrupt & 0b00011111:
             return Interrupt.INTERRUPT_NONE # There are not pending interrupts skip test just leave
-        if Interrupt.INTERRUPT_VBLANK == Interrupt.INTERRUPT_VBLANK & pending_interrupt:
+        if Interrupt.INTERRUPT_VBLANK & pending_interrupt:
             return Interrupt.INTERRUPT_VBLANK
-        if Interrupt.INTERRUPT_LCDSTAT == Interrupt.INTERRUPT_LCDSTAT & pending_interrupt:
+        if Interrupt.INTERRUPT_LCDSTAT & pending_interrupt:
             return Interrupt.INTERRUPT_LCDSTAT 
-        if Interrupt.INTERRUPT_TIMER == Interrupt.INTERRUPT_TIMER & pending_interrupt:
+        if Interrupt.INTERRUPT_TIMER & pending_interrupt:
             return Interrupt.INTERRUPT_TIMER
-        if Interrupt.INTERRUPT_SERIAL == Interrupt.INTERRUPT_SERIAL & pending_interrupt:
+        if Interrupt.INTERRUPT_SERIAL & pending_interrupt:
             return Interrupt.INTERRUPT_SERIAL
-        if Interrupt.INTERRUPT_JOYPAD == Interrupt.INTERRUPT_JOYPAD & pending_interrupt:
+        if Interrupt.INTERRUPT_JOYPAD & pending_interrupt:
             return Interrupt.INTERRUPT_JOYPAD
         return Interrupt.INTERRUPT_NONE
 
