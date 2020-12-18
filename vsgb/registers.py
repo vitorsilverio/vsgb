@@ -3,94 +3,103 @@
 
 class Registers:
 
-    Z_FLAG = 0x80
-    N_FLAG = 0x40
-    H_FLAG = 0x20
-    C_FLAG = 0x10
+    Z_FLAG: int = 0x80
+    N_FLAG: int = 0x40
+    H_FLAG: int = 0x20
+    C_FLAG: int = 0x10
 
-    def __init__(self):
-        self.a = 0x00
-        self.b = 0x00
-        self.c = 0x00
-        self.d = 0x00
-        self.e = 0x00
-        self.f = 0x00
-        self.h = 0x00
-        self.l = 0x00
-        self.pc = 0x0000
-        self.sp = 0x0000
+    a: int = 0x00
+    b: int = 0x00
+    c: int = 0x00
+    d: int = 0x00
+    e: int = 0x00
+    f: int = 0x00
+    h: int = 0x00
+    l: int = 0x00
+    pc: int = 0x0000
+    sp: int = 0x0000
 
-    def set_af(self, word : int):
-        self.a = ( word >> 8 ) & 0xff
-        self.f = word & 0xf0
+    @classmethod    
+    def set_af(cls, word : int):
+        cls.a = ( word >> 8 ) & 0xff
+        cls.f = word & 0xf0
 
-    def set_bc(self, word : int):
-        self.b = ( word >> 8 ) & 0xff
-        self.c = word & 0xff
+    @classmethod
+    def set_bc(cls, word : int):
+        cls.b = ( word >> 8 ) & 0xff
+        cls.c = word & 0xff
 
-    def set_de(self, word : int):
-        self.d = ( word >> 8 ) & 0xff
-        self.e = word & 0xff
+    @classmethod
+    def set_de(cls, word : int):
+        cls.d = ( word >> 8 ) & 0xff
+        cls.e = word & 0xff
 
-    def set_hl(self, word : int):
-        self.h = ( word >> 8 ) & 0xff
-        self.l = word & 0xff
+    @classmethod
+    def set_hl(cls, word : int):
+        cls.h = ( word >> 8 ) & 0xff
+        cls.l = word & 0xff
 
-    def get_af(self) -> int:
-        return ((self.a << 8) + self.f) & 0xfff0
+    @classmethod
+    def get_af(cls) -> int:
+        return ((cls.a << 8) + cls.f) & 0xfff0
 
-    def get_bc(self) -> int:
-        return (self.b << 8) + self.c
+    @classmethod
+    def get_bc(cls) -> int:
+        return (cls.b << 8) + cls.c
 
-    def get_de(self) -> int:
-        return (self.d << 8) + self.e
+    @classmethod
+    def get_de(cls) -> int:
+        return (cls.d << 8) + cls.e
 
-    def get_hl(self) -> int:
-        return (self.h << 8) + self.l
+    @classmethod
+    def get_hl(cls) -> int:
+        return (cls.h << 8) + cls.l
 
-    def set_z_flag(self):
-        self.f |= Registers.Z_FLAG
+    @classmethod
+    def set_z_flag(cls):
+        cls.f |= cls.Z_FLAG
 
-    def reset_z_flag(self):
-        self.f &= Registers.Z_FLAG ^ 0xff
+    @classmethod
+    def reset_z_flag(cls):
+        cls.f &= cls.Z_FLAG ^ 0xff
 
-    def set_n_flag(self):
-        self.f |= Registers.N_FLAG
+    @classmethod
+    def set_n_flag(cls):
+        cls.f |= cls.N_FLAG
 
-    def reset_n_flag(self):
-        self.f &= Registers.N_FLAG ^ 0xff
+    @classmethod
+    def reset_n_flag(cls):
+        cls.f &= cls.N_FLAG ^ 0xff
 
-    def set_c_flag(self):
-        self.f |= Registers.C_FLAG
+    @classmethod
+    def set_c_flag(cls):
+        cls.f |= cls.C_FLAG
 
-    def reset_c_flag(self):
-        self.f &= Registers.C_FLAG ^ 0xff
+    @classmethod
+    def reset_c_flag(cls):
+        cls.f &= cls.C_FLAG ^ 0xff
 
-    def set_h_flag(self):
-        self.f |= Registers.H_FLAG
+    @classmethod
+    def set_h_flag(cls):
+        cls.f |= cls.H_FLAG
 
-    def reset_h_flag(self):
-        self.f &= Registers.H_FLAG ^ 0xff
+    @classmethod
+    def reset_h_flag(cls):
+        cls.f &= cls.H_FLAG ^ 0xff
 
-    def is_z_flag(self) -> bool:
-        return self.f & Registers.Z_FLAG == Registers.Z_FLAG
+    @classmethod
+    def is_z_flag(cls) -> bool:
+        return cls.f & cls.Z_FLAG == cls.Z_FLAG
 
-    def is_n_flag(self) -> bool:
-        return self.f & Registers.N_FLAG == Registers.N_FLAG
+    @classmethod
+    def is_n_flag(cls) -> bool:
+        return cls.f & cls.N_FLAG == cls.N_FLAG
 
-    def is_c_flag(self) -> bool:
-        return self.f & Registers.C_FLAG == Registers.C_FLAG
+    @classmethod
+    def is_c_flag(cls) -> bool:
+        return cls.f & cls.C_FLAG == cls.C_FLAG
 
-    def is_h_flag(self) -> bool:
-        return self.f & Registers.H_FLAG == Registers.H_FLAG
+    @classmethod
+    def is_h_flag(cls) -> bool:
+        return cls.f & cls.H_FLAG == cls.H_FLAG
 
-    def __str__(self) -> str:
-        return 'A: {:02x} F: {:02x} BC: {:04x} DE: {:04x} HL: {:04x}: SP: {:04x} PC: {:04x} '.format(
-           self.a,
-           self.f,
-           self.get_bc(),
-           self.get_de(),
-           self.get_hl(),
-           self.sp,
-           self.pc
-        )

@@ -15,6 +15,7 @@ from vsgb.ppu import PPU
 from vsgb.timer import Timer
 from vsgb.window import Window
 from vsgb.instructions import instructions
+from vsgb.registers import Registers
 from vsgb.save_state_manager import SaveStateManager
 from vsgb.video_stat_interrupt import VideoStatInterrupt
 import threading
@@ -75,8 +76,6 @@ class Emulator:
                 if 0 == ticks:
                     self.cpu.step()
                     ticks = self.cpu.ticks
-                    if self.debug:
-                        logging.debug('{}\t\t\t{}'.format(self.get_last_instruction(), self.cpu.registers))
                 self.timer.tick(ticks)
                 self.ppu.step(ticks)
 
@@ -89,7 +88,6 @@ class Emulator:
                     refresh = False
         except Exception as e:
             print('An error occurred:')
-            print(self.cpu.registers)
             print(self.get_last_instruction())
             raise e
 
@@ -105,20 +103,20 @@ class Emulator:
 
 
     def skip_boot_rom(self):
-        self.cpu.registers.pc = 0x0100
+        Registers.pc = 0x0100
         if self.mmu.rom.is_cgb() and self.cgb_mode:
-            self.cpu.registers.set_af(0x1180)
-            self.cpu.registers.set_bc(0x0000)
-            self.cpu.registers.set_de(0xff56)
-            self.cpu.registers.set_hl(0x000d)
-            self.cpu.registers.sp = 0xfffe
+            Registers.set_af(0x1180)
+            Registers.set_bc(0x0000)
+            Registers.set_de(0xff56)
+            Registers.set_hl(0x000d)
+            Registers.sp = 0xfffe
             self.mmu.write_byte(IO_Registers.KEY1, 0x81)            
         else:
-            self.cpu.registers.set_af(0x01b0)
-            self.cpu.registers.set_bc(0x0013)
-            self.cpu.registers.set_de(0x00d8)
-            self.cpu.registers.set_hl(0x014d)
-            self.cpu.registers.sp = 0xfffe
+            Registers.set_af(0x01b0)
+            Registers.set_bc(0x0013)
+            Registers.set_de(0x00d8)
+            Registers.set_hl(0x014d)
+            Registers.sp = 0xfffe
         self.mmu.write_byte(IO_Registers.NR_10, 0x80)
         self.mmu.write_byte(IO_Registers.NR_11, 0xbf)
         self.mmu.write_byte(IO_Registers.NR_12, 0xf3)

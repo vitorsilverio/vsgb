@@ -11,7 +11,6 @@ class InstructionPerformer:
     def __init__(self, cpu):
         self.cpu = cpu
         self.mmu = cpu.mmu
-        self.registers = cpu.registers
         self.stackManager = cpu.stackManager
         self.instrs = [
             self.NOP, self.LD_BC_d16, self.LD_REF_BC_A, self.INC_BC, self.INC_B, self.DEC_B, self.LD_B_d8, self.RLCA, self.LD_REF_a16_SP, self.ADD_HL_BC, self.LD_A_REF_BC, self.DEC_BC, self.INC_C, self.DEC_C, self.LD_C_d8, self.RRCA, 
@@ -57,77 +56,77 @@ class InstructionPerformer:
         return 4
     
     def LD_BC_d16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.registers.set_bc(word) 
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        Registers.set_bc(word) 
         return 12
     
     def LD_REF_BC_A(self) -> int:
-        self.mmu.write_byte(self.registers.get_bc(), self.registers.a)
+        self.mmu.write_byte(Registers.get_bc(), Registers.a)
         return 8
 
     def INC_BC(self) -> int:
-        self.registers.set_bc((self.registers.get_bc() + 1) & 0xffff )
+        Registers.set_bc((Registers.get_bc() + 1) & 0xffff )
         return 8
 
     def INC_B(self) -> int:
-        self.registers.b = self.inc_byte(self.registers.b)
+        Registers.b = self.inc_byte(Registers.b)
         return 4
 
     def DEC_B(self) -> int:
-        self.registers.b = self.dec_byte(self.registers.b)
+        Registers.b = self.dec_byte(Registers.b)
         return 4
     
     def LD_B_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.b = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.b = byte 
         return 8
 
     def RLCA(self) -> int:
-        self.registers.a = self.rlc(self.registers.a)
-        self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+        Registers.a = self.rlc(Registers.a)
+        Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return 4
     
     def LD_REF_a16_SP(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.mmu.write_word(word, self.registers.sp)
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        self.mmu.write_word(word, Registers.sp)
         return 20
 
     def ADD_HL_BC(self) -> int:
-        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_bc()))
+        Registers.set_hl(self.add_word(Registers.get_hl(), Registers.get_bc()))
         return 8
     
     def LD_A_REF_BC(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.get_bc())
+        Registers.a = self.mmu.read_byte(Registers.get_bc())
         return 8
 
     def DEC_BC(self) -> int:
-        self.registers.set_bc((self.registers.get_bc() - 1) & 0xffff )
+        Registers.set_bc((Registers.get_bc() - 1) & 0xffff )
         return 8
 
     def INC_C(self) -> int:
-        self.registers.c = self.inc_byte(self.registers.c)
+        Registers.c = self.inc_byte(Registers.c)
         return 4
 
     def DEC_C(self) -> int:
-        self.registers.c = self.dec_byte(self.registers.c)
+        Registers.c = self.dec_byte(Registers.c)
         return 4
     
     def LD_C_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.c = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.c = byte 
         return 8
 
     def RRCA(self) -> int:
-        self.registers.a = self.rrc(self.registers.a)
-        self.registers.reset_h_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_z_flag()
+        Registers.a = self.rrc(Registers.a)
+        Registers.reset_h_flag()
+        Registers.reset_n_flag()
+        Registers.reset_z_flag()
         return 4  
 
     def STOP(self) -> int:
@@ -135,475 +134,475 @@ class InstructionPerformer:
         return 4       
     
     def LD_DE_d16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.registers.set_de(word) 
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        Registers.set_de(word) 
         return 12
     
     def LD_REF_DE_A(self) -> int:
-        self.mmu.write_byte(self.registers.get_de(), self.registers.a)
+        self.mmu.write_byte(Registers.get_de(), Registers.a)
         return 8
 
     def INC_DE(self) -> int:
-        self.registers.set_de((self.registers.get_de() + 1) & 0xffff )
+        Registers.set_de((Registers.get_de() + 1) & 0xffff )
         return 8
 
     def INC_D(self) -> int:
-        self.registers.d = self.inc_byte(self.registers.d)
+        Registers.d = self.inc_byte(Registers.d)
         return 4
 
     def DEC_D(self) -> int:
-        self.registers.d = self.dec_byte(self.registers.d)
+        Registers.d = self.dec_byte(Registers.d)
         return 4
     
     def LD_D_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.d = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.d = byte 
         return 8
 
     def RLA(self) -> int:
-        self.registers.a = self.rl(self.registers.a)
-        self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+        Registers.a = self.rl(Registers.a)
+        Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return 4
 
     def JR_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.pc += signed_value(byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.pc += signed_value(byte)
         return 12
 
     def ADD_HL_DE(self) -> int:
-        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_de()))
+        Registers.set_hl(self.add_word(Registers.get_hl(), Registers.get_de()))
         return 8
     
     def LD_A_REF_DE(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.get_de())
+        Registers.a = self.mmu.read_byte(Registers.get_de())
         return 8
 
     def DEC_DE(self) -> int:
-        self.registers.set_de((self.registers.get_de() - 1) & 0xffff )
+        Registers.set_de((Registers.get_de() - 1) & 0xffff )
         return 8
 
     def INC_E(self) -> int:
-        self.registers.e = self.inc_byte(self.registers.e)
+        Registers.e = self.inc_byte(Registers.e)
         return 4
 
     def DEC_E(self) -> int:
-        self.registers.e = self.dec_byte(self.registers.e)
+        Registers.e = self.dec_byte(Registers.e)
         return 4
     
     def LD_E_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.e = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.e = byte 
         return 8
 
     def RRA(self) -> int:
-        self.registers.a = self.rr(self.registers.a)
-        self.registers.reset_h_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_z_flag()
+        Registers.a = self.rr(Registers.a)
+        Registers.reset_h_flag()
+        Registers.reset_n_flag()
+        Registers.reset_z_flag()
         return 4  
 
     def JR_NZ_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        if not self.registers.is_z_flag():
-            self.registers.pc += signed_value(byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        if not Registers.is_z_flag():
+            Registers.pc += signed_value(byte)
             return 12
         return 8
     
     def LD_HL_d16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.registers.set_hl(word) 
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        Registers.set_hl(word) 
         return 12
     
     def LDI_HL_A(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
-        self.registers.set_hl(self.registers.get_hl()+1)
+        self.mmu.write_byte(Registers.get_hl(), Registers.a)
+        Registers.set_hl(Registers.get_hl()+1)
         return 8
 
     def INC_HL(self) -> int:
-        self.registers.set_hl((self.registers.get_hl() + 1) & 0xffff )
+        Registers.set_hl((Registers.get_hl() + 1) & 0xffff )
         return 8
 
     def INC_H(self) -> int:
-        self.registers.h = self.inc_byte(self.registers.h)
+        Registers.h = self.inc_byte(Registers.h)
         return 4
 
     def DEC_H(self) -> int:
-        self.registers.h = self.dec_byte(self.registers.h)
+        Registers.h = self.dec_byte(Registers.h)
         return 4
     
     def LD_H_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.h = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.h = byte 
         return 8
 
     def DAA(self) -> int:
-        temp = self.registers.a 
-        if self.registers.is_n_flag():
-            if self.registers.is_h_flag():
+        temp = Registers.a 
+        if Registers.is_n_flag():
+            if Registers.is_h_flag():
                 temp = (temp - 0x06) & 0xff
-            if self.registers.is_c_flag():
+            if Registers.is_c_flag():
                 temp = (temp - 0x60) & 0xff
         else:
-            if self.registers.is_h_flag() or (temp & 0x0f) > 0x09:
+            if Registers.is_h_flag() or (temp & 0x0f) > 0x09:
                 temp += 0x06
-            if self.registers.is_c_flag() or temp > 0x9f:
+            if Registers.is_c_flag() or temp > 0x9f:
                 temp += 0x60
-        self.registers.reset_h_flag()
+        Registers.reset_h_flag()
         if temp > 0xff:
-            self.registers.set_c_flag()
+            Registers.set_c_flag()
         temp &= 0xff
         if temp == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
-        self.registers.a = temp
+            Registers.reset_z_flag()
+        Registers.a = temp
         return 4
 
     def JR_Z_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        if self.registers.is_z_flag():
-            self.registers.pc += signed_value(byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        if Registers.is_z_flag():
+            Registers.pc += signed_value(byte)
             return 12
         return 8
 
     def ADD_HL_HL(self) -> int:
-        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.get_hl()))
+        Registers.set_hl(self.add_word(Registers.get_hl(), Registers.get_hl()))
         return 8
     
     def LDI_A_HL(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.get_hl())
-        self.registers.set_hl(self.registers.get_hl()+1)
+        Registers.a = self.mmu.read_byte(Registers.get_hl())
+        Registers.set_hl(Registers.get_hl()+1)
         return 8
 
     def DEC_HL(self) -> int:
-        self.registers.set_hl((self.registers.get_hl() - 1) & 0xffff )
+        Registers.set_hl((Registers.get_hl() - 1) & 0xffff )
         return 8
 
     def INC_L(self) -> int:
-        self.registers.l = self.inc_byte(self.registers.l)
+        Registers.l = self.inc_byte(Registers.l)
         return 4
 
     def DEC_L(self) -> int:
-        self.registers.l = self.dec_byte(self.registers.l)
+        Registers.l = self.dec_byte(Registers.l)
         return 4
     
     def LD_L_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.l = byte 
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.l = byte 
         return 8
 
     def CPL(self) -> int:
-        self.registers.a = self.registers.a ^ 0xff
-        self.registers.set_n_flag()
-        self.registers.set_h_flag()
+        Registers.a = Registers.a ^ 0xff
+        Registers.set_n_flag()
+        Registers.set_h_flag()
         return 4
 
     def JR_NC_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        if not self.registers.is_c_flag():
-            self.registers.pc += signed_value(byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        if not Registers.is_c_flag():
+            Registers.pc += signed_value(byte)
             return 12
         return 8
     
     def LD_SP_d16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.registers.sp = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        Registers.sp = word
         return 12
     
     def LDD_HL_A(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
-        self.registers.set_hl(self.registers.get_hl()-1)
+        self.mmu.write_byte(Registers.get_hl(), Registers.a)
+        Registers.set_hl(Registers.get_hl()-1)
         return 8
 
     def INC_SP(self) -> int:
-        self.registers.sp = ((self.registers.sp + 1) & 0xffff )
+        Registers.sp = ((Registers.sp + 1) & 0xffff )
         return 8
 
     def INC_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.inc_byte(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(),self.inc_byte(self.mmu.read_byte(Registers.get_hl())))
         return 12
 
     def DEC_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.dec_byte(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.dec_byte(self.mmu.read_byte(Registers.get_hl())))
         return 12
     
     def LD_REF_HL_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.mmu.write_byte(self.registers.get_hl(),byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        self.mmu.write_byte(Registers.get_hl(),byte)
         return 12
 
     def SCF(self) -> int:
-        self.registers.set_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+        Registers.set_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return 4
 
     def JR_C_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        if self.registers.is_c_flag():
-            self.registers.pc += signed_value(byte)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        if Registers.is_c_flag():
+            Registers.pc += signed_value(byte)
             return 12
         return 8
 
     def ADD_HL_SP(self) -> int:
-        self.registers.set_hl(self.add_word(self.registers.get_hl(), self.registers.sp))
+        Registers.set_hl(self.add_word(Registers.get_hl(), Registers.sp))
         return 8
     
     def LDD_A_HL(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.get_hl())
-        self.registers.set_hl(self.registers.get_hl()-1)
+        Registers.a = self.mmu.read_byte(Registers.get_hl())
+        Registers.set_hl(Registers.get_hl()-1)
         return 8
 
     def DEC_SP(self) -> int:
-        self.registers.sp = ((self.registers.sp - 1) & 0xffff )
+        Registers.sp = ((Registers.sp - 1) & 0xffff )
         return 8
 
     def INC_A(self) -> int:
-        self.registers.a = self.inc_byte(self.registers.a)
+        Registers.a = self.inc_byte(Registers.a)
         return 4
 
     def DEC_A(self) -> int:
-        self.registers.a = self.dec_byte(self.registers.a)
+        Registers.a = self.dec_byte(Registers.a)
         return 4
     
     def LD_A_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.a = byte
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.a = byte
         return 8
 
     def CCF(self) -> int:
-        if self.registers.is_c_flag():
-            self.registers.reset_c_flag()
+        if Registers.is_c_flag():
+            Registers.reset_c_flag()
         else:
-            self.registers.set_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.set_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return 4
     
     def LD_B_B(self) -> int:
         return 4
     
     def LD_B_C(self) -> int:
-        self.registers.b = self.registers.c
+        Registers.b = Registers.c
         return 4
     
     def LD_B_D(self) -> int:
-        self.registers.b = self.registers.d
+        Registers.b = Registers.d
         return 4
     
     def LD_B_E(self) -> int:
-        self.registers.b = self.registers.e
+        Registers.b = Registers.e
         return 4
     
     def LD_B_H(self) -> int:
-        self.registers.b = self.registers.h
+        Registers.b = Registers.h
         return 4
     
     def LD_B_L(self) -> int:
-        self.registers.b = self.registers.l
+        Registers.b = Registers.l
         return 4
     
     def LD_B_REF_HL(self) -> int:
-        self.registers.b = self.mmu.read_byte(self.registers.get_hl())
+        Registers.b = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_B_A(self) -> int:
-        self.registers.b = self.registers.a
+        Registers.b = Registers.a
         return 4
     
     def LD_C_B(self) -> int:
-        self.registers.c = self.registers.b
+        Registers.c = Registers.b
         return 4
     
     def LD_C_C(self) -> int:
         return 4
     
     def LD_C_D(self) -> int:
-        self.registers.c = self.registers.d
+        Registers.c = Registers.d
         return 4
     
     def LD_C_E(self) -> int:
-        self.registers.c = self.registers.e
+        Registers.c = Registers.e
         return 4
     
     def LD_C_H(self) -> int:
-        self.registers.c = self.registers.h
+        Registers.c = Registers.h
         return 4
     
     def LD_C_L(self) -> int:
-        self.registers.c = self.registers.l
+        Registers.c = Registers.l
         return 4
     
     def LD_C_REF_HL(self) -> int:
-        self.registers.c = self.mmu.read_byte(self.registers.get_hl())
+        Registers.c = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_C_A(self) -> int:
-        self.registers.c = self.registers.a
+        Registers.c = Registers.a
         return 4
     
     def LD_D_B(self) -> int:
-        self.registers.d = self.registers.b
+        Registers.d = Registers.b
         return 4
     
     def LD_D_C(self) -> int:
-        self.registers.d = self.registers.c
+        Registers.d = Registers.c
         return 4
     
     def LD_D_D(self) -> int:
         return 4
     
     def LD_D_E(self) -> int:
-        self.registers.d = self.registers.e
+        Registers.d = Registers.e
         return 4
     
     def LD_D_H(self) -> int:
-        self.registers.d = self.registers.h
+        Registers.d = Registers.h
         return 4
     
     def LD_D_L(self) -> int:
-        self.registers.d = self.registers.l
+        Registers.d = Registers.l
         return 4
     
     def LD_D_REF_HL(self) -> int:
-        self.registers.d = self.mmu.read_byte(self.registers.get_hl())
+        Registers.d = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_D_A(self) -> int:
-        self.registers.d = self.registers.a
+        Registers.d = Registers.a
         return 4
     
     def LD_E_B(self) -> int:
-        self.registers.e = self.registers.b
+        Registers.e = Registers.b
         return 4
     
     def LD_E_C(self) -> int:
-        self.registers.e = self.registers.c
+        Registers.e = Registers.c
         return 4
     
     def LD_E_D(self) -> int:
-        self.registers.e = self.registers.d
+        Registers.e = Registers.d
         return 4
     
     def LD_E_E(self) -> int:
         return 4
     
     def LD_E_H(self) -> int:
-        self.registers.e = self.registers.h
+        Registers.e = Registers.h
         return 4
     
     def LD_E_L(self) -> int:
-        self.registers.e = self.registers.l
+        Registers.e = Registers.l
         return 4
     
     def LD_E_REF_HL(self) -> int:
-        self.registers.e = self.mmu.read_byte(self.registers.get_hl())
+        Registers.e = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_E_A(self) -> int:
-        self.registers.e = self.registers.a
+        Registers.e = Registers.a
         return 4
     
     def LD_H_B(self) -> int:
-        self.registers.h = self.registers.b
+        Registers.h = Registers.b
         return 4
     
     def LD_H_C(self) -> int:
-        self.registers.h = self.registers.c
+        Registers.h = Registers.c
         return 4
     
     def LD_H_D(self) -> int:
-        self.registers.h = self.registers.d
+        Registers.h = Registers.d
         return 4
     
     def LD_H_E(self) -> int:
-        self.registers.h = self.registers.e
+        Registers.h = Registers.e
         return 4
     
     def LD_H_H(self) -> int:
         return 4
     
     def LD_H_L(self) -> int:
-        self.registers.h = self.registers.l
+        Registers.h = Registers.l
         return 4
     
     def LD_H_REF_HL(self) -> int:
-        self.registers.h = self.mmu.read_byte(self.registers.get_hl())
+        Registers.h = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_H_A(self) -> int:
-        self.registers.h = self.registers.a
+        Registers.h = Registers.a
         return 4
     
     def LD_L_B(self) -> int:
-        self.registers.l = self.registers.b
+        Registers.l = Registers.b
         return 4
     
     def LD_L_C(self) -> int:
-        self.registers.l = self.registers.c
+        Registers.l = Registers.c
         return 4
     
     def LD_L_D(self) -> int:
-        self.registers.l = self.registers.d
+        Registers.l = Registers.d
         return 4
     
     def LD_L_E(self) -> int:
-        self.registers.l = self.registers.e
+        Registers.l = Registers.e
         return 4
     
     def LD_L_H(self) -> int:
-        self.registers.l = self.registers.h
+        Registers.l = Registers.h
         return 4
     
     def LD_L_L(self) -> int:
         return 4
     
     def LD_L_REF_HL(self) -> int:
-        self.registers.l = self.mmu.read_byte(self.registers.get_hl())
+        Registers.l = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_L_A(self) -> int:
-        self.registers.l = self.registers.a
+        Registers.l = Registers.a
         return 4
     
     def LD_REF_HL_B(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.b)
+        self.mmu.write_byte(Registers.get_hl(),Registers.b)
         return 8
     
     def LD_REF_HL_C(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.c)
+        self.mmu.write_byte(Registers.get_hl(),Registers.c)
         return 8
     
     def LD_REF_HL_D(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.d)
+        self.mmu.write_byte(Registers.get_hl(),Registers.d)
         return 8
     
     def LD_REF_HL_E(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.e)
+        self.mmu.write_byte(Registers.get_hl(),Registers.e)
         return 8
     
     def LD_REF_HL_H(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.h)
+        self.mmu.write_byte(Registers.get_hl(),Registers.h)
         return 8
     
     def LD_REF_HL_L(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(),self.registers.l)
+        self.mmu.write_byte(Registers.get_hl(),Registers.l)
         return 8
 
     def HALT(self) -> int:
@@ -612,556 +611,556 @@ class InstructionPerformer:
         return 4
     
     def LD_REF_HL_A(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.registers.a)
+        self.mmu.write_byte(Registers.get_hl(), Registers.a)
         return 8
     
     def LD_A_B(self) -> int:
-        self.registers.a = self.registers.b
+        Registers.a = Registers.b
         return 4
     
     def LD_A_C(self) -> int:
-        self.registers.a = self.registers.c
+        Registers.a = Registers.c
         return 4
     
     def LD_A_D(self) -> int:
-        self.registers.a = self.registers.d
+        Registers.a = Registers.d
         return 4
     
     def LD_A_E(self) -> int:
-        self.registers.a = self.registers.e
+        Registers.a = Registers.e
         return 4
     
     def LD_A_H(self) -> int:
-        self.registers.a = self.registers.h
+        Registers.a = Registers.h
         return 4
     
     def LD_A_L(self) -> int:
-        self.registers.a = self.registers.l
+        Registers.a = Registers.l
         return 4
     
     def LD_A_REF_HL(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.get_hl())
+        Registers.a = self.mmu.read_byte(Registers.get_hl())
         return 8
     
     def LD_A_A(self) -> int:
         return 4
     
     def ADD_B(self) -> int:
-        self.add_byte(self.registers.b)
+        self.add_byte(Registers.b)
         return 4
     
     def ADD_C(self) -> int:
-        self.add_byte(self.registers.c)
+        self.add_byte(Registers.c)
         return 4
     
     def ADD_D(self) -> int:
-        self.add_byte(self.registers.d)
+        self.add_byte(Registers.d)
         return 4
     
     def ADD_E(self) -> int:
-        self.add_byte(self.registers.e)
+        self.add_byte(Registers.e)
         return 4
     
     def ADD_H(self) -> int:
-        self.add_byte(self.registers.h)
+        self.add_byte(Registers.h)
         return 4
     
     def ADD_L(self) -> int:
-        self.add_byte(self.registers.l)
+        self.add_byte(Registers.l)
         return 4
     
     def ADD_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self.add_byte(byte)
         return 8
     
     def ADD_A(self) -> int:
-        self.add_byte(self.registers.a)
+        self.add_byte(Registers.a)
         return 4
     
     def ADC_B(self) -> int:
-        self.adc(self.registers.b)
+        self.adc(Registers.b)
         return 4
     
     def ADC_C(self) -> int:
-        self.adc(self.registers.c)
+        self.adc(Registers.c)
         return 4
     
     def ADC_D(self) -> int:
-        self.adc(self.registers.d)
+        self.adc(Registers.d)
         return 4
     
     def ADC_E(self) -> int:
-        self.adc(self.registers.e)
+        self.adc(Registers.e)
         return 4
     
     def ADC_H(self) -> int:
-        self.adc(self.registers.h)
+        self.adc(Registers.h)
         return 4
     
     def ADC_L(self) -> int:
-        self.adc(self.registers.l)
+        self.adc(Registers.l)
         return 4
     
     def ADC_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self.adc(byte)
         return 8
     
     def ADC_A(self) -> int:
-        self.adc(self.registers.a)
+        self.adc(Registers.a)
         return 4
 
     def SUB_B(self) -> int:
-        self.sub(self.registers.b)
+        self.sub(Registers.b)
         return 4
 
     def SUB_C(self) -> int:
-        self.sub(self.registers.c)
+        self.sub(Registers.c)
         return 4
 
     def SUB_D(self) -> int:
-        self.sub(self.registers.d)
+        self.sub(Registers.d)
         return 4
 
     def SUB_E(self) -> int:
-        self.sub(self.registers.e)
+        self.sub(Registers.e)
         return 4
 
     def SUB_H(self) -> int:
-        self.sub(self.registers.h)
+        self.sub(Registers.h)
         return 4
 
     def SUB_L(self) -> int:
-        self.sub(self.registers.l)
+        self.sub(Registers.l)
         return 4
 
     def SUB_REF_HL(self) -> int:
-        self.sub(self.mmu.read_byte(self.registers.get_hl()))
+        self.sub(self.mmu.read_byte(Registers.get_hl()))
         return 8
 
     def SUB_A(self) -> int:
-        self.sub(self.registers.a)
+        self.sub(Registers.a)
         return 4
 
     def SBC_B(self) -> int:
-        self.sbc(self.registers.b)
+        self.sbc(Registers.b)
         return 4
 
     def SBC_C(self) -> int:
-        self.sbc(self.registers.c)
+        self.sbc(Registers.c)
         return 4
 
     def SBC_D(self) -> int:
-        self.sbc(self.registers.d)
+        self.sbc(Registers.d)
         return 4
 
     def SBC_E(self) -> int:
-        self.sbc(self.registers.e)
+        self.sbc(Registers.e)
         return 4
 
     def SBC_H(self) -> int:
-        self.sbc(self.registers.h)
+        self.sbc(Registers.h)
         return 4
 
     def SBC_L(self) -> int:
-        self.sbc(self.registers.l)
+        self.sbc(Registers.l)
         return 4
 
     def SBC_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self.sbc(byte)
         return 8
 
     def SBC_A(self) -> int:
-        self.sbc(self.registers.a)
+        self.sbc(Registers.a)
         return 4
 
     def AND_B(self) -> int:
-        self._and(self.registers.b)
+        self._and(Registers.b)
         return 4
 
     def AND_C(self) -> int:
-        self._and(self.registers.c)
+        self._and(Registers.c)
         return 4
 
     def AND_D(self) -> int:
-        self._and(self.registers.d)
+        self._and(Registers.d)
         return 4
 
     def AND_E(self) -> int:
-        self._and(self.registers.e)
+        self._and(Registers.e)
         return 4
 
     def AND_H(self) -> int:
-        self._and(self.registers.h)
+        self._and(Registers.h)
         return 4
 
     def AND_L(self) -> int:
-        self._and(self.registers.l)
+        self._and(Registers.l)
         return 4
 
     def AND_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self._and(byte)
         return 8
 
     def AND_A(self) -> int:
-        self._and(self.registers.a)
+        self._and(Registers.a)
         return 4
 
     def XOR_B(self) -> int:
-        self.xor(self.registers.b)
+        self.xor(Registers.b)
         return 4
 
     def XOR_C(self) -> int:
-        self.xor(self.registers.c)
+        self.xor(Registers.c)
         return 4
 
     def XOR_D(self) -> int:
-        self.xor(self.registers.d)
+        self.xor(Registers.d)
         return 4
 
     def XOR_E(self) -> int:
-        self.xor(self.registers.e)
+        self.xor(Registers.e)
         return 4
 
     def XOR_H(self) -> int:
-        self.xor(self.registers.h)
+        self.xor(Registers.h)
         return 4
 
     def XOR_L(self) -> int:
-        self.xor(self.registers.l)
+        self.xor(Registers.l)
         return 4
 
     def XOR_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self.xor(byte)
         return 8
 
     def XOR_A(self) -> int:
-        self.xor(self.registers.a)
+        self.xor(Registers.a)
         return 4
 
     def OR_B(self) -> int:
-        self._or(self.registers.b)
+        self._or(Registers.b)
         return 4
 
     def OR_C(self) -> int:
-        self._or(self.registers.c)
+        self._or(Registers.c)
         return 4
 
     def OR_D(self) -> int:
-        self._or(self.registers.d)
+        self._or(Registers.d)
         return 4
 
     def OR_E(self) -> int:
-        self._or(self.registers.e)
+        self._or(Registers.e)
         return 4
 
     def OR_H(self) -> int:
-        self._or(self.registers.h)
+        self._or(Registers.h)
         return 4
 
     def OR_L(self) -> int:
-        self._or(self.registers.l)
+        self._or(Registers.l)
         return 4
 
     def OR_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self._or(byte)
         return 8
 
     def OR_A(self) -> int:
-        self._or(self.registers.a)
+        self._or(Registers.a)
         return 4
 
     def CP_B(self) -> int:
-        self.cp(self.registers.b)
+        self.cp(Registers.b)
         return 4
 
     def CP_C(self) -> int:
-        self.cp(self.registers.c)
+        self.cp(Registers.c)
         return 4
 
     def CP_D(self) -> int:
-        self.cp(self.registers.d)
+        self.cp(Registers.d)
         return 4
 
     def CP_E(self) -> int:
-        self.cp(self.registers.e)
+        self.cp(Registers.e)
         return 4
 
     def CP_H(self) -> int:
-        self.cp(self.registers.h)
+        self.cp(Registers.h)
         return 4
 
     def CP_L(self) -> int:
-        self.cp(self.registers.l)
+        self.cp(Registers.l)
         return 4
 
     def CP_REF_HL(self) -> int:
-        byte = self.mmu.read_byte(self.registers.get_hl())
+        byte = self.mmu.read_byte(Registers.get_hl())
         self.cp(byte)
         return 8
 
     def CP_A(self) -> int:
-        self.cp(self.registers.a)
+        self.cp(Registers.a)
         return 4
 
     def RET_NZ(self) -> int:
-        if not self.registers.is_z_flag():
-            self.registers.pc = self.stackManager.pop_word()
+        if not Registers.is_z_flag():
+            Registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
     def POP_BC(self) -> int:
-        self.registers.set_bc(self.stackManager.pop_word())
+        Registers.set_bc(self.stackManager.pop_word())
         return 12
 
     def JP_NZ_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if not self.registers.is_z_flag():
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if not Registers.is_z_flag():
+            Registers.pc = word
             return 16
         return 12
 
     def JP_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc = word
         return 16
 
     def CALL_NZ_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if not self.registers.is_z_flag():
-            self.stackManager.push_word(self.registers.pc)
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if not Registers.is_z_flag():
+            self.stackManager.push_word(Registers.pc)
+            Registers.pc = word
             return 24
         return 12
     
     def PUSH_BC(self) -> int:
-        self.stackManager.push_word(self.registers.get_bc())
+        self.stackManager.push_word(Registers.get_bc())
         return 16
     
     def ADD_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.add_byte(byte)
         return 8
 
     def RST_00H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x00
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x00
         return 16
 
     def RET_Z(self) -> int:
-        if self.registers.is_z_flag():
-            self.registers.pc = self.stackManager.pop_word()
+        if Registers.is_z_flag():
+            Registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
     def RET(self) -> int:
-        self.registers.pc = self.stackManager.pop_word()
+        Registers.pc = self.stackManager.pop_word()
         return 16
 
     def JP_Z_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if self.registers.is_z_flag():
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if Registers.is_z_flag():
+            Registers.pc = word
             return 16
         return 12
 
     def CALL_Z_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if self.registers.is_z_flag():
-            self.stackManager.push_word(self.registers.pc)
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if Registers.is_z_flag():
+            self.stackManager.push_word(Registers.pc)
+            Registers.pc = word
             return 24
         return 12
 
     def CALL_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = word
         return 24
     
     def ADC_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.adc(byte)
         return 8
 
     def RST_08H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x08
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x08
         return 16
 
     def RET_NC(self) -> int:
-        if not self.registers.is_c_flag():
-            self.registers.pc = self.stackManager.pop_word()
+        if not Registers.is_c_flag():
+            Registers.pc = self.stackManager.pop_word()
             return 20
         return 8
     
     def POP_DE(self) -> int:
-        self.registers.set_de(self.stackManager.pop_word())
+        Registers.set_de(self.stackManager.pop_word())
         return 12
 
     def JP_NC_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if not self.registers.is_c_flag():
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if not Registers.is_c_flag():
+            Registers.pc = word
             return 16
         return 12
 
     def CALL_NC_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if not self.registers.is_c_flag():
-            self.stackManager.push_word(self.registers.pc)
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if not Registers.is_c_flag():
+            self.stackManager.push_word(Registers.pc)
+            Registers.pc = word
             return 24
         return 12
     
     def PUSH_DE(self) -> int:
-        self.stackManager.push_word(self.registers.get_de())
+        self.stackManager.push_word(Registers.get_de())
         return 16
 
     def SUB_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.sub(byte)
         return 8
 
     def RST_10H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x10
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x10
         return 16
 
     def RET_C(self) -> int:
-        if self.registers.is_c_flag():
-            self.registers.pc = self.stackManager.pop_word()
+        if Registers.is_c_flag():
+            Registers.pc = self.stackManager.pop_word()
             return 20
         return 8
 
     def RETI(self) -> int:
-        self.registers.pc = self.stackManager.pop_word()
+        Registers.pc = self.stackManager.pop_word()
         self.cpu.ime = True
         return 16
 
     def JP_C_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if self.registers.is_c_flag():
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if Registers.is_c_flag():
+            Registers.pc = word
             return 16
         return 12
 
     def CALL_C_a16(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        if self.registers.is_c_flag():
-            self.stackManager.push_word(self.registers.pc)
-            self.registers.pc = word
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        if Registers.is_c_flag():
+            self.stackManager.push_word(Registers.pc)
+            Registers.pc = word
             return 24
         return 12
 
     def SBC_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.sbc(byte)
         return 8
 
     def RST_18H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x18
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x18
         return 16
 
     def LDH_REF_a8_A(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.mmu.write_byte((byte + 0xff00), self.registers.a)
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        self.mmu.write_byte((byte + 0xff00), Registers.a)
         return 12
     
     def POP_HL(self) -> int:
-        self.registers.set_hl(self.stackManager.pop_word())
+        Registers.set_hl(self.stackManager.pop_word())
         return 12
 
     def LD_REF_C_A(self) -> int:
-        self.mmu.write_byte((self.registers.c + 0xff00), self.registers.a)
+        self.mmu.write_byte((Registers.c + 0xff00), Registers.a)
         return 8
     
     def PUSH_HL(self) -> int:
-        self.stackManager.push_word(self.registers.get_hl())
+        self.stackManager.push_word(Registers.get_hl())
         return 16
 
     def AND_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self._and(byte)
         return 8
 
     def RST_20H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x20
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x20
         return 16
 
     def ADD_SP_r8(self) -> int:
-        byte = signed_value(self.mmu.read_byte(self.registers.pc))
-        temp = self.registers.sp + byte
-        self.registers.pc += 1
-        self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        if ( self.registers.sp ^ byte ^ temp ) & 0x100 == 0x100:
-            self.registers.set_c_flag()
+        byte = signed_value(self.mmu.read_byte(Registers.pc))
+        temp = Registers.sp + byte
+        Registers.pc += 1
+        Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        if ( Registers.sp ^ byte ^ temp ) & 0x100 == 0x100:
+            Registers.set_c_flag()
         else:
-            self.registers.reset_c_flag()
-        if ( self.registers.sp ^ byte ^ temp ) & 0x10 == 0x10:
-            self.registers.set_h_flag()
+            Registers.reset_c_flag()
+        if ( Registers.sp ^ byte ^ temp ) & 0x10 == 0x10:
+            Registers.set_h_flag()
         else:
-            self.registers.reset_h_flag()
-        self.registers.sp = temp
+            Registers.reset_h_flag()
+        Registers.sp = temp
         return 16
 
     def JP_HL(self) -> int:
-        word = self.registers.get_hl()
-        self.registers.pc = word
+        word = Registers.get_hl()
+        Registers.pc = word
         return 4
     
     def LD_REF_a16_A(self) -> int:
-        word = self.mmu.read_word(self.registers.pc)
-        self.registers.pc += 2
-        self.mmu.write_byte(word, self.registers.a)
+        word = self.mmu.read_word(Registers.pc)
+        Registers.pc += 2
+        self.mmu.write_byte(word, Registers.a)
         return 16
 
     def XOR_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.xor(byte)
         return 8
 
     def RST_28H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x28
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x28
         return 16
     
     def LDH_A_REF_a8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        self.registers.a = self.mmu.read_byte((byte + 0xff00))
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        Registers.a = self.mmu.read_byte((byte + 0xff00))
         return 12
     
     def POP_AF(self) -> int:
-        self.registers.set_af(self.stackManager.pop_word())
+        Registers.set_af(self.stackManager.pop_word())
         return 12
     
     def LD_A_REF_C(self) -> int:
-        self.registers.a = self.mmu.read_byte(self.registers.c + 0xff00)
+        Registers.a = self.mmu.read_byte(Registers.c + 0xff00)
         return 8
 
     def DI(self) -> int:
@@ -1169,45 +1168,45 @@ class InstructionPerformer:
         return 4
     
     def PUSH_AF(self) -> int:
-        self.stackManager.push_word(self.registers.get_af())
+        self.stackManager.push_word(Registers.get_af())
         return 16
 
     def OR_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self._or(byte)
         return 8
 
     def RST_30H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x30
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x30
         return 16
     
     def LD_HL_SP_r8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
-        hl = self.registers.sp + signed_value(byte)
-        self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        if (self.registers.sp ^ signed_value(byte) ^ hl) & 0x100 == 0x100:
-            self.registers.set_c_flag()
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
+        hl = Registers.sp + signed_value(byte)
+        Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        if (Registers.sp ^ signed_value(byte) ^ hl) & 0x100 == 0x100:
+            Registers.set_c_flag()
         else: 
-            self.registers.reset_c_flag()
-        if (self.registers.sp ^ signed_value(byte) ^ hl) & 0x10 == 0x10:
-            self.registers.set_h_flag()
+            Registers.reset_c_flag()
+        if (Registers.sp ^ signed_value(byte) ^ hl) & 0x10 == 0x10:
+            Registers.set_h_flag()
         else: 
-            self.registers.reset_h_flag()
-        self.registers.set_hl(hl)
+            Registers.reset_h_flag()
+        Registers.set_hl(hl)
         return 12
     
     def LD_SP_HL(self) -> int:
-        self.registers.sp = self.registers.get_hl()
+        Registers.sp = Registers.get_hl()
         return 8
     
     def LD_A_a16(self) -> int:
-        byte = self.mmu.read_byte(self.mmu.read_word(self.registers.pc))
-        self.registers.pc += 2
-        self.registers.a = byte
+        byte = self.mmu.read_byte(self.mmu.read_word(Registers.pc))
+        Registers.pc += 2
+        Registers.a = byte
         return 16
 
     def EI(self) -> int:
@@ -1215,1182 +1214,1182 @@ class InstructionPerformer:
         return 4
 
     def CP_d8(self) -> int:
-        byte = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        byte = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         self.cp(byte)
         return 8
 
     def RST_38H(self) -> int:
-        self.stackManager.push_word(self.registers.pc)
-        self.registers.pc = 0x38
+        self.stackManager.push_word(Registers.pc)
+        Registers.pc = 0x38
         return 16
 
     def RLC_B(self) -> int:
-        self.registers.b = self.rlc(self.registers.b)
+        Registers.b = self.rlc(Registers.b)
         return 8
 
     def RLC_C(self) -> int:
-        self.registers.c = self.rlc(self.registers.c)
+        Registers.c = self.rlc(Registers.c)
         return 8
 
     def RLC_D(self) -> int:
-        self.registers.d = self.rlc(self.registers.d)
+        Registers.d = self.rlc(Registers.d)
         return 8
 
     def RLC_E(self) -> int:
-        self.registers.e = self.rlc(self.registers.e)
+        Registers.e = self.rlc(Registers.e)
         return 8
 
     def RLC_H(self) -> int:
-        self.registers.h = self.rlc(self.registers.h)
+        Registers.h = self.rlc(Registers.h)
         return 8
 
     def RLC_L(self) -> int:
-        self.registers.l = self.rlc(self.registers.l)
+        Registers.l = self.rlc(Registers.l)
         return 8
 
     def RLC_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rlc(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.rlc(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RLC_A(self) -> int:
-        self.registers.a = self.rlc(self.registers.a)
+        Registers.a = self.rlc(Registers.a)
         return 8
 
     def RRC_B(self) -> int:
-        self.registers.b = self.rrc(self.registers.b)
+        Registers.b = self.rrc(Registers.b)
         return 8
 
     def RRC_C(self) -> int:
-        self.registers.c = self.rrc(self.registers.c)
+        Registers.c = self.rrc(Registers.c)
         return 8
 
     def RRC_D(self) -> int:
-        self.registers.d = self.rrc(self.registers.d)
+        Registers.d = self.rrc(Registers.d)
         return 8
 
     def RRC_E(self) -> int:
-        self.registers.e = self.rrc(self.registers.e)
+        Registers.e = self.rrc(Registers.e)
         return 8
 
     def RRC_H(self) -> int:
-        self.registers.h = self.rrc(self.registers.h)
+        Registers.h = self.rrc(Registers.h)
         return 8
 
     def RRC_L(self) -> int:
-        self.registers.l = self.rrc(self.registers.l)
+        Registers.l = self.rrc(Registers.l)
         return 8
 
     def RRC_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rrc(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.rrc(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RRC_A(self) -> int:
-        self.registers.a = self.rrc(self.registers.a)
+        Registers.a = self.rrc(Registers.a)
         return 8
 
     def RL_B(self) -> int:
-        self.registers.b = self.rl(self.registers.b)
+        Registers.b = self.rl(Registers.b)
         return 8
 
     def RL_C(self) -> int:
-        self.registers.c = self.rl(self.registers.c)
+        Registers.c = self.rl(Registers.c)
         return 8
 
     def RL_D(self) -> int:
-        self.registers.d = self.rl(self.registers.d)
+        Registers.d = self.rl(Registers.d)
         return 8
 
     def RL_E(self) -> int:
-        self.registers.e = self.rl(self.registers.e)
+        Registers.e = self.rl(Registers.e)
         return 8
 
     def RL_H(self) -> int:
-        self.registers.h = self.rl(self.registers.h)
+        Registers.h = self.rl(Registers.h)
         return 8
 
     def RL_L(self) -> int:
-        self.registers.l = self.rl(self.registers.l)
+        Registers.l = self.rl(Registers.l)
         return 8
 
     def RL_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rl(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.rl(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RL_A(self) -> int:
-        self.registers.a = self.rl(self.registers.a)
+        Registers.a = self.rl(Registers.a)
         return 8
 
     def RR_B(self) -> int:
-        self.registers.b = self.rr(self.registers.b)
+        Registers.b = self.rr(Registers.b)
         return 8
 
     def RR_C(self) -> int:
-        self.registers.c = self.rr(self.registers.c)
+        Registers.c = self.rr(Registers.c)
         return 8
 
     def RR_D(self) -> int:
-        self.registers.d = self.rr(self.registers.d)
+        Registers.d = self.rr(Registers.d)
         return 8
 
     def RR_E(self) -> int:
-        self.registers.e = self.rr(self.registers.e)
+        Registers.e = self.rr(Registers.e)
         return 8
 
     def RR_H(self) -> int:
-        self.registers.h = self.rr(self.registers.h)
+        Registers.h = self.rr(Registers.h)
         return 8
 
     def RR_L(self) -> int:
-        self.registers.l = self.rr(self.registers.l)
+        Registers.l = self.rr(Registers.l)
         return 8
 
     def RR_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.rr(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.rr(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RR_A(self) -> int:
-        self.registers.a = self.rr(self.registers.a)
+        Registers.a = self.rr(Registers.a)
         return 8
 
     def SLA_B(self) -> int:
-        self.registers.b = self.sla(self.registers.b)
+        Registers.b = self.sla(Registers.b)
         return 8
 
     def SLA_C(self) -> int:
-        self.registers.c = self.sla(self.registers.c)
+        Registers.c = self.sla(Registers.c)
         return 8
 
     def SLA_D(self) -> int:
-        self.registers.d = self.sla(self.registers.d)
+        Registers.d = self.sla(Registers.d)
         return 8
 
     def SLA_E(self) -> int:
-        self.registers.e = self.sla(self.registers.e)
+        Registers.e = self.sla(Registers.e)
         return 8
 
     def SLA_H(self) -> int:
-        self.registers.h = self.sla(self.registers.h)
+        Registers.h = self.sla(Registers.h)
         return 8
 
     def SLA_L(self) -> int:
-        self.registers.l = self.sla(self.registers.l)
+        Registers.l = self.sla(Registers.l)
         return 8
 
     def SLA_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.sla(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.sla(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SLA_A(self) -> int:
-        self.registers.a = self.sla(self.registers.a)
+        Registers.a = self.sla(Registers.a)
         return 8
 
     def SRA_B(self) -> int:
-        self.registers.b = self.sra(self.registers.b)
+        Registers.b = self.sra(Registers.b)
         return 8
 
     def SRA_C(self) -> int:
-        self.registers.c = self.sra(self.registers.c)
+        Registers.c = self.sra(Registers.c)
         return 8
 
     def SRA_D(self) -> int:
-        self.registers.d = self.sra(self.registers.d)
+        Registers.d = self.sra(Registers.d)
         return 8
 
     def SRA_E(self) -> int:
-        self.registers.e = self.sra(self.registers.e)
+        Registers.e = self.sra(Registers.e)
         return 8
 
     def SRA_H(self) -> int:
-        self.registers.h = self.sra(self.registers.h)
+        Registers.h = self.sra(Registers.h)
         return 8
 
     def SRA_L(self) -> int:
-        self.registers.l = self.sra(self.registers.l)
+        Registers.l = self.sra(Registers.l)
         return 8
 
     def SRA_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.sra(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.sra(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SRA_A(self) -> int:
-        self.registers.a = self.sra(self.registers.a)
+        Registers.a = self.sra(Registers.a)
         return 8
 
     def SWAP_B(self) -> int:
-        self.registers.b = self.swap(self.registers.b)
+        Registers.b = self.swap(Registers.b)
         return 8
 
     def SWAP_C(self) -> int:
-        self.registers.c = self.swap(self.registers.c)
+        Registers.c = self.swap(Registers.c)
         return 8
 
     def SWAP_D(self) -> int:
-        self.registers.d = self.swap(self.registers.d)
+        Registers.d = self.swap(Registers.d)
         return 8
 
     def SWAP_E(self) -> int:
-        self.registers.e = self.swap(self.registers.e)
+        Registers.e = self.swap(Registers.e)
         return 8
 
     def SWAP_H(self) -> int:
-        self.registers.h = self.swap(self.registers.h)
+        Registers.h = self.swap(Registers.h)
         return 8
 
     def SWAP_L(self) -> int:
-        self.registers.l = self.swap(self.registers.l)
+        Registers.l = self.swap(Registers.l)
         return 8
 
     def SWAP_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.swap(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.swap(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SWAP_A(self) -> int:
-        self.registers.a = self.swap(self.registers.a)
+        Registers.a = self.swap(Registers.a)
         return 8
 
     def SRL_B(self) -> int:
-        self.registers.b = self.srl(self.registers.b)
+        Registers.b = self.srl(Registers.b)
         return 8
 
     def SRL_C(self) -> int:
-        self.registers.c = self.srl(self.registers.c)
+        Registers.c = self.srl(Registers.c)
         return 8
 
     def SRL_D(self) -> int:
-        self.registers.d = self.srl(self.registers.d)
+        Registers.d = self.srl(Registers.d)
         return 8
 
     def SRL_E(self) -> int:
-        self.registers.e = self.srl(self.registers.e)
+        Registers.e = self.srl(Registers.e)
         return 8
 
     def SRL_H(self) -> int:
-        self.registers.h = self.srl(self.registers.h)
+        Registers.h = self.srl(Registers.h)
         return 8
 
     def SRL_L(self) -> int:
-        self.registers.l = self.srl(self.registers.l)
+        Registers.l = self.srl(Registers.l)
         return 8
 
     def SRL_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.srl(self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.srl(self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SRL_A(self) -> int:
-        self.registers.a = self.srl(self.registers.a)
+        Registers.a = self.srl(Registers.a)
         return 8
 
     def BIT_0_B(self) -> int:
-        self.bit(0, self.registers.b)
+        self.bit(0, Registers.b)
         return 8
 
     def BIT_0_C(self) -> int:
-        self.bit(0, self.registers.c)
+        self.bit(0, Registers.c)
         return 8
 
     def BIT_0_D(self) -> int:
-        self.bit(0, self.registers.d)
+        self.bit(0, Registers.d)
         return 8
 
     def BIT_0_E(self) -> int:
-        self.bit(0, self.registers.e)
+        self.bit(0, Registers.e)
         return 8
 
     def BIT_0_H(self) -> int:
-        self.bit(0, self.registers.h)
+        self.bit(0, Registers.h)
         return 8
 
     def BIT_0_L(self) -> int:
-        self.bit(0, self.registers.l)
+        self.bit(0, Registers.l)
         return 8
 
     def BIT_0_REF_HL(self) -> int:
-        self.bit(0, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(0, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_0_A(self) -> int:
-        self.bit(0, self.registers.a)
+        self.bit(0, Registers.a)
         return 8
 
     def BIT_1_B(self) -> int:
-        self.bit(1, self.registers.b)
+        self.bit(1, Registers.b)
         return 8
 
     def BIT_1_C(self) -> int:
-        self.bit(1, self.registers.c)
+        self.bit(1, Registers.c)
         return 8
 
     def BIT_1_D(self) -> int:
-        self.bit(1, self.registers.d)
+        self.bit(1, Registers.d)
         return 8
 
     def BIT_1_E(self) -> int:
-        self.bit(1, self.registers.e)
+        self.bit(1, Registers.e)
         return 8
 
     def BIT_1_H(self) -> int:
-        self.bit(1, self.registers.h)
+        self.bit(1, Registers.h)
         return 8
 
     def BIT_1_L(self) -> int:
-        self.bit(1, self.registers.l)
+        self.bit(1, Registers.l)
         return 8
 
     def BIT_1_REF_HL(self) -> int:
-        self.bit(1, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(1, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_1_A(self) -> int:
-        self.bit(1, self.registers.a)
+        self.bit(1, Registers.a)
         return 8
 
     def BIT_2_B(self) -> int:
-        self.bit(2, self.registers.b)
+        self.bit(2, Registers.b)
         return 8
 
     def BIT_2_C(self) -> int:
-        self.bit(2, self.registers.c)
+        self.bit(2, Registers.c)
         return 8
 
     def BIT_2_D(self) -> int:
-        self.bit(2, self.registers.d)
+        self.bit(2, Registers.d)
         return 8
 
     def BIT_2_E(self) -> int:
-        self.bit(2, self.registers.e)
+        self.bit(2, Registers.e)
         return 8
 
     def BIT_2_H(self) -> int:
-        self.bit(2, self.registers.h)
+        self.bit(2, Registers.h)
         return 8
 
     def BIT_2_L(self) -> int:
-        self.bit(2, self.registers.l)
+        self.bit(2, Registers.l)
         return 8
 
     def BIT_2_REF_HL(self) -> int:
-        self.bit(2, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(2, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_2_A(self) -> int:
-        self.bit(2, self.registers.a)
+        self.bit(2, Registers.a)
         return 8
 
     def BIT_3_B(self) -> int:
-        self.bit(3, self.registers.b)
+        self.bit(3, Registers.b)
         return 8
 
     def BIT_3_C(self) -> int:
-        self.bit(3, self.registers.c)
+        self.bit(3, Registers.c)
         return 8
 
     def BIT_3_D(self) -> int:
-        self.bit(3, self.registers.d)
+        self.bit(3, Registers.d)
         return 8
 
     def BIT_3_E(self) -> int:
-        self.bit(3, self.registers.e)
+        self.bit(3, Registers.e)
         return 8
 
     def BIT_3_H(self) -> int:
-        self.bit(3, self.registers.h)
+        self.bit(3, Registers.h)
         return 8
 
     def BIT_3_L(self) -> int:
-        self.bit(3, self.registers.l)
+        self.bit(3, Registers.l)
         return 8
 
     def BIT_3_REF_HL(self) -> int:
-        self.bit(3, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(3, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_3_A(self) -> int:
-        self.bit(3, self.registers.a)
+        self.bit(3, Registers.a)
         return 8
 
     def BIT_4_B(self) -> int:
-        self.bit(4, self.registers.b)
+        self.bit(4, Registers.b)
         return 8
 
     def BIT_4_C(self) -> int:
-        self.bit(4, self.registers.c)
+        self.bit(4, Registers.c)
         return 8
 
     def BIT_4_D(self) -> int:
-        self.bit(4, self.registers.d)
+        self.bit(4, Registers.d)
         return 8
 
     def BIT_4_E(self) -> int:
-        self.bit(4, self.registers.e)
+        self.bit(4, Registers.e)
         return 8
 
     def BIT_4_H(self) -> int:
-        self.bit(4, self.registers.h)
+        self.bit(4, Registers.h)
         return 8
 
     def BIT_4_L(self) -> int:
-        self.bit(4, self.registers.l)
+        self.bit(4, Registers.l)
         return 8
 
     def BIT_4_REF_HL(self) -> int:
-        self.bit(4, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(4, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_4_A(self) -> int:
-        self.bit(4, self.registers.a)
+        self.bit(4, Registers.a)
         return 8
 
     def BIT_5_B(self) -> int:
-        self.bit(5, self.registers.b)
+        self.bit(5, Registers.b)
         return 8
 
     def BIT_5_C(self) -> int:
-        self.bit(5, self.registers.c)
+        self.bit(5, Registers.c)
         return 8
 
     def BIT_5_D(self) -> int:
-        self.bit(5, self.registers.d)
+        self.bit(5, Registers.d)
         return 8
 
     def BIT_5_E(self) -> int:
-        self.bit(5, self.registers.e)
+        self.bit(5, Registers.e)
         return 8
 
     def BIT_5_H(self) -> int:
-        self.bit(5, self.registers.h)
+        self.bit(5, Registers.h)
         return 8
 
     def BIT_5_L(self) -> int:
-        self.bit(5, self.registers.l)
+        self.bit(5, Registers.l)
         return 8
 
     def BIT_5_REF_HL(self) -> int:
-        self.bit(5, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(5, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_5_A(self) -> int:
-        self.bit(5, self.registers.a)
+        self.bit(5, Registers.a)
         return 8
 
     def BIT_6_B(self) -> int:
-        self.bit(6, self.registers.b)
+        self.bit(6, Registers.b)
         return 8
 
     def BIT_6_C(self) -> int:
-        self.bit(6, self.registers.c)
+        self.bit(6, Registers.c)
         return 8
 
     def BIT_6_D(self) -> int:
-        self.bit(6, self.registers.d)
+        self.bit(6, Registers.d)
         return 8
 
     def BIT_6_E(self) -> int:
-        self.bit(6, self.registers.e)
+        self.bit(6, Registers.e)
         return 8
 
     def BIT_6_H(self) -> int:
-        self.bit(6, self.registers.h)
+        self.bit(6, Registers.h)
         return 8
 
     def BIT_6_L(self) -> int:
-        self.bit(6, self.registers.l)
+        self.bit(6, Registers.l)
         return 8
 
     def BIT_6_REF_HL(self) -> int:
-        self.bit(6, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(6, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_6_A(self) -> int:
-        self.bit(6, self.registers.a)
+        self.bit(6, Registers.a)
         return 8
 
     def BIT_7_B(self) -> int:
-        self.bit(7, self.registers.b)
+        self.bit(7, Registers.b)
         return 8
 
     def BIT_7_C(self) -> int:
-        self.bit(7, self.registers.c)
+        self.bit(7, Registers.c)
         return 8
 
     def BIT_7_D(self) -> int:
-        self.bit(7, self.registers.d)
+        self.bit(7, Registers.d)
         return 8
 
     def BIT_7_E(self) -> int:
-        self.bit(7, self.registers.e)
+        self.bit(7, Registers.e)
         return 8
 
     def BIT_7_H(self) -> int:
-        self.bit(7, self.registers.h)
+        self.bit(7, Registers.h)
         return 8
 
     def BIT_7_L(self) -> int:
-        self.bit(7, self.registers.l)
+        self.bit(7, Registers.l)
         return 8
 
     def BIT_7_REF_HL(self) -> int:
-        self.bit(7, self.mmu.read_byte(self.registers.get_hl()))
+        self.bit(7, self.mmu.read_byte(Registers.get_hl()))
         return 12
 
     def BIT_7_A(self) -> int:
-        self.bit(7, self.registers.a)
+        self.bit(7, Registers.a)
         return 8
 
     def RES_0_B(self) -> int:
-        self.registers.b = self.res(0, self.registers.b)
+        Registers.b = self.res(0, Registers.b)
         return 8
 
     def RES_0_C(self) -> int:
-        self.registers.c = self.res(0, self.registers.c)
+        Registers.c = self.res(0, Registers.c)
         return 8
 
     def RES_0_D(self) -> int:
-        self.registers.d = self.res(0, self.registers.d)
+        Registers.d = self.res(0, Registers.d)
         return 8
 
     def RES_0_E(self) -> int:
-        self.registers.e = self.res(0, self.registers.e)
+        Registers.e = self.res(0, Registers.e)
         return 8
 
     def RES_0_H(self) -> int:
-        self.registers.h = self.res(0, self.registers.h)
+        Registers.h = self.res(0, Registers.h)
         return 8
 
     def RES_0_L(self) -> int:
-        self.registers.l = self.res(0, self.registers.l)
+        Registers.l = self.res(0, Registers.l)
         return 8
 
     def RES_0_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(0, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(0, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_0_A(self) -> int:
-        self.registers.a = self.res(0, self.registers.a)
+        Registers.a = self.res(0, Registers.a)
         return 8
 
     def RES_1_B(self) -> int:
-        self.registers.b = self.res(1, self.registers.b)
+        Registers.b = self.res(1, Registers.b)
         return 8
 
     def RES_1_C(self) -> int:
-        self.registers.c = self.res(1, self.registers.c)
+        Registers.c = self.res(1, Registers.c)
         return 8
 
     def RES_1_D(self) -> int:
-        self.registers.d = self.res(1, self.registers.d)
+        Registers.d = self.res(1, Registers.d)
         return 8
 
     def RES_1_E(self) -> int:
-        self.registers.e = self.res(1, self.registers.e)
+        Registers.e = self.res(1, Registers.e)
         return 8
 
     def RES_1_H(self) -> int:
-        self.registers.h = self.res(1, self.registers.h)
+        Registers.h = self.res(1, Registers.h)
         return 8
 
     def RES_1_L(self) -> int:
-        self.registers.l = self.res(1, self.registers.l)
+        Registers.l = self.res(1, Registers.l)
         return 8
 
     def RES_1_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(1, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(1, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_1_A(self) -> int:
-        self.registers.a = self.res(1, self.registers.a)
+        Registers.a = self.res(1, Registers.a)
         return 8
 
     def RES_2_B(self) -> int:
-        self.registers.b = self.res(2, self.registers.b)
+        Registers.b = self.res(2, Registers.b)
         return 8
 
     def RES_2_C(self) -> int:
-        self.registers.c = self.res(2, self.registers.c)
+        Registers.c = self.res(2, Registers.c)
         return 8
 
     def RES_2_D(self) -> int:
-        self.registers.d = self.res(2, self.registers.d)
+        Registers.d = self.res(2, Registers.d)
         return 8
 
     def RES_2_E(self) -> int:
-        self.registers.e = self.res(2, self.registers.e)
+        Registers.e = self.res(2, Registers.e)
         return 8
 
     def RES_2_H(self) -> int:
-        self.registers.h = self.res(2, self.registers.h)
+        Registers.h = self.res(2, Registers.h)
         return 8
 
     def RES_2_L(self) -> int:
-        self.registers.l = self.res(2, self.registers.l)
+        Registers.l = self.res(2, Registers.l)
         return 8
 
     def RES_2_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(2, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(2, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_2_A(self) -> int:
-        self.registers.a = self.res(2, self.registers.a)
+        Registers.a = self.res(2, Registers.a)
         return 8
 
     def RES_3_B(self) -> int:
-        self.registers.b = self.res(3, self.registers.b)
+        Registers.b = self.res(3, Registers.b)
         return 8
 
     def RES_3_C(self) -> int:
-        self.registers.c = self.res(3, self.registers.c)
+        Registers.c = self.res(3, Registers.c)
         return 8
 
     def RES_3_D(self) -> int:
-        self.registers.d = self.res(3, self.registers.d)
+        Registers.d = self.res(3, Registers.d)
         return 8
 
     def RES_3_E(self) -> int:
-        self.registers.e = self.res(3, self.registers.e)
+        Registers.e = self.res(3, Registers.e)
         return 8
 
     def RES_3_H(self) -> int:
-        self.registers.h = self.res(3, self.registers.h)
+        Registers.h = self.res(3, Registers.h)
         return 8
 
     def RES_3_L(self) -> int:
-        self.registers.l = self.res(3, self.registers.l)
+        Registers.l = self.res(3, Registers.l)
         return 8
 
     def RES_3_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(3, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(3, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_3_A(self) -> int:
-        self.registers.a = self.res(3, self.registers.a)
+        Registers.a = self.res(3, Registers.a)
         return 8
 
     def RES_4_B(self) -> int:
-        self.registers.b = self.res(4, self.registers.b)
+        Registers.b = self.res(4, Registers.b)
         return 8
 
     def RES_4_C(self) -> int:
-        self.registers.c = self.res(4, self.registers.c)
+        Registers.c = self.res(4, Registers.c)
         return 8
 
     def RES_4_D(self) -> int:
-        self.registers.d = self.res(4, self.registers.d)
+        Registers.d = self.res(4, Registers.d)
         return 8
 
     def RES_4_E(self) -> int:
-        self.registers.e = self.res(4, self.registers.e)
+        Registers.e = self.res(4, Registers.e)
         return 8
 
     def RES_4_H(self) -> int:
-        self.registers.h = self.res(4, self.registers.h)
+        Registers.h = self.res(4, Registers.h)
         return 8
 
     def RES_4_L(self) -> int:
-        self.registers.l = self.res(4, self.registers.l)
+        Registers.l = self.res(4, Registers.l)
         return 8
 
     def RES_4_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(4, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(4, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_4_A(self) -> int:
-        self.registers.a = self.res(4, self.registers.a)
+        Registers.a = self.res(4, Registers.a)
         return 8
 
     def RES_5_B(self) -> int:
-        self.registers.b = self.res(5, self.registers.b)
+        Registers.b = self.res(5, Registers.b)
         return 8
 
     def RES_5_C(self) -> int:
-        self.registers.c = self.res(5, self.registers.c)
+        Registers.c = self.res(5, Registers.c)
         return 8
 
     def RES_5_D(self) -> int:
-        self.registers.d = self.res(5, self.registers.d)
+        Registers.d = self.res(5, Registers.d)
         return 8
 
     def RES_5_E(self) -> int:
-        self.registers.e = self.res(5, self.registers.e)
+        Registers.e = self.res(5, Registers.e)
         return 8
 
     def RES_5_H(self) -> int:
-        self.registers.h = self.res(5, self.registers.h)
+        Registers.h = self.res(5, Registers.h)
         return 8
 
     def RES_5_L(self) -> int:
-        self.registers.l = self.res(5, self.registers.l)
+        Registers.l = self.res(5, Registers.l)
         return 8
 
     def RES_5_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(5, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(5, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_5_A(self) -> int:
-        self.registers.a = self.res(5, self.registers.a)
+        Registers.a = self.res(5, Registers.a)
         return 8
 
     def RES_6_B(self) -> int:
-        self.registers.b = self.res(6, self.registers.b)
+        Registers.b = self.res(6, Registers.b)
         return 8
 
     def RES_6_C(self) -> int:
-        self.registers.c = self.res(6, self.registers.c)
+        Registers.c = self.res(6, Registers.c)
         return 8
 
     def RES_6_D(self) -> int:
-        self.registers.d = self.res(6, self.registers.d)
+        Registers.d = self.res(6, Registers.d)
         return 8
 
     def RES_6_E(self) -> int:
-        self.registers.e = self.res(6, self.registers.e)
+        Registers.e = self.res(6, Registers.e)
         return 8
 
     def RES_6_H(self) -> int:
-        self.registers.h = self.res(6, self.registers.h)
+        Registers.h = self.res(6, Registers.h)
         return 8
 
     def RES_6_L(self) -> int:
-        self.registers.l = self.res(6, self.registers.l)
+        Registers.l = self.res(6, Registers.l)
         return 8
 
     def RES_6_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(6, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(6, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_6_A(self) -> int:
-        self.registers.a = self.res(6, self.registers.a)
+        Registers.a = self.res(6, Registers.a)
         return 8
 
     def RES_7_B(self) -> int:
-        self.registers.b = self.res(7, self.registers.b)
+        Registers.b = self.res(7, Registers.b)
         return 8
 
     def RES_7_C(self) -> int:
-        self.registers.c = self.res(7, self.registers.c)
+        Registers.c = self.res(7, Registers.c)
         return 8
 
     def RES_7_D(self) -> int:
-        self.registers.d = self.res(7, self.registers.d)
+        Registers.d = self.res(7, Registers.d)
         return 8
 
     def RES_7_E(self) -> int:
-        self.registers.e = self.res(7, self.registers.e)
+        Registers.e = self.res(7, Registers.e)
         return 8
 
     def RES_7_H(self) -> int:
-        self.registers.h = self.res(7, self.registers.h)
+        Registers.h = self.res(7, Registers.h)
         return 8
 
     def RES_7_L(self) -> int:
-        self.registers.l = self.res(7, self.registers.l)
+        Registers.l = self.res(7, Registers.l)
         return 8
 
     def RES_7_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), self.res(7, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), self.res(7, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def RES_7_A(self) -> int:
-        self.registers.a = self.res(7, self.registers.a)
+        Registers.a = self.res(7, Registers.a)
         return 8
 
     def SET_0_B(self) -> int:
-        self.registers.b = set_bit(0, self.registers.b)
+        Registers.b = set_bit(0, Registers.b)
         return 8
 
     def SET_0_C(self) -> int:
-        self.registers.c = set_bit(0, self.registers.c)
+        Registers.c = set_bit(0, Registers.c)
         return 8
 
     def SET_0_D(self) -> int:
-        self.registers.d = set_bit(0, self.registers.d)
+        Registers.d = set_bit(0, Registers.d)
         return 8
 
     def SET_0_E(self) -> int:
-        self.registers.e = set_bit(0, self.registers.e)
+        Registers.e = set_bit(0, Registers.e)
         return 8
 
     def SET_0_H(self) -> int:
-        self.registers.h = set_bit(0, self.registers.h)
+        Registers.h = set_bit(0, Registers.h)
         return 8
 
     def SET_0_L(self) -> int:
-        self.registers.l = set_bit(0, self.registers.l)
+        Registers.l = set_bit(0, Registers.l)
         return 8
 
     def SET_0_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(0, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(0, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_0_A(self) -> int:
-        self.registers.a = set_bit(0, self.registers.a)
+        Registers.a = set_bit(0, Registers.a)
         return 8
 
     def SET_1_B(self) -> int:
-        self.registers.b = set_bit(1, self.registers.b)
+        Registers.b = set_bit(1, Registers.b)
         return 8
 
     def SET_1_C(self) -> int:
-        self.registers.c = set_bit(1, self.registers.c)
+        Registers.c = set_bit(1, Registers.c)
         return 8
 
     def SET_1_D(self) -> int:
-        self.registers.d = set_bit(1, self.registers.d)
+        Registers.d = set_bit(1, Registers.d)
         return 8
 
     def SET_1_E(self) -> int:
-        self.registers.e = set_bit(1, self.registers.e)
+        Registers.e = set_bit(1, Registers.e)
         return 8
 
     def SET_1_H(self) -> int:
-        self.registers.h = set_bit(1, self.registers.h)
+        Registers.h = set_bit(1, Registers.h)
         return 8
 
     def SET_1_L(self) -> int:
-        self.registers.l = set_bit(1, self.registers.l)
+        Registers.l = set_bit(1, Registers.l)
         return 8
 
     def SET_1_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(1, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(1, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_1_A(self) -> int:
-        self.registers.a = set_bit(1, self.registers.a)
+        Registers.a = set_bit(1, Registers.a)
         return 8
 
     def SET_2_B(self) -> int:
-        self.registers.b = set_bit(2, self.registers.b)
+        Registers.b = set_bit(2, Registers.b)
         return 8
 
     def SET_2_C(self) -> int:
-        self.registers.c = set_bit(2, self.registers.c)
+        Registers.c = set_bit(2, Registers.c)
         return 8
 
     def SET_2_D(self) -> int:
-        self.registers.d = set_bit(2, self.registers.d)
+        Registers.d = set_bit(2, Registers.d)
         return 8
 
     def SET_2_E(self) -> int:
-        self.registers.e = set_bit(2, self.registers.e)
+        Registers.e = set_bit(2, Registers.e)
         return 8
 
     def SET_2_H(self) -> int:
-        self.registers.h = set_bit(2, self.registers.h)
+        Registers.h = set_bit(2, Registers.h)
         return 8
 
     def SET_2_L(self) -> int:
-        self.registers.l = set_bit(2, self.registers.l)
+        Registers.l = set_bit(2, Registers.l)
         return 8
 
     def SET_2_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(2, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(2, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_2_A(self) -> int:
-        self.registers.a = set_bit(2, self.registers.a)
+        Registers.a = set_bit(2, Registers.a)
         return 8
 
     def SET_3_B(self) -> int:
-        self.registers.b = set_bit(3, self.registers.b)
+        Registers.b = set_bit(3, Registers.b)
         return 8
 
     def SET_3_C(self) -> int:
-        self.registers.c = set_bit(3, self.registers.c)
+        Registers.c = set_bit(3, Registers.c)
         return 8
 
     def SET_3_D(self) -> int:
-        self.registers.d = set_bit(3, self.registers.d)
+        Registers.d = set_bit(3, Registers.d)
         return 8
 
     def SET_3_E(self) -> int:
-        self.registers.e = set_bit(3, self.registers.e)
+        Registers.e = set_bit(3, Registers.e)
         return 8
 
     def SET_3_H(self) -> int:
-        self.registers.h = set_bit(3, self.registers.h)
+        Registers.h = set_bit(3, Registers.h)
         return 8
 
     def SET_3_L(self) -> int:
-        self.registers.l = set_bit(3, self.registers.l)
+        Registers.l = set_bit(3, Registers.l)
         return 8
 
     def SET_3_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(3, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(3, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_3_A(self) -> int:
-        self.registers.a = set_bit(3, self.registers.a)
+        Registers.a = set_bit(3, Registers.a)
         return 8
 
     def SET_4_B(self) -> int:
-        self.registers.b = set_bit(4, self.registers.b)
+        Registers.b = set_bit(4, Registers.b)
         return 8
 
     def SET_4_C(self) -> int:
-        self.registers.c = set_bit(4, self.registers.c)
+        Registers.c = set_bit(4, Registers.c)
         return 8
 
     def SET_4_D(self) -> int:
-        self.registers.d = set_bit(4, self.registers.d)
+        Registers.d = set_bit(4, Registers.d)
         return 8
 
     def SET_4_E(self) -> int:
-        self.registers.e = set_bit(4, self.registers.e)
+        Registers.e = set_bit(4, Registers.e)
         return 8
 
     def SET_4_H(self) -> int:
-        self.registers.h = set_bit(4, self.registers.h)
+        Registers.h = set_bit(4, Registers.h)
         return 8
 
     def SET_4_L(self) -> int:
-        self.registers.l = set_bit(4, self.registers.l)
+        Registers.l = set_bit(4, Registers.l)
         return 8
 
     def SET_4_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(4, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(4, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_4_A(self) -> int:
-        self.registers.a = set_bit(4, self.registers.a)
+        Registers.a = set_bit(4, Registers.a)
         return 8
 
     def SET_5_B(self) -> int:
-        self.registers.b = set_bit(5, self.registers.b)
+        Registers.b = set_bit(5, Registers.b)
         return 8
 
     def SET_5_C(self) -> int:
-        self.registers.c = set_bit(5, self.registers.c)
+        Registers.c = set_bit(5, Registers.c)
         return 8
 
     def SET_5_D(self) -> int:
-        self.registers.d = set_bit(5, self.registers.d)
+        Registers.d = set_bit(5, Registers.d)
         return 8
 
     def SET_5_E(self) -> int:
-        self.registers.e = set_bit(5, self.registers.e)
+        Registers.e = set_bit(5, Registers.e)
         return 8
 
     def SET_5_H(self) -> int:
-        self.registers.h = set_bit(5, self.registers.h)
+        Registers.h = set_bit(5, Registers.h)
         return 8
 
     def SET_5_L(self) -> int:
-        self.registers.l = set_bit(5, self.registers.l)
+        Registers.l = set_bit(5, Registers.l)
         return 8
 
     def SET_5_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(5, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(5, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_5_A(self) -> int:
-        self.registers.a = set_bit(5, self.registers.a)
+        Registers.a = set_bit(5, Registers.a)
         return 8
 
     def SET_6_B(self) -> int:
-        self.registers.b = set_bit(6, self.registers.b)
+        Registers.b = set_bit(6, Registers.b)
         return 8
 
     def SET_6_C(self) -> int:
-        self.registers.c = set_bit(6, self.registers.c)
+        Registers.c = set_bit(6, Registers.c)
         return 8
 
     def SET_6_D(self) -> int:
-        self.registers.d = set_bit(6, self.registers.d)
+        Registers.d = set_bit(6, Registers.d)
         return 8
 
     def SET_6_E(self) -> int:
-        self.registers.e = set_bit(6, self.registers.e)
+        Registers.e = set_bit(6, Registers.e)
         return 8
 
     def SET_6_H(self) -> int:
-        self.registers.h = set_bit(6, self.registers.h)
+        Registers.h = set_bit(6, Registers.h)
         return 8
 
     def SET_6_L(self) -> int:
-        self.registers.l = set_bit(6, self.registers.l)
+        Registers.l = set_bit(6, Registers.l)
         return 8
 
     def SET_6_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(6, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(6, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_6_A(self) -> int:
-        self.registers.a = set_bit(6, self.registers.a)
+        Registers.a = set_bit(6, Registers.a)
         return 8
 
     def SET_7_B(self) -> int:
-        self.registers.b = set_bit(7, self.registers.b)
+        Registers.b = set_bit(7, Registers.b)
         return 8
 
     def SET_7_C(self) -> int:
-        self.registers.c = set_bit(7, self.registers.c)
+        Registers.c = set_bit(7, Registers.c)
         return 8
 
     def SET_7_D(self) -> int:
-        self.registers.d = set_bit(7, self.registers.d)
+        Registers.d = set_bit(7, Registers.d)
         return 8
 
     def SET_7_E(self) -> int:
-        self.registers.e = set_bit(7, self.registers.e)
+        Registers.e = set_bit(7, Registers.e)
         return 8
 
     def SET_7_H(self) -> int:
-        self.registers.h = set_bit(7, self.registers.h)
+        Registers.h = set_bit(7, Registers.h)
         return 8
 
     def SET_7_L(self) -> int:
-        self.registers.l = set_bit(7, self.registers.l)
+        Registers.l = set_bit(7, Registers.l)
         return 8
 
     def SET_7_REF_HL(self) -> int:
-        self.mmu.write_byte(self.registers.get_hl(), set_bit(7, self.mmu.read_byte(self.registers.get_hl())))
+        self.mmu.write_byte(Registers.get_hl(), set_bit(7, self.mmu.read_byte(Registers.get_hl())))
         return 16
 
     def SET_7_A(self) -> int:
-        self.registers.a = set_bit(7, self.registers.a)
+        Registers.a = set_bit(7, Registers.a)
         return 8
     
     def add_byte(self, value : int) -> int:
-        byte = self.registers.a + value
+        byte = Registers.a + value
         if (byte & 0xff) == 0x00:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-                self.registers.reset_z_flag()
-        if (self.registers.a ^ value ^ byte) & 0x100 == 0x100:
-            self.registers.set_c_flag()
+                Registers.reset_z_flag()
+        if (Registers.a ^ value ^ byte) & 0x100 == 0x100:
+            Registers.set_c_flag()
         else: 
-            self.registers.reset_c_flag()
-        if (self.registers.a ^ value ^ byte) & 0x10 == 0x10: 
-            self.registers.set_h_flag() 
+            Registers.reset_c_flag()
+        if (Registers.a ^ value ^ byte) & 0x10 == 0x10: 
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
-        self.registers.reset_n_flag()
-        self.registers.a = byte & 0xff
+            Registers.reset_h_flag()
+        Registers.reset_n_flag()
+        Registers.a = byte & 0xff
 
     def add_word(self, value1 : int, value2 : int) -> int:
         result = value1 + value2
 
-        self.registers.reset_n_flag()
+        Registers.reset_n_flag()
         if result & 0x10000 == 0x10000: 
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         if (value1 ^ value2 ^ (result & 0xFFFF)) & 0x1000 == 0x1000: 
-            self.registers.set_h_flag() 
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
+            Registers.reset_h_flag()
 
         return result & 0xFFFF
 
     def adc(self, value : int) -> int:
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a + value + carry
+        carry = 1 if Registers.is_c_flag() else 0
+        result = Registers.a + value + carry
         if result & 0xff == 0x0: 
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         if result > 0xff: 
-            self.registers.set_c_flag()
+            Registers.set_c_flag()
         else: 
-            self.registers.reset_c_flag()
-        if (self.registers.a & 0xf) + (value & 0xf) + carry > 0xf: 
-            self.registers.set_h_flag()
+            Registers.reset_c_flag()
+        if (Registers.a & 0xf) + (value & 0xf) + carry > 0xf: 
+            Registers.set_h_flag()
         else: 
-            self.registers.reset_h_flag()
-        self.registers.reset_n_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_h_flag()
+        Registers.reset_n_flag()
+        Registers.a = result & 0xff
         
     def sub(self, value : int) -> int:
-        result = self.registers.a - value
+        result = Registers.a - value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
-        if (self.registers.a ^ value ^ result) & 0x100 == 0x100:
-            self.registers.set_c_flag() 
+            Registers.reset_z_flag()
+        if (Registers.a ^ value ^ result) & 0x100 == 0x100:
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
-        if (self.registers.a ^ value ^ result) & 0x10 == 0x10:
-            self.registers.set_h_flag() 
+            Registers.reset_c_flag()
+        if (Registers.a ^ value ^ result) & 0x10 == 0x10:
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
-        self.registers.set_n_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_h_flag()
+        Registers.set_n_flag()
+        Registers.a = result & 0xff
 
     def sbc(self, value : int) -> int:
-        carry = 1 if self.registers.is_c_flag() else 0
-        result = self.registers.a - value - carry
+        carry = 1 if Registers.is_c_flag() else 0
+        result = Registers.a - value - carry
         if result & 0xff == 0x0:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         if result < 0x0:
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
-        if (self.registers.a & 0xF) - (value & 0xF) - carry < 0: 
-            self.registers.set_h_flag() 
+            Registers.reset_c_flag()
+        if (Registers.a & 0xF) - (value & 0xF) - carry < 0: 
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
-        self.registers.set_n_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_h_flag()
+        Registers.set_n_flag()
+        Registers.a = result & 0xff
 
     def _and(self, value: int) -> int:
-        result = self.registers.a & value
+        result = Registers.a & value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.set_h_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_z_flag()
+        Registers.reset_c_flag()
+        Registers.reset_n_flag()
+        Registers.set_h_flag()
+        Registers.a = result & 0xff
 
     def _or(self, value : int) -> int:
-        result = self.registers.a | value
+        result = Registers.a | value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_z_flag()
+        Registers.reset_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
+        Registers.a = result & 0xff
 
     def xor(self, value: int) -> int:
-        result = self.registers.a ^ value
+        result = Registers.a ^ value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
-        self.registers.a = result & 0xff
+            Registers.reset_z_flag()
+        Registers.reset_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
+        Registers.a = result & 0xff
 
     def cp(self, value: int):
-        result = self.registers.a - value
+        result = Registers.a - value
         if result & 0xff == 0x0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else: 
-            self.registers.reset_z_flag()
-        if self.registers.a < value:
-            self.registers.set_c_flag()
+            Registers.reset_z_flag()
+        if Registers.a < value:
+            Registers.set_c_flag()
         else: 
-            self.registers.reset_c_flag()
-        if (result & 0xf) > (self.registers.a & 0xf):
-            self.registers.set_h_flag()
+            Registers.reset_c_flag()
+        if (result & 0xf) > (Registers.a & 0xf):
+            Registers.set_h_flag()
         else: 
-            self.registers.reset_h_flag()
-        self.registers.set_n_flag()
+            Registers.reset_h_flag()
+        Registers.set_n_flag()
 
     def bit(self, pos : int, value : int) -> int:
         bit = 1 if value & bit_mask[pos] == bit_mask[pos] else 0
         if bit & 0xff == 0x0:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.set_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.set_h_flag()
 
     def res(self, pos : int, value : int) -> int:
         return value & (bit_mask[pos] ^ 0xff)
@@ -2398,136 +2397,136 @@ class InstructionPerformer:
     def swap(self, value : int) -> int:
         value = ((value << 4) & 0xff) | (value >> 4)
         if value & 0xff == 0x00:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
-        self.registers.reset_c_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
+        Registers.reset_c_flag()
         return value
 
 
     def inc_byte(self, value : int) -> int:
         result = value + 1
         if result & 0xff == 0x0:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         if result & 0xf == 0x0:
-            self.registers.set_h_flag() 
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
-        self.registers.reset_n_flag()
+            Registers.reset_h_flag()
+        Registers.reset_n_flag()
         return result & 0xff
 
     def dec_byte(self, value : int) -> int:
         result = value - 1
         if result & 0xff == 0x0:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         if result & 0xf == 0xf:
-            self.registers.set_h_flag() 
+            Registers.set_h_flag() 
         else: 
-            self.registers.reset_h_flag()
-        self.registers.set_n_flag()
+            Registers.reset_h_flag()
+        Registers.set_n_flag()
         return result & 0xff
 
     def rl(self, value : int) -> int:
-        carry = 1 if self.registers.is_c_flag() else 0
+        carry = 1 if Registers.is_c_flag() else 0
         if value & 0x80 == 0x80:
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         result = ((value << 1) & 0xff) + carry
         if result & 0xFF == 0x0:
-            self.registers.set_z_flag() 
+            Registers.set_z_flag() 
         else: 
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return result
 
     def rlc(self, value : int) -> int:
         bit_out = 0x1 if value & 0x80 == 0x80 else 0x0
         if bit_out == 0x1:
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         if ((value << 1) & 0xff) + bit_out == 0x00:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return ((value << 1) & 0xff) + bit_out
 
     def rr(self, value : int) -> int:
-        carry = 0x80 if self.registers.is_c_flag() else 0x0
+        carry = 0x80 if Registers.is_c_flag() else 0x0
         if value & 0x1 == 0x1:
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         if (value >> 1) + carry == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         return (value >> 1) + carry
 
     def rrc(self, value : int) -> int:
         bit_out = 0x80 if value & 0x1 == 0x1 else 0x0
         if bit_out == 0x80:
-            self.registers.set_c_flag() 
+            Registers.set_c_flag() 
         else: 
-            self.registers.reset_c_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_c_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         if (value >> 1) + bit_out == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
+            Registers.reset_z_flag()
         return (value >> 1) + bit_out
 
     def srl(self, value: int) -> int:
         if value & 0x01 == 0x01:
-            self.registers.set_c_flag()
+            Registers.set_c_flag()
         else:
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         temp = value >> 1
         if temp == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return temp & 0xff
 
     def sra(self, value: int) -> int:
         if value & 0x01 == 0x01:
-            self.registers.set_c_flag()
+            Registers.set_c_flag()
         else:
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         temp = ( value >> 1 ) | ( value & 0x80 )
         if temp == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return temp & 0xff
 
     def sla(self, value: int) -> int:
         if value & 0x80 == 0x80:
-            self.registers.set_c_flag()
+            Registers.set_c_flag()
         else:
-            self.registers.reset_c_flag()
+            Registers.reset_c_flag()
         temp = value << 1
         if temp & 0xff == 0:
-            self.registers.set_z_flag()
+            Registers.set_z_flag()
         else:
-            self.registers.reset_z_flag()
-        self.registers.reset_n_flag()
-        self.registers.reset_h_flag()
+            Registers.reset_z_flag()
+        Registers.reset_n_flag()
+        Registers.reset_h_flag()
         return temp & 0xff

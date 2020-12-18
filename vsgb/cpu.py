@@ -15,10 +15,9 @@ class CPU:
 
     def __init__(self,mmu: MMU, interrupt_manager: InterruptManager):
         self.mmu = mmu
-        self.registers = Registers()
         self.interruptManager = interrupt_manager
         
-        self.stackManager = StackManager(self.registers, self.mmu)
+        self.stackManager = StackManager(self.mmu)
         self.instructionPerformer = InstructionPerformer(self)
         self.ticks = 0
         self.ime = False
@@ -39,7 +38,7 @@ class CPU:
         if self.halted:
             self.ticks += 4
         else:
-            self.last_pc = self.registers.pc
+            self.last_pc = Registers.pc
             instruction = self.fetch_instruction()
             self.last_instruction = instruction
             self.perform_instruction(instruction)
@@ -57,29 +56,29 @@ class CPU:
         self.ime = False
         if self.halted:
             self.halted = False
-        self.stackManager.push_word(self.registers.pc)
+        self.stackManager.push_word(Registers.pc)
         if_register = self.mmu.read_byte(IO_Registers.IF)
         if interrupt == Interrupt.INTERRUPT_VBLANK:
-            self.registers.pc = 0x40 #RST 40H
+            Registers.pc = 0x40 #RST 40H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111110)
         if interrupt == Interrupt.INTERRUPT_LCDSTAT:
-            self.registers.pc = 0x48 #RST 48H
+            Registers.pc = 0x48 #RST 48H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111101)
         if interrupt == Interrupt.INTERRUPT_TIMER:
-            self.registers.pc = 0x50 #RST 50H
+            Registers.pc = 0x50 #RST 50H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11111011)
         if interrupt == Interrupt.INTERRUPT_SERIAL:
-            self.registers.pc = 0x58 #RST 58H
+            Registers.pc = 0x58 #RST 58H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11110111)
         if interrupt == Interrupt.INTERRUPT_JOYPAD:
-            self.registers.pc = 0x60 #RST 60H
+            Registers.pc = 0x60 #RST 60H
             self.mmu.write_byte(IO_Registers.IF, if_register & 0b11101111)
         self.ticks += 20
         return None
 
     def fetch_instruction(self, prefix: bool = False) -> int:
-        instruction = self.mmu.read_byte(self.registers.pc)
-        self.registers.pc += 1
+        instruction = self.mmu.read_byte(Registers.pc)
+        Registers.pc += 1
         if 0xcb == instruction and not prefix:
             return 0xcb00 + self.fetch_instruction(True)
         return instruction
