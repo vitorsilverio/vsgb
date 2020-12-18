@@ -2,7 +2,8 @@ from vsgb.interrupt_manager import Interrupt, InterruptManager
 
 class VideoStatInterrupt:
 
-    def check_stat(self, old, new):
+    @staticmethod
+    def check_stat(old, new):
 
         if (new & 0b01000100) & ((~old) & 0b01000100):
         #if (new & 0b01000100):

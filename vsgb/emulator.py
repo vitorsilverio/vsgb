@@ -16,7 +16,6 @@ from vsgb.window import Window
 from vsgb.instructions import instructions
 from vsgb.registers import Registers
 from vsgb.save_state_manager import SaveStateManager
-from vsgb.video_stat_interrupt import VideoStatInterrupt
 import threading
 
 
@@ -40,7 +39,6 @@ class Emulator:
         self.changing_state = False
         self.serialize_ok = False
         self.save_state_manager = SaveStateManager()
-        self.mmu.set_video_stat(VideoStatInterrupt())
 
     def run(self):
         try:

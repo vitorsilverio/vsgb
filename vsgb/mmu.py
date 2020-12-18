@@ -11,6 +11,7 @@ from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 from vsgb.game_shark import GameShark
 from vsgb.interrupt_manager import InterruptManager
+from vsgb.video_stat_interrupt import VideoStatInterrupt
 
 from vsgb.memory.vram import VideoRam
 from vsgb.memory.wram import WorkRam
@@ -53,9 +54,6 @@ class MMU:
         else:
             self.boot_rom  = boot_rom
         self.game_shark = GameShark()
-
-    def set_video_stat(self, video_stat_interrupt):
-        self.set_video_stat = video_stat_interrupt
 
     def set_dma(self, dma):
         self.dma = dma
@@ -170,7 +168,7 @@ class MMU:
                     self.cgb_palette.set_obpd(value)
                 elif address == IO_Registers.STAT:
                     old_stat = self.io_registers.read_value(address)
-                    self.set_video_stat.check_stat(old_stat,value)
+                    VideoStatInterrupt.check_stat(old_stat,value)
                     self.io_registers.write_value(address, value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
