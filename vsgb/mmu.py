@@ -12,6 +12,7 @@ from vsgb.cartridge import CartridgeType
 from vsgb.game_shark import GameShark
 from vsgb.interrupt_manager import InterruptManager
 from vsgb.video_stat_interrupt import VideoStatInterrupt
+from vsgb.timer import Timer
 
 from vsgb.memory.vram import VideoRam
 from vsgb.memory.wram import WorkRam
@@ -103,6 +104,14 @@ class MMU:
                 return self.cgb_palette.get_obpi()
             if address == IO_Registers.OBPD:
                 return self.cgb_palette.get_obpd()
+            if address == IO_Registers.KEY1:
+                return Timer.KEY1
+            if address == IO_Registers.TMA:
+                return Timer.TMA
+            if address == IO_Registers.TIMA:
+                return Timer.TIMA
+            if address == IO_Registers.DIV:
+                return Timer.DIV  
             if address == IO_Registers.SVBK:
                 if self.cgb_mode:
                     return (IO_Registers.read_value(address) | 0b11111000) & 0xff
@@ -165,6 +174,14 @@ class MMU:
                     self.cgb_palette.set_obpi(value)
                 elif address == IO_Registers.OBPD:
                     self.cgb_palette.set_obpd(value)
+                elif address == IO_Registers.KEY1:
+                    Timer.KEY1 = value
+                elif address == IO_Registers.TMA:
+                    Timer.TMA = value
+                elif address == IO_Registers.TIMA:
+                    Timer.TIMA = value
+                elif address == IO_Registers.DIV:# Reset div register
+                    Timer.DIV = 0
                 elif address == IO_Registers.STAT:
                     old_stat = IO_Registers.read_value(address)
                     VideoStatInterrupt.check_stat(old_stat,value)

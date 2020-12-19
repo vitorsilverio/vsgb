@@ -28,7 +28,6 @@ class Emulator:
         self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, cgb_mode)
-        self.timer = Timer(self.mmu)
         self.dma = DMA(self.mmu)
         self.hdma = HDMA(self.mmu)
         self.window = Window(self)
@@ -67,7 +66,7 @@ class Emulator:
                 if 0 == ticks:
                     self.cpu.step()
                     ticks = self.cpu.ticks
-                self.timer.tick(ticks)
+                Timer.tick(ticks)
                 self.ppu.step(ticks)
 
                 for i in range(0,self.cpu.ticks,4):
