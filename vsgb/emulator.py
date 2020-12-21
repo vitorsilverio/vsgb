@@ -5,7 +5,6 @@ from vsgb.apu import APU
 from vsgb.cartridge import Cartridge
 from vsgb.cpu import CPU
 from vsgb.dma import DMA, HDMA
-from vsgb.input import Input
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.ppu import PPU
@@ -24,13 +23,12 @@ class Emulator:
         self.cartridge = Cartridge(file)
         self.apu = APU(cgb_mode)
         self.apu.start()
-        self.input = Input()
-        self.mmu = MMU(self.cartridge.rom(), self.apu, self.input, cgb_mode) 
+        self.mmu = MMU(self.cartridge.rom(), self.apu, cgb_mode) 
         self.cpu = CPU(self.mmu)
         self.ppu = PPU(self.mmu, cgb_mode)
         self.dma = DMA(self.mmu)
         self.hdma = HDMA(self.mmu)
-        self.window = Window(self)
+        self.window = Window()
         self.window.start()
         self.changing_state = False
         self.serialize_ok = False

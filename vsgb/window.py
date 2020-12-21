@@ -18,11 +18,10 @@ class Window(Thread):
     WINDOW_WIDTH = SCREEN_WIDTH * H_SCALE
     WINDOW_HEIGHT = SCREEN_HEIGHT * V_SCALE
 
-    def __init__(self, parent):
+    def __init__(self):
         super(Window, self). __init__()
         self.framebuffer = [0xffffffff]*(Window.WINDOW_WIDTH * Window.WINDOW_HEIGHT)
         self.updated = False
-        self.parent = parent
         self.window = None
         
     def run(self):
@@ -59,9 +58,6 @@ class Window(Thread):
         new_v_scale = (height / Window.SCREEN_HEIGHT)
         glPixelZoom(new_h_scale, new_v_scale)
 
-    def request_input_interrupt(self):
-        self.parent.input.request_interrupt()
-
     def _key(self, c, x, y):
         self._glkeyboard(c.decode("ascii"), x, y, False)
 
@@ -79,48 +75,50 @@ class Window(Thread):
     def _glkeyboardspecial(self, c, x, y, up):
         if up:
             if c == GLUT_KEY_UP:
-                self.parent.input.BUTTON_UP = False  
+                Input.BUTTON_UP = False  
             if c == GLUT_KEY_DOWN:
-                self.parent.input.BUTTON_DOWN = False
+                Input.BUTTON_DOWN = False
             if c == GLUT_KEY_LEFT:
-                self.parent.input.BUTTON_LEFT = False
+                Input.BUTTON_LEFT = False
             if c == GLUT_KEY_RIGHT:
-                self.parent.input.BUTTON_RIGHT = False
+                Input.BUTTON_RIGHT = False
             if c == GLUT_KEY_F4:
-                self.parent.save_state()
+                #self.parent.save_state()
+                print('TODO bind savestate')
             if c == GLUT_KEY_F5:
-                self.parent.load_state()    
+                #self.parent.load_state()    
+                print('TODO bind savestate')
                 
         else:
             if c == GLUT_KEY_UP:
-                self.parent.input.BUTTON_UP = True
+                Input.BUTTON_UP = True
             if c == GLUT_KEY_DOWN:
-                self.parent.input.BUTTON_DOWN = True
+                Input.BUTTON_DOWN = True
             if c == GLUT_KEY_LEFT:
-                self.parent.input.BUTTON_LEFT = True
+                Input.BUTTON_LEFT = True
             if c == GLUT_KEY_RIGHT:
-                self.parent.input.BUTTON_RIGHT = True 
+                Input.BUTTON_RIGHT = True 
 
     def _glkeyboard(self, c, x, y, up):
         if up:
             if c == 'z':
-                self.parent.input.BUTTON_A = False
+                Input.BUTTON_A = False
             elif c == 'x':
-                self.parent.input.BUTTON_B = False
+                Input.BUTTON_B = False
             elif c == chr(13):
-                self.parent.input.BUTTON_START = False
+                Input.BUTTON_START = False
             elif c == chr(8):
-                self.parent.input.BUTTON_SELECT = False
+                Input.BUTTON_SELECT = False
                 
         else:
             if c == 'z':
-                self.parent.input.BUTTON_A = True  
+                Input.BUTTON_A = True  
             elif c == 'x':
-                self.parent.input.BUTTON_B = True  
+                Input.BUTTON_B = True  
             elif c == chr(13):
-                self.parent.input.BUTTON_START = True
+                Input.BUTTON_START = True
             elif c == chr(8):
-                self.parent.input.BUTTON_SELECT = True
+                Input.BUTTON_SELECT = True
                 
 
 

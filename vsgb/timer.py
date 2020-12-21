@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from vsgb.interrupt_manager import Interrupt, InterruptManager
+from vsgb.address_space import AddressSpace
+from vsgb.io_registers import IO_Registers
 
-class Timer:
+
+class Timer(AddressSpace):
 
     DIV_INC_TIME: int = 256 # cycles
     KEY1: int = 0
@@ -12,6 +15,37 @@ class Timer:
     DIV: int = 0
     div_cycles: int = 0
     tima_cycles: int = 0
+
+    @classmethod
+    def accept(cls, address: int) -> bool:
+        return address in [
+            IO_Registers.DIV,
+            IO_Registers.KEY1,
+            IO_Registers.TMA,
+            IO_Registers.TIMA
+        ]
+
+    @classmethod
+    def read(cls, address: int) -> int:
+        if address == IO_Registers.DIV:
+            return cls.DIV
+        if address == IO_Registers.KEY1:
+            return cls.KEY1
+        if address == IO_Registers.TMA:
+            return cls.TMA
+        if address == IO_Registers.TIMA:
+            return cls.TIMA
+
+    @classmethod
+    def write(cls, address: int, value: int):
+        if address == IO_Registers.DIV:
+            cls.DIV = 0
+        elif address == IO_Registers.KEY1:
+            cls.KEY1 = value
+        elif address == IO_Registers.TMA:
+            cls.TMA = value
+        elif address == IO_Registers.TIMA:
+            cls.TIMA = value
 
     @classmethod
     def tick(cls, cycles : int = 0):

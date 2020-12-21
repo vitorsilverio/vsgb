@@ -18,6 +18,8 @@ from vsgb.memory.vram import VideoRam
 from vsgb.memory.wram import WorkRam
 from vsgb.memory.unused_memory_area import UnusedMemoryArea
 
+from vsgb.address_space import AddressSpace
+
 # General Memory Map
 # Start End     Description                      Notes
 # 0000  3FFF    16KB ROM bank 00                 From cartridge, usually a fixed bank
@@ -36,10 +38,15 @@ from vsgb.memory.unused_memory_area import UnusedMemoryArea
 # FFFF  FFFF    Interrupts Enable Register (IE) 	
 class MMU:
 
-    def __init__(self, rom : CartridgeType, apu: APU, _input : Input, cgb_mode: bool):
+    spaces: list = [
+        InterruptManager,
+        Timer,
+        Input
+    ]
+
+    def __init__(self, rom : CartridgeType, apu: APU, cgb_mode: bool):
         self.rom = rom
         self.apu = apu
-        self.input = _input
         self.vram = VideoRam()
         self.wram = WorkRam()
         self.oam = array.array('B', [0x00]*0xa0)
@@ -62,6 +69,10 @@ class MMU:
         self.hdma = hdma
         
     def read_byte(self, address: int) -> int:
+        for space in MMU.spaces:
+            if space.accept(address):
+                return space.read(address)
+
         if self.game_shark.cheats_enabled and (address in self.game_shark.cheats):
             return self.game_shark.cheats[address]
 
@@ -92,8 +103,6 @@ class MMU:
         if 0xfea0 <= address < 0xff00:
             return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
-            if address == IO_Registers.P1:
-                return self.input.read_input(IO_Registers.read_value(address)) & 0xff
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
             if address == IO_Registers.BGPI:
@@ -104,14 +113,6 @@ class MMU:
                 return self.cgb_palette.get_obpi()
             if address == IO_Registers.OBPD:
                 return self.cgb_palette.get_obpd()
-            if address == IO_Registers.KEY1:
-                return Timer.KEY1
-            if address == IO_Registers.TMA:
-                return Timer.TMA
-            if address == IO_Registers.TIMA:
-                return Timer.TIMA
-            if address == IO_Registers.DIV:
-                return Timer.DIV  
             if address == IO_Registers.SVBK:
                 if self.cgb_mode:
                     return (IO_Registers.read_value(address) | 0b11111000) & 0xff
@@ -120,19 +121,20 @@ class MMU:
                 if self.cgb_mode:
                     return (IO_Registers.read_value(address) | 0b11111110) & 0xff
                 return 0xff
-            
-            if address == IO_Registers.IF:
-                return InterruptManager.if_register & 0xff
             return IO_Registers.read_value(address) & 0xff
             
         if 0xff80 <= address < 0x10000:
-            if address == IO_Registers.IE:
-                return InterruptManager.ie_register & 0xff
             return self.hram[address - 0xff80] & 0xff
         return 0xff
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
         value = value & 0xff
+        for space in MMU.spaces:
+            if space.accept(address):
+                space.write(address, value)
+                break
+
+
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
         elif 0x8000 <= address < 0xa000:
@@ -174,14 +176,6 @@ class MMU:
                     self.cgb_palette.set_obpi(value)
                 elif address == IO_Registers.OBPD:
                     self.cgb_palette.set_obpd(value)
-                elif address == IO_Registers.KEY1:
-                    Timer.KEY1 = value
-                elif address == IO_Registers.TMA:
-                    Timer.TMA = value
-                elif address == IO_Registers.TIMA:
-                    Timer.TIMA = value
-                elif address == IO_Registers.DIV:# Reset div register
-                    Timer.DIV = 0
                 elif address == IO_Registers.STAT:
                     old_stat = IO_Registers.read_value(address)
                     VideoStatInterrupt.check_stat(old_stat,value)
@@ -191,15 +185,11 @@ class MMU:
                     print('Boot rom disabled. Starting rom...')
                 elif address in self.apu.registers:
                     self.apu.write_register(address, value)
-                elif address == IO_Registers.IF:
-                    InterruptManager.if_register = value & 0xff
                 else:
                     IO_Registers.write_value(address,value)
             else:     
                 IO_Registers.write_value(address,value)
         elif 0xff80 <= address < 0x10000:
-            if address == IO_Registers.IE:
-                InterruptManager.ie_register = value & 0xff
             self.hram[address - 0xff80] = value
 
     def read_word(self, address: int) -> int:

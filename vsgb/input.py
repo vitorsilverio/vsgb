@@ -19,37 +19,51 @@
 # (the first reads used as short delay, allowing the inputs to stabilize, 
 # and only the value from the last read actually used).
 
-class Input:
+from vsgb.address_space import AddressSpace
+from vsgb.io_registers import IO_Registers
 
-    def __init__(self):
-        self.BUTTON_A = False
-        self.BUTTON_B = False
-        self.BUTTON_START = False
-        self.BUTTON_SELECT = False
-        self.BUTTON_UP = False
-        self.BUTTON_DOWN = False
-        self.BUTTON_LEFT = False
-        self.BUTTON_RIGHT = False
+class Input(AddressSpace):
 
-    def read_input(self, joyp : int) -> int:
+    
+    BUTTON_A: bool = False
+    BUTTON_B: bool = False
+    BUTTON_START: bool = False
+    BUTTON_SELECT: bool = False
+    BUTTON_UP: bool = False
+    BUTTON_DOWN: bool = False
+    BUTTON_LEFT: bool = False
+    BUTTON_RIGHT: bool = False
+    P1: int = 0
+
+    @classmethod
+    def accept(cls, address: int) -> bool:
+        return address == IO_Registers.P1
+
+    @classmethod
+    def write(cls, address: int, value: int):
+        if address == IO_Registers.P1:
+            cls.P1 = value
+
+    @classmethod
+    def read(cls, address : int) -> int:
         _input = 0x0f
-        if 0 == joyp & 0b00100000:
-            if self.BUTTON_START:
+        if 0 == cls.P1 & 0b00100000:
+            if cls.BUTTON_START:
                 _input ^= 0b1000
-            if self.BUTTON_SELECT:
+            if cls.BUTTON_SELECT:
                 _input ^= 0b0100
-            if self.BUTTON_B:
+            if cls.BUTTON_B:
                 _input ^= 0b0010
-            if self.BUTTON_A:
+            if cls.BUTTON_A:
                 _input ^= 0b0001
-        elif 0 == joyp & 0b00010000:
-            if self.BUTTON_DOWN:
+        elif 0 == cls.P1 & 0b00010000:
+            if cls.BUTTON_DOWN:
                 _input ^= 0b1000
-            if self.BUTTON_UP:
+            if cls.BUTTON_UP:
                 _input ^= 0b0100
-            if self.BUTTON_LEFT:
+            if cls.BUTTON_LEFT:
                 _input ^= 0b0010
-            if self.BUTTON_RIGHT:
+            if cls.BUTTON_RIGHT:
                 _input ^= 0b0001
 
-        return ((0b00110000 & joyp) | _input)
+        return ((0b00110000 & cls.P1) | _input)

@@ -285,7 +285,7 @@ class PPU:
         map_select = self.lcdControlRegister.window_tile_map_display_select()
 
         line_adjusted = self.window_line
-        y_offset = int(line_adjusted / 8) * 32
+        y_offset = (line_adjusted // 8) * 32
         tile_line = line_adjusted % 8
         tile_line_offset = tile_line * 2
 
