@@ -9,25 +9,45 @@ from vsgb.interrupt_manager import Interrupt, InterruptManager
 from vsgb.io_registers import IO_Registers
 from vsgb.mmu import MMU
 from vsgb.window import Window
+from vsgb.address_space import AddressSpace
 
-class PPU:
 
-    FRAMEBUFFER_SIZE = Window.SCREEN_WIDTH * Window.SCREEN_HEIGHT
+class PPU(AddressSpace):
 
-    H_BLANK_STATE     = 0
-    V_BLANK_STATE     = 1
-    OAM_READ_STATE    = 2
-    VMRAM_READ_STATE  = 3
+    FRAMEBUFFER_SIZE: int = Window.SCREEN_WIDTH * Window.SCREEN_HEIGHT
 
-    OAM_SCANLINE_TIME   = 80
-    VRAM_SCANLINE_TIME  = 172
-    H_BLANK_TIME        = 204
-    V_BLANK_TIME        = 4560
+    H_BLANK_STATE: int     = 0
+    V_BLANK_STATE: int     = 1
+    OAM_READ_STATE: int    = 2
+    VMRAM_READ_STATE: int  = 3
+
+    OAM_SCANLINE_TIME: int   = 80
+    VRAM_SCANLINE_TIME: int  = 172
+    H_BLANK_TIME: int        = 204
+    V_BLANK_TIME: int        = 4560
+    framebuffer: list = [0xffffffff]*FRAMEBUFFER_SIZE
+
+    # Registers
+    LY: int   = 0
+    STAT: int = 0
+    LYC: int  = 0
+    SCX: int  = 0
+    SCY: int  = 0
+    BGP: int  = 0
+    WX: int   = 0
+    WY: int   = 0
+    LCDC: int = 0
+    OBP0: int = 0
+    OBP1: int = 0
+    VBK: int  = 0
+
+    # Memory
+    VRAM: list = [[0]*0x2000,[0]*0x2000]
+    OAM: list = [0]*0xa0
 
     def __init__(self, mmu : MMU, cgb_mode: bool):
         self.mmu = mmu
         self.lcdControlRegister = LCDControlRegister(self.mmu)
-        self.framebuffer = [0xffffffff]*PPU.FRAMEBUFFER_SIZE
         self.original_color = [0]*PPU.FRAMEBUFFER_SIZE
         self.bg_priority = [False]*PPU.FRAMEBUFFER_SIZE
         self.mode = PPU.V_BLANK_STATE
@@ -91,8 +111,11 @@ class PPU:
             self.vblank = True
             self.window_line = 0
             InterruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
+            Window.framebuffer = PPU.framebuffer
 
         self.update_stat_mode()
+
+        
 
     def exec_vblank(self):
         if self.auxillary_modeclock >= 456:
@@ -251,11 +274,11 @@ class PPU:
                         position = line_width + buffer_addr % Window.SCREEN_WIDTH
                         self.original_color[position] = color
                         if not self.cgb_mode:
-                            self.framebuffer[position] = self.rgb(color)
+                            PPU.framebuffer[position] = self.rgb(color)
                         else:
                             if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
                                 color = pixel
-                            self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                            PPU.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                             self.bg_priority[position] = tile_attributes.is_bg_priority()
                             
                     buffer_addr = ( line_pixel_offset + pixelx - scx )
@@ -263,7 +286,7 @@ class PPU:
                 x += 1
         else:
             for i in range(0, Window.SCREEN_WIDTH):
-                self.framebuffer[line_width + i] = self.rgb(0)
+                PPU.framebuffer[line_width + i] = self.rgb(0)
                 self.original_color[line_width + i] = 0
 
 
@@ -338,12 +361,12 @@ class PPU:
                 position = line_width + buffer_addr
                 color = (palette >> (pixel * 2)) & 0x3
                 if not self.cgb_mode:
-                    self.framebuffer[position] = self.rgb(color)
+                    PPU.framebuffer[position] = self.rgb(color)
                     self.original_color[position] = color
                 else:
                     if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
                         color = pixel
-                    self.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                    PPU.framebuffer[position] = self.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                     self.bg_priority[position] = tile_attributes.is_bg_priority()
                     self.original_color[position] = color
 
@@ -418,13 +441,13 @@ class PPU:
 
                 if sprite_attributes.is_priority() or self.original_color[position] == 0 :
                     if not self.cgb_mode:
-                        self.framebuffer[position] = self.rgb_sprite(color)
+                        PPU.framebuffer[position] = self.rgb_sprite(color)
 
                     elif not self.bg_priority[position] \
                         or self.original_color[position] == 0:
                         if self.mmu.bootstrap_enabled or self.mmu.rom.is_cgb():
                             color = pixel
-                        self.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
+                        PPU.framebuffer[position] = self.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
         
 
 

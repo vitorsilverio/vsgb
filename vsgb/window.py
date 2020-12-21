@@ -11,25 +11,23 @@ from vsgb.input import Input
 
 class Window(Thread):
 
-    SCREEN_WIDTH = 160
-    SCREEN_HEIGHT = 144 
-    V_SCALE = 4
-    H_SCALE = 4
-    WINDOW_WIDTH = SCREEN_WIDTH * H_SCALE
-    WINDOW_HEIGHT = SCREEN_HEIGHT * V_SCALE
+    SCREEN_WIDTH: int = 160
+    SCREEN_HEIGHT: int = 144 
+    V_SCALE: int = 4
+    H_SCALE: int = 4
+    WINDOW_WIDTH: int = SCREEN_WIDTH * H_SCALE
+    WINDOW_HEIGHT: int = SCREEN_HEIGHT * V_SCALE
+    framebuffer: list = [0xffffffff]*(WINDOW_WIDTH * WINDOW_HEIGHT)
 
     def __init__(self):
         super(Window, self). __init__()
-        self.framebuffer = [0xffffffff]*(Window.WINDOW_WIDTH * Window.WINDOW_HEIGHT)
-        self.updated = False
-        self.window = None
         
     def run(self):
         glutInit()
         glutInitDisplayMode(GLUT_RGBA)
         glutInitWindowSize(Window.WINDOW_WIDTH, Window.WINDOW_HEIGHT)
         glutInitWindowPosition(200, 200)
-        self.window = glutCreateWindow(b'vsgb')
+        glutCreateWindow(b'vsgb')
         glutKeyboardFunc(self._key)
         glutKeyboardUpFunc(self._keyUp)
         glutSpecialFunc(self._spec)
@@ -40,18 +38,14 @@ class Window(Thread):
         glutIdleFunc(self.draw)
         glutMainLoop()
 
-    def render(self, framebuffer : list):
-        self.framebuffer = framebuffer
-        self.updated = False
-
     def draw(self):
-        if not self.updated:
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            glLoadIdentity()
-            glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, self.framebuffer)
-            glFlush()
-            glutSwapBuffers()
-        self.updated = True
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+        glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, Window.framebuffer)
+        glFlush()
+        glutSwapBuffers()
+        
 
     def resize(self, width, height):
         new_h_scale = (width / Window.SCREEN_WIDTH)

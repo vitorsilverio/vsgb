@@ -38,7 +38,6 @@ class Emulator:
         try:
             can_exec_hdma = False
             last_ppu_mode = None
-            refresh = False
             while True:
                 while self.changing_state:
                     self.serialize_ok = True
@@ -46,7 +45,6 @@ class Emulator:
                     last_ppu_mode = self.ppu.mode
                     ly = self.mmu.read_byte(IO_Registers.LY)
                     can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode and ly < 143
-                refresh = (ly == 143)
                 ticks = 0
                 if self.cgb_mode: 
                     if self.hdma.in_progress:
@@ -71,9 +69,6 @@ class Emulator:
                     self.apu.step(4)
 
                 
-                if refresh:
-                    self.window.render(self.ppu.framebuffer)
-                    refresh = False
         except Exception as e:
             print('An error occurred:')
             print(self.get_last_instruction())
