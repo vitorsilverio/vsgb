@@ -11,10 +11,8 @@ from vsgb.io_registers import IO_Registers
 from vsgb.cartridge import CartridgeType
 from vsgb.game_shark import GameShark
 from vsgb.interrupt_manager import InterruptManager
-from vsgb.video_stat_interrupt import VideoStatInterrupt
 from vsgb.timer import Timer
-
-from vsgb.memory.vram import VideoRam
+from vsgb.ppu import PPU
 from vsgb.memory.wram import WorkRam
 from vsgb.memory.unused_memory_area import UnusedMemoryArea
 
@@ -42,14 +40,13 @@ class MMU:
         InterruptManager,
         Timer,
         Input,
-        WorkRam
+        WorkRam,
+        PPU
     ]
 
     def __init__(self, rom : CartridgeType, apu: APU, cgb_mode: bool):
         self.rom = rom
         self.apu = apu
-        self.vram = VideoRam()
-        self.oam = array.array('B', [0x00]*0xa0)
         self.zero_page = array.array('B', [0x00]*0x80)
         self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
@@ -80,37 +77,13 @@ class MMU:
             if self.bootstrap_enabled and ((0 <= address <= 0xff) or (0x0200 <= address <= 0x08ff)):
                 return self.boot_rom[address] & 0xff
             return self.rom.read_rom_byte(address)
-        if 0x8000 <= address < 0xa000:
-            if self.cgb_mode:
-                bank = self.read_byte(IO_Registers.VBK) & 0x1
-                return self.vram.read_value(address, bank) & 0xff
-            else:
-                return self.vram.read_value(address, 0) & 0xff
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
-        if 0xfe00 <= address < 0xfea0:
-            return self.oam[address - 0xfe00] & 0xff
         if 0xfea0 <= address < 0xff00:
             return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
-            if address == IO_Registers.BGPI:
-                return self.cgb_palette.get_bgpi()
-            if address == IO_Registers.BGPD:
-                return self.cgb_palette.get_bgpd()
-            if address == IO_Registers.OBPI:
-                return self.cgb_palette.get_obpi()
-            if address == IO_Registers.OBPD:
-                return self.cgb_palette.get_obpd()
-            if address == IO_Registers.SVBK:
-                if self.cgb_mode:
-                    return (IO_Registers.read_value(address) | 0b11111000) & 0xff
-                return 0xff
-            if address == IO_Registers.VBK:
-                if self.cgb_mode:
-                    return (IO_Registers.read_value(address) | 0b11111110) & 0xff
-                return 0xff
             return IO_Registers.read_value(address) & 0xff
             
         if 0xff80 <= address < 0x10000:
@@ -123,19 +96,11 @@ class MMU:
             if space.accept(address):
                 space.write(address, value)
                 break
-            
+
         if 0 <= address < 0x8000:
             self.rom.write_rom_byte(address, value)
-        elif 0x8000 <= address < 0xa000:
-            if self.cgb_mode:
-                bank = self.read_byte(IO_Registers.VBK) & 0x1
-                self.vram.write_value(address, bank, value)
-            else:
-                self.vram.write_value(address, 0, value)
         elif 0xa000 <= address < 0xc000:
             self.rom.write_external_ram_byte(address, value)
-        elif 0xfe00 <= address < 0xfea0:
-            self.oam[address - 0xfe00] = value
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
                 if address == IO_Registers.P1:
@@ -146,18 +111,6 @@ class MMU:
                     self.dma.request_dma_transfer(value)
                 elif address == IO_Registers.HDMA5: # Start hdma transfer
                     self.hdma.request_hdma_transfer(value)
-                elif address == IO_Registers.BGPI:
-                    self.cgb_palette.set_bgpi(value)
-                elif address == IO_Registers.BGPD:
-                    self.cgb_palette.set_bgpd(value)
-                elif address == IO_Registers.OBPI:
-                    self.cgb_palette.set_obpi(value)
-                elif address == IO_Registers.OBPD:
-                    self.cgb_palette.set_obpd(value)
-                elif address == IO_Registers.STAT:
-                    old_stat = IO_Registers.read_value(address)
-                    VideoStatInterrupt.check_stat(old_stat,value)
-                    IO_Registers.write_value(address, value)
                 elif address == 0xff50:
                     self.bootstrap_enabled = False
                     print('Boot rom disabled. Starting rom...')

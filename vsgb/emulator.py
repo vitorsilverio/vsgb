@@ -25,7 +25,7 @@ class Emulator:
         self.apu.start()
         self.mmu = MMU(self.cartridge.rom(), self.apu, cgb_mode) 
         self.cpu = CPU(self.mmu)
-        self.ppu = PPU(self.mmu, cgb_mode)
+        PPU.cgb_mode = cgb_mode
         self.dma = DMA(self.mmu)
         self.hdma = HDMA(self.mmu)
         self.window = Window()
@@ -41,8 +41,8 @@ class Emulator:
             while True:
                 while self.changing_state:
                     self.serialize_ok = True
-                if last_ppu_mode != self.ppu.mode:
-                    last_ppu_mode = self.ppu.mode
+                if last_ppu_mode != PPU.mode:
+                    last_ppu_mode = PPU.mode
                     ly = self.mmu.read_byte(IO_Registers.LY)
                     can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode and ly < 143
                 ticks = 0
@@ -63,7 +63,7 @@ class Emulator:
                     self.cpu.step()
                     ticks = self.cpu.ticks
                 Timer.tick(ticks)
-                self.ppu.step(ticks)
+                PPU.step(ticks)
 
                 for i in range(0,self.cpu.ticks,4):
                     self.apu.step(4)

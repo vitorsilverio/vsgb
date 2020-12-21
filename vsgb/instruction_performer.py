@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from vsgb.byte_operations import signed_value, set_bit, bit_mask
+from vsgb.byte_operations import signed_value, set_bit
 from vsgb.io_registers import IO_Registers
 from vsgb.registers import Registers
 
@@ -2383,7 +2383,7 @@ class InstructionPerformer:
         Registers.set_n_flag()
 
     def bit(self, pos : int, value : int) -> int:
-        bit = 1 if value & bit_mask[pos] == bit_mask[pos] else 0
+        bit = 1 if value & (1 << pos) else 0
         if bit & 0xff == 0x0:
             Registers.set_z_flag() 
         else: 
@@ -2392,7 +2392,7 @@ class InstructionPerformer:
         Registers.set_h_flag()
 
     def res(self, pos : int, value : int) -> int:
-        return value & (bit_mask[pos] ^ 0xff)
+        return value & ((1 << pos) ^ 0xff)
 
     def swap(self, value : int) -> int:
         value = ((value << 4) & 0xff) | (value >> 4)
