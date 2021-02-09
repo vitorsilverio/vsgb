@@ -49,6 +49,20 @@ def bit(pos: int, operand: int) -> int:
         Registers.reset_z_flag()
     Registers.reset_n_flag()
     Registers.set_h_flag()
+    return 8
+
+def ccf() -> int:
+    if Registers.is_c_flag():
+        Registers.reset_c_flag()
+    else:
+        Registers.set_c_flag()
+    Registers.reset_n_flag()
+    Registers.reset_h_flag()
+    return 4
+
+def ld_op_op(op1: int, op2: int) -> int:
+    setattr(Registers, int, getattr(Registers, op2))
+    return 4
 
 
 # 1 - mnemonic
