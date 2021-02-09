@@ -15,7 +15,6 @@ class CPU:
 
     def __init__(self, mmu: MMU):
         self.mmu = mmu        
-        self.stackManager = StackManager(self.mmu)
         self.instructionPerformer = InstructionPerformer(self)
         self.ticks = 0
         self.ime = False
@@ -54,7 +53,7 @@ class CPU:
         self.ime = False
         if self.halted:
             self.halted = False
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         if interrupt == Interrupt.INTERRUPT_VBLANK:
             Registers.pc = 0x40 #RST 40H
             InterruptManager.if_register &= 0b11111110

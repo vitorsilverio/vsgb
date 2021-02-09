@@ -3,16 +3,17 @@
 
 import logging
 from vsgb.byte_operations import signed_value, set_bit
-from vsgb.io_registers import IO_Registers
 from vsgb.registers import Registers
+from vsgb.stack_manager import StackManager
+from vsgb.interrupt_manager import InterruptManager
 
 class InstructionPerformer:
+    
 
     def __init__(self, cpu):
         self.cpu = cpu
         self.mmu = cpu.mmu
-        self.stackManager = cpu.stackManager
-        self.instrs = [
+        self.instrs = (
             self.NOP, self.LD_BC_d16, self.LD_REF_BC_A, self.INC_BC, self.INC_B, self.DEC_B, self.LD_B_d8, self.RLCA, self.LD_REF_a16_SP, self.ADD_HL_BC, self.LD_A_REF_BC, self.DEC_BC, self.INC_C, self.DEC_C, self.LD_C_d8, self.RRCA, 
             self.STOP, self.LD_DE_d16, self.LD_REF_DE_A, self.INC_DE, self.INC_D, self.DEC_D, self.LD_D_d8, self.RLA, self.JR_r8, self.ADD_HL_DE, self.LD_A_REF_DE, self.DEC_DE, self.INC_E, self.DEC_E, self.LD_E_d8, self.RRA, 
             self.JR_NZ_r8, self.LD_HL_d16, self.LDI_HL_A, self.INC_HL, self.INC_H, self.DEC_H, self.LD_H_d8, self.DAA, self.JR_Z_r8, self.ADD_HL_HL, self.LDI_A_HL, self.DEC_HL, self.INC_L, self.DEC_L, self.LD_L_d8, self.CPL, 
@@ -45,7 +46,7 @@ class InstructionPerformer:
             self.SET_2_B, self.SET_2_C, self.SET_2_D, self.SET_2_E, self.SET_2_H, self.SET_2_L, self.SET_2_REF_HL, self.SET_2_A, self.SET_3_B, self.SET_3_C, self.SET_3_D, self.SET_3_E, self.SET_3_H, self.SET_3_L, self.SET_3_REF_HL, self.SET_3_A, 
             self.SET_4_B, self.SET_4_C, self.SET_4_D, self.SET_4_E, self.SET_4_H, self.SET_4_L, self.SET_4_REF_HL, self.SET_4_A, self.SET_5_B, self.SET_5_C, self.SET_5_D, self.SET_5_E, self.SET_5_H, self.SET_5_L, self.SET_5_REF_HL, self.SET_5_A, 
             self.SET_6_B, self.SET_6_C, self.SET_6_D, self.SET_6_E, self.SET_6_H, self.SET_6_L, self.SET_6_REF_HL, self.SET_6_A, self.SET_7_B, self.SET_7_C, self.SET_7_D, self.SET_7_E, self.SET_7_H, self.SET_7_L, self.SET_7_REF_HL, self.SET_7_A 
-        ]
+        )
 
     def perform_instruction(self, opcode: int) -> int:
         if 0xcb00 <= opcode :
@@ -607,7 +608,7 @@ class InstructionPerformer:
 
     def HALT(self) -> int:
         self.cpu.halted = True
-        self.cpu.pending_interrupts_before_halt = self.mmu.read_byte(IO_Registers.IF)
+        self.cpu.pending_interrupts_before_halt = InterruptManager.if_register
         return 4
     
     def LD_REF_HL_A(self) -> int:
@@ -910,12 +911,12 @@ class InstructionPerformer:
 
     def RET_NZ(self) -> int:
         if not Registers.is_z_flag():
-            Registers.pc = self.stackManager.pop_word()
+            Registers.pc = StackManager.pop_word()
             return 20
         return 8
     
     def POP_BC(self) -> int:
-        Registers.set_bc(self.stackManager.pop_word())
+        Registers.set_bc(StackManager.pop_word())
         return 12
 
     def JP_NZ_a16(self) -> int:
@@ -935,13 +936,13 @@ class InstructionPerformer:
         word = self.mmu.read_word(Registers.pc)
         Registers.pc += 2
         if not Registers.is_z_flag():
-            self.stackManager.push_word(Registers.pc)
+            StackManager.push_word(Registers.pc)
             Registers.pc = word
             return 24
         return 12
     
     def PUSH_BC(self) -> int:
-        self.stackManager.push_word(Registers.get_bc())
+        StackManager.push_word(Registers.get_bc())
         return 16
     
     def ADD_d8(self) -> int:
@@ -951,18 +952,18 @@ class InstructionPerformer:
         return 8
 
     def RST_00H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x00
         return 16
 
     def RET_Z(self) -> int:
         if Registers.is_z_flag():
-            Registers.pc = self.stackManager.pop_word()
+            Registers.pc = StackManager.pop_word()
             return 20
         return 8
 
     def RET(self) -> int:
-        Registers.pc = self.stackManager.pop_word()
+        Registers.pc = StackManager.pop_word()
         return 16
 
     def JP_Z_a16(self) -> int:
@@ -977,7 +978,7 @@ class InstructionPerformer:
         word = self.mmu.read_word(Registers.pc)
         Registers.pc += 2
         if Registers.is_z_flag():
-            self.stackManager.push_word(Registers.pc)
+            StackManager.push_word(Registers.pc)
             Registers.pc = word
             return 24
         return 12
@@ -985,7 +986,7 @@ class InstructionPerformer:
     def CALL_a16(self) -> int:
         word = self.mmu.read_word(Registers.pc)
         Registers.pc += 2
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = word
         return 24
     
@@ -996,18 +997,18 @@ class InstructionPerformer:
         return 8
 
     def RST_08H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x08
         return 16
 
     def RET_NC(self) -> int:
         if not Registers.is_c_flag():
-            Registers.pc = self.stackManager.pop_word()
+            Registers.pc = StackManager.pop_word()
             return 20
         return 8
     
     def POP_DE(self) -> int:
-        Registers.set_de(self.stackManager.pop_word())
+        Registers.set_de(StackManager.pop_word())
         return 12
 
     def JP_NC_a16(self) -> int:
@@ -1022,13 +1023,13 @@ class InstructionPerformer:
         word = self.mmu.read_word(Registers.pc)
         Registers.pc += 2
         if not Registers.is_c_flag():
-            self.stackManager.push_word(Registers.pc)
+            StackManager.push_word(Registers.pc)
             Registers.pc = word
             return 24
         return 12
     
     def PUSH_DE(self) -> int:
-        self.stackManager.push_word(Registers.get_de())
+        StackManager.push_word(Registers.get_de())
         return 16
 
     def SUB_d8(self) -> int:
@@ -1038,18 +1039,18 @@ class InstructionPerformer:
         return 8
 
     def RST_10H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x10
         return 16
 
     def RET_C(self) -> int:
         if Registers.is_c_flag():
-            Registers.pc = self.stackManager.pop_word()
+            Registers.pc = StackManager.pop_word()
             return 20
         return 8
 
     def RETI(self) -> int:
-        Registers.pc = self.stackManager.pop_word()
+        Registers.pc = StackManager.pop_word()
         self.cpu.ime = True
         return 16
 
@@ -1065,7 +1066,7 @@ class InstructionPerformer:
         word = self.mmu.read_word(Registers.pc)
         Registers.pc += 2
         if Registers.is_c_flag():
-            self.stackManager.push_word(Registers.pc)
+            StackManager.push_word(Registers.pc)
             Registers.pc = word
             return 24
         return 12
@@ -1077,7 +1078,7 @@ class InstructionPerformer:
         return 8
 
     def RST_18H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x18
         return 16
 
@@ -1088,7 +1089,7 @@ class InstructionPerformer:
         return 12
     
     def POP_HL(self) -> int:
-        Registers.set_hl(self.stackManager.pop_word())
+        Registers.set_hl(StackManager.pop_word())
         return 12
 
     def LD_REF_C_A(self) -> int:
@@ -1096,7 +1097,7 @@ class InstructionPerformer:
         return 8
     
     def PUSH_HL(self) -> int:
-        self.stackManager.push_word(Registers.get_hl())
+        StackManager.push_word(Registers.get_hl())
         return 16
 
     def AND_d8(self) -> int:
@@ -1106,7 +1107,7 @@ class InstructionPerformer:
         return 8
 
     def RST_20H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x20
         return 16
 
@@ -1145,7 +1146,7 @@ class InstructionPerformer:
         return 8
 
     def RST_28H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x28
         return 16
     
@@ -1156,7 +1157,7 @@ class InstructionPerformer:
         return 12
     
     def POP_AF(self) -> int:
-        Registers.set_af(self.stackManager.pop_word())
+        Registers.set_af(StackManager.pop_word())
         return 12
     
     def LD_A_REF_C(self) -> int:
@@ -1168,7 +1169,7 @@ class InstructionPerformer:
         return 4
     
     def PUSH_AF(self) -> int:
-        self.stackManager.push_word(Registers.get_af())
+        StackManager.push_word(Registers.get_af())
         return 16
 
     def OR_d8(self) -> int:
@@ -1178,7 +1179,7 @@ class InstructionPerformer:
         return 8
 
     def RST_30H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x30
         return 16
     
@@ -1220,7 +1221,7 @@ class InstructionPerformer:
         return 8
 
     def RST_38H(self) -> int:
-        self.stackManager.push_word(Registers.pc)
+        StackManager.push_word(Registers.pc)
         Registers.pc = 0x38
         return 16
 

@@ -8,7 +8,7 @@ class WorkRam(AddressSpace):
 
     @classmethod
     def accept(cls, address: int) -> bool:
-        return (0xc000 <= address < 0xe000) or (0xe000 <= address < 0xfe00) or (address == IO_Registers.SVBK)
+        return (0xc000 <= address < 0xfe00) or (address == IO_Registers.SVBK)
 
     @classmethod
     def read(cls, address: int) -> int:

@@ -18,6 +18,7 @@ class Window(Thread):
     WINDOW_WIDTH: int = SCREEN_WIDTH * H_SCALE
     WINDOW_HEIGHT: int = SCREEN_HEIGHT * V_SCALE
     framebuffer: list = [0xffffffff]*(WINDOW_WIDTH * WINDOW_HEIGHT)
+    refresh: bool = False
 
     def __init__(self):
         super(Window, self). __init__()
@@ -39,12 +40,13 @@ class Window(Thread):
         glutMainLoop()
 
     def draw(self):
-        
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
-        glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, Window.framebuffer)
-        glFlush()
-        glutSwapBuffers()
+        if Window.refresh:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glLoadIdentity()
+            glDrawPixels(Window.SCREEN_WIDTH, Window.SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, Window.framebuffer)
+            glFlush()
+            glutSwapBuffers()
+            Window.refresh = False
         
 
     def resize(self, width, height):
@@ -70,27 +72,27 @@ class Window(Thread):
         if up:
             if c == GLUT_KEY_UP:
                 Input.BUTTON_UP = False  
-            if c == GLUT_KEY_DOWN:
+            elif c == GLUT_KEY_DOWN:
                 Input.BUTTON_DOWN = False
-            if c == GLUT_KEY_LEFT:
+            elif c == GLUT_KEY_LEFT:
                 Input.BUTTON_LEFT = False
-            if c == GLUT_KEY_RIGHT:
+            elif c == GLUT_KEY_RIGHT:
                 Input.BUTTON_RIGHT = False
-            if c == GLUT_KEY_F4:
+            elif c == GLUT_KEY_F4:
                 #self.parent.save_state()
                 print('TODO bind savestate')
-            if c == GLUT_KEY_F5:
+            elif c == GLUT_KEY_F5:
                 #self.parent.load_state()    
                 print('TODO bind savestate')
                 
         else:
             if c == GLUT_KEY_UP:
                 Input.BUTTON_UP = True
-            if c == GLUT_KEY_DOWN:
+            elif c == GLUT_KEY_DOWN:
                 Input.BUTTON_DOWN = True
-            if c == GLUT_KEY_LEFT:
+            elif c == GLUT_KEY_LEFT:
                 Input.BUTTON_LEFT = True
-            if c == GLUT_KEY_RIGHT:
+            elif c == GLUT_KEY_RIGHT:
                 Input.BUTTON_RIGHT = True 
 
     def _glkeyboard(self, c, x, y, up):

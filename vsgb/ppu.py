@@ -25,7 +25,7 @@ class PPU(AddressSpace):
     V_BLANK_TIME: int        = 4560
 
     #Vars
-    framebuffer: list        = [0xffffffff]*FRAMEBUFFER_SIZE
+    #framebuffer: list        = [0xffffffff]*FRAMEBUFFER_SIZE
     original_color: list     = [0]*FRAMEBUFFER_SIZE
     bg_priority: list        = [False]*FRAMEBUFFER_SIZE
     mode: int                = V_BLANK_STATE
@@ -56,7 +56,8 @@ class PPU(AddressSpace):
 
     @classmethod
     def accept(cls, address: int) -> bool:
-        return (0x8000 <= address < 0xa000) or (0xfe00 <= address < 0xfea0) or (address in [
+        # 0x8000 <= address < 0xa0000 -> ((address >> 8) & 0b11100000 == 0b10000000)
+        return (address  & 0b11100000_00000000 == 0b10000000_00000000) or (0xfe00 <= address < 0xfea0) or (address in [
             IO_Registers.LY,
             IO_Registers.STAT,
             IO_Registers.LYC,
@@ -157,6 +158,7 @@ class PPU(AddressSpace):
                 if cls.mode == cls.H_BLANK_STATE:
                     if cls.modeclock >= cls.H_BLANK_TIME:
                         cls.exec_hblank()
+                        Window.refresh = True
                 elif cls.mode == cls.V_BLANK_STATE:
                     cls.exec_vblank()
                 elif cls.mode == cls.OAM_READ_STATE:
@@ -203,8 +205,7 @@ class PPU(AddressSpace):
             cls.auxillary_modeclock = cls.modeclock
             cls.window_line = 0
             InterruptManager.request_interrupt(Interrupt.INTERRUPT_VBLANK)
-            Window.framebuffer = cls.framebuffer
-
+            
         cls.update_stat_mode()
 
         
@@ -357,7 +358,7 @@ class PPU(AddressSpace):
                         position = line_width + buffer_addr % Window.SCREEN_WIDTH
                         cls.original_color[position] = color
                         if not cls.cgb_mode:
-                            cls.framebuffer[position] = cls.rgb(color)
+                            Window.framebuffer[position] = cls.rgb(color)
                             
                         else:
                             """
@@ -365,8 +366,8 @@ class PPU(AddressSpace):
                                 color = pixel
                             """
                             
-                            #cls.framebuffer[position] = cls.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
-                            cls.framebuffer[position] = cls.rgb(color) #FIXME
+                            #Window.framebuffer[position] = cls.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                            Window.framebuffer[position] = cls.rgb(color) #FIXME
                             
                             cls.bg_priority[position] = tile_attributes.is_bg_priority()
                             
@@ -375,7 +376,7 @@ class PPU(AddressSpace):
                 x += 1
         else:
             for i in range(0, Window.SCREEN_WIDTH):
-                cls.framebuffer[line_width + i] = cls.rgb(0)
+                Window.framebuffer[line_width + i] = cls.rgb(0)
                 cls.original_color[line_width + i] = 0
 
 
@@ -451,12 +452,12 @@ class PPU(AddressSpace):
                 position = line_width + buffer_addr
                 color = (cls.bgp >> (pixel * 2)) & 0x3
                 if not cls.cgb_mode:
-                    cls.framebuffer[position] = cls.rgb(color)
+                    Window.framebuffer[position] = cls.rgb(color)
                     cls.original_color[position] = color
                 else:
                     if cls.mmu.bootstrap_enabled or cls.mmu.rom.is_cgb():
                         color = pixel
-                    cls.framebuffer[position] = cls.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
+                    Window.framebuffer[position] = cls.mmu.cgb_palette.get_bg_rgba_palette_color(tile_attributes.get_palette(), color)
                     cls.bg_priority[position] = tile_attributes.is_bg_priority()
                     cls.original_color[position] = color
 
@@ -529,13 +530,13 @@ class PPU(AddressSpace):
 
                 if sprite_attributes.is_priority() or cls.original_color[position] == 0 :
                     if not cls.cgb_mode:
-                        cls.framebuffer[position] = cls.rgb_sprite(color)
+                        Window.framebuffer[position] = cls.rgb_sprite(color)
 
                     elif not cls.bg_priority[position] \
                         or cls.original_color[position] == 0:
                         if cls.mmu.bootstrap_enabled or cls.mmu.rom.is_cgb():
                             color = pixel
-                        cls.framebuffer[position] = cls.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
+                        Window.framebuffer[position] = cls.mmu.cgb_palette.get_ob_rgba_palette_color(sprite_attributes.get_cgb_palette(), color)
         
 
 

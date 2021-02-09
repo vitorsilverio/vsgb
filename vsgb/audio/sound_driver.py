@@ -49,12 +49,17 @@ class SoundDriver():
     def stop(self):
         self.buffer = [0]*SoundDriver.BUFFER_SIZE
         if self.play_obj is not None:
-
-            self.play_obj.stop()
+            try:
+                self.play_obj.stop()
+            except:
+                pass
 
     def play_sound(self,wave):
-        wave_obj = sa.WaveObject(wave,1,1,self.sample_rate)
-        while self.play_obj and self.play_obj.is_playing():
+        try:
+            wave_obj = sa.WaveObject(wave,1,1,self.sample_rate)
+            while self.play_obj and self.play_obj.is_playing():
+                pass
+            self.play_obj = wave_obj.play()
+        except:
             pass
-        self.play_obj = wave_obj.play()
     

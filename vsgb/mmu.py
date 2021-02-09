@@ -15,6 +15,7 @@ from vsgb.timer import Timer
 from vsgb.ppu import PPU
 from vsgb.memory.wram import WorkRam
 from vsgb.memory.unused_memory_area import UnusedMemoryArea
+from vsgb.memory.hram import HighRam
 
 from vsgb.address_space import AddressSpace
 
@@ -34,23 +35,25 @@ from vsgb.address_space import AddressSpace
 # FF00  FF7F    I/O Registers
 # FF80  FFFE    High RAM (HRAM)
 # FFFF  FFFF    Interrupts Enable Register (IE) 	
-class MMU:
+class MMU(AddressSpace):
 
     spaces: list = [
         InterruptManager,
+        HighRam,
         Timer,
         Input,
         WorkRam,
-        PPU
+        PPU,
+        UnusedMemoryArea
     ]
+
+    mmu = None
 
     def __init__(self, rom : CartridgeType, apu: APU, cgb_mode: bool):
         self.rom = rom
         self.apu = apu
-        self.zero_page = array.array('B', [0x00]*0x80)
-        self.hram = array.array('B', [0x00]*0x80)
         self.bootstrap_enabled = True
-        self.unusable_memory_area = UnusedMemoryArea(cgb_mode)
+        UnusedMemoryArea.cgb= cgb_mode
         self.cgb_mode = cgb_mode
         self.cgb_palette = CGB_Palette()
         if self.cgb_mode:
@@ -58,6 +61,7 @@ class MMU:
         else:
             self.boot_rom  = boot_rom
         self.game_shark = GameShark()
+        MMU.mmu = self
 
     def set_dma(self, dma):
         self.dma = dma
@@ -79,15 +83,10 @@ class MMU:
             return self.rom.read_rom_byte(address)
         if 0xa000 <= address < 0xc000:
             return self.rom.read_external_ram_byte(address) & 0xff
-        if 0xfea0 <= address < 0xff00:
-            return self.unusable_memory_area.read_value(address) & 0xff
         if 0xff00 <= address < 0xff80:
             if address in self.apu.registers:
                 return self.apu.read_register(address) & 0xff
             return IO_Registers.read_value(address) & 0xff
-            
-        if 0xff80 <= address < 0x10000:
-            return self.hram[address - 0xff80] & 0xff
         return 0xff
 
     def write_byte(self, address : int, value : int, hardware_operation : bool = False):
@@ -103,11 +102,7 @@ class MMU:
             self.rom.write_external_ram_byte(address, value)
         elif 0xff00 <= address < 0xff80:
             if not hardware_operation:
-                if address == IO_Registers.P1:
-                    IO_Registers.write_value(address,value & 0b00110000)
-                elif address == IO_Registers.DIV: # Reset div register
-                    IO_Registers.write_value(address,0)
-                elif address == IO_Registers.DMA: # Start dma transfer
+                if address == IO_Registers.DMA: # Start dma transfer
                     self.dma.request_dma_transfer(value)
                 elif address == IO_Registers.HDMA5: # Start hdma transfer
                     self.hdma.request_hdma_transfer(value)
@@ -120,8 +115,7 @@ class MMU:
                     IO_Registers.write_value(address,value)
             else:     
                 IO_Registers.write_value(address,value)
-        elif 0xff80 <= address < 0x10000:
-            self.hram[address - 0xff80] = value
+
 
     def read_word(self, address: int) -> int:
         return (self.read_byte(address) | (self.read_byte(address + 1) << 8)) & 0xffff
@@ -130,3 +124,11 @@ class MMU:
         value = (value & 0xffff)
         self.write_byte(address, (value & 0xff))
         self.write_byte((address + 1), (value >> 8) & 0xff)
+
+    @classmethod
+    def read(cls, address: int) -> int:
+        return cls.mmu.read_byte(address)
+
+    @classmethod
+    def write(cls, address: int, value: int):
+        cls.mmu.write_byte(address, value)
