@@ -4,12 +4,10 @@
 from vsgb.registers import Registers
 from vsgb.byte_operations import signed_value, set_bit
 
-def nop(): return 4
-
+nop = lambda: 4
 
 def invalid():
     raise RuntimeError()
-
 
 def inc_byte(operand: int) -> int:
     result = getattr(Registers, operand) + 1
@@ -25,7 +23,6 @@ def inc_byte(operand: int) -> int:
     setattr(Registers, operand, result & 0xff)
     return 4
 
-
 def dec_byte(value: int) -> int:
     result = getattr(Registers, operand) - 1
     if result & 0xff == 0x0:
@@ -39,7 +36,6 @@ def dec_byte(value: int) -> int:
     Registers.set_n_flag()
     setattr(Registers, operand, result & 0xff)
     return 4
-
 
 def bit(pos: int, operand: int) -> int:
     bit = 1 if getattr(Registers, operand) & (1 << pos) else 0
@@ -68,17 +64,30 @@ def ccf() -> int:
     Registers.reset_h_flag()
     return 4
 
+def cp(operand: int):
+    result = Registers.a - getattr(Registers, operand)
+    if result & 0xff == 0x0:
+        Registers.set_z_flag()
+    else: 
+        Registers.reset_z_flag()
+    if Registers.a < value:
+        Registers.set_c_flag()
+    else: 
+        Registers.reset_c_flag()
+    if (result & 0xf) > (Registers.a & 0xf):
+        Registers.set_h_flag()
+    else: 
+        Registers.reset_h_flag()
+    Registers.set_n_flag()
 
 def ld_op_op(op1: int, op2: int) -> int:
     setattr(Registers, int, getattr(Registers, op2))
     return 4
 
-
 # 1 - mnemonic
 # 2 - extra bytes
 # 3 - function
 # 4 - tuple of params
-
 instructions = (
     ('NOP', 0, nop, tuple()),
     ('LD BC, {:04x}', 2, nop, tuple()),
@@ -264,14 +273,14 @@ instructions = (
     ('OR L', 0, nop, tuple()),
     ('OR (HL)', 0, nop, tuple()),
     ('OR A', 0, nop, tuple()),
-    ('CP B', 0, nop, tuple()),
-    ('CP C', 0, nop, tuple()),
-    ('CP D', 0, nop, tuple()),
-    ('CP E', 0, nop, tuple()),
-    ('CP H', 0, nop, tuple()),
-    ('CP L', 0, nop, tuple()),
+    ('CP B', 0, cp, ('b')),
+    ('CP C', 0, cp, ('c')),
+    ('CP D', 0, cp, ('d')),
+    ('CP E', 0, cp, ('e')),
+    ('CP H', 0, cp, ('h')),
+    ('CP L', 0, cp, ('l')),
     ('CP (HL)', 0, nop, tuple()),
-    ('CP A', 0, nop, tuple()),
+    ('CP A', 0, cp, ('a')),
     ('RET NZ', 0, nop, tuple()),
     ('POP BC', 0, nop, tuple()),
     ('JP NZ, {:04x}', 2, nop, tuple()),
@@ -529,67 +538,67 @@ instructions = (
     ('RES 7, (HL)', 0, nop, tuple()),
     ('RES 7, A', 0, nop, tuple()),
     ('SET 0, B', 0, set_, (0, 'b')),
-    ('SET 0, C', 0, nop, tuple()),
-    ('SET 0, D', 0, nop, tuple()),
-    ('SET 0, E', 0, nop, tuple()),
-    ('SET 0, H', 0, nop, tuple()),
-    ('SET 0, L', 0, nop, tuple()),
+    ('SET 0, C', 0, set_, (0, 'c')),
+    ('SET 0, D', 0, set_, (0, 'd')),
+    ('SET 0, E', 0, set_, (0, 'e')),
+    ('SET 0, H', 0, set_, (0, 'h')),
+    ('SET 0, L', 0, set_, (0, 'l')),
     ('SET 0, (HL)', 0, nop, tuple()),
-    ('SET 0, A', 0, nop, tuple()),
-    ('SET 1, B', 0, nop, tuple()),
-    ('SET 1, C', 0, nop, tuple()),
-    ('SET 1, D', 0, nop, tuple()),
-    ('SET 1, E', 0, nop, tuple()),
-    ('SET 1, H', 0, nop, tuple()),
-    ('SET 1, L', 0, nop, tuple()),
+    ('SET 0, A', 0, set_, (0, 'a')),
+    ('SET 1, B', 0, set_, (1, 'b')),
+    ('SET 1, C', 0, set_, (1, 'c')),
+    ('SET 1, D', 0, set_, (1, 'd')),
+    ('SET 1, E', 0, set_, (1, 'e')),
+    ('SET 1, H', 0, set_, (1, 'h')),
+    ('SET 1, L', 0, set_, (1, 'l')),
     ('SET 1, (HL)', 0, nop, tuple()),
-    ('SET 1, A', 0, nop, tuple()),
-    ('SET 2, B', 0, nop, tuple()),
-    ('SET 2, C', 0, nop, tuple()),
-    ('SET 2, D', 0, nop, tuple()),
-    ('SET 2, E', 0, nop, tuple()),
-    ('SET 2, H', 0, nop, tuple()),
-    ('SET 2, L', 0, nop, tuple()),
+    ('SET 1, A', 0, set_, (1, 'a')),
+    ('SET 2, B', 0, set_, (2, 'b')),
+    ('SET 2, C', 0, set_, (2, 'c')),
+    ('SET 2, D', 0, set_, (2, 'd')),
+    ('SET 2, E', 0, set_, (2, 'e')),
+    ('SET 2, H', 0, set_, (2, 'h')),
+    ('SET 2, L', 0, set_, (2, 'l')),
     ('SET 2, (HL)', 0, nop, tuple()),
-    ('SET 2, A', 0, nop, tuple()),
-    ('SET 3, B', 0, nop, tuple()),
-    ('SET 3, C', 0, nop, tuple()),
-    ('SET 3, D', 0, nop, tuple()),
-    ('SET 3, E', 0, nop, tuple()),
-    ('SET 3, H', 0, nop, tuple()),
-    ('SET 3, L', 0, nop, tuple()),
+    ('SET 2, A', 0, set_, (2, 'a')),
+    ('SET 3, B', 0, set_, (3, 'b')),
+    ('SET 3, C', 0, set_, (3, 'c')),
+    ('SET 3, D', 0, set_, (3, 'd')),
+    ('SET 3, E', 0, set_, (3, 'e')),
+    ('SET 3, H', 0, set_, (3, 'h')),
+    ('SET 3, L', 0, set_, (3, 'l')),
     ('SET 3, (HL)', 0, nop, tuple()),
-    ('SET 3, A', 0, nop, tuple()),
-    ('SET 4, B', 0, nop, tuple()),
-    ('SET 4, C', 0, nop, tuple()),
-    ('SET 4, D', 0, nop, tuple()),
-    ('SET 4, E', 0, nop, tuple()),
-    ('SET 4, H', 0, nop, tuple()),
-    ('SET 4, L', 0, nop, tuple()),
+    ('SET 3, A', 0, set_, (3, 'a')),
+    ('SET 4, B', 0, set_, (4, 'b')),
+    ('SET 4, C', 0, set_, (4, 'c')),
+    ('SET 4, D', 0, set_, (4, 'd')),
+    ('SET 4, E', 0, set_, (4, 'e')),
+    ('SET 4, H', 0, set_, (4, 'h')),
+    ('SET 4, L', 0, set_, (4, 'l')),
     ('SET 4, (HL)', 0, nop, tuple()),
-    ('SET 4, A', 0, nop, tuple()),
-    ('SET 5, B', 0, nop, tuple()),
-    ('SET 5, C', 0, nop, tuple()),
-    ('SET 5, D', 0, nop, tuple()),
-    ('SET 5, E', 0, nop, tuple()),
-    ('SET 5, H', 0, nop, tuple()),
-    ('SET 5, L', 0, nop, tuple()),
+    ('SET 4, A', 0, set_, (4, 'a')),
+    ('SET 5, B', 0, set_, (5, 'b')),
+    ('SET 5, C', 0, set_, (5, 'c')),
+    ('SET 5, D', 0, set_, (5, 'd')),
+    ('SET 5, E', 0, set_, (5, 'e')),
+    ('SET 5, H', 0, set_, (5, 'h')),
+    ('SET 5, L', 0, set_, (5, 'l')),
     ('SET 5, (HL)', 0, nop, tuple()),
-    ('SET 5, A', 0, nop, tuple()),
-    ('SET 6, B', 0, nop, tuple()),
-    ('SET 6, C', 0, nop, tuple()),
-    ('SET 6, D', 0, nop, tuple()),
-    ('SET 6, E', 0, nop, tuple()),
-    ('SET 6, H', 0, nop, tuple()),
-    ('SET 6, L', 0, nop, tuple()),
+    ('SET 5, A', 0, set_, (5, 'a')),
+    ('SET 6, B', 0, set_, (6, 'b')),
+    ('SET 6, C', 0, set_, (6, 'c')),
+    ('SET 6, D', 0, set_, (6, 'd')),
+    ('SET 6, E', 0, set_, (6, 'e')),
+    ('SET 6, H', 0, set_, (6, 'h')),
+    ('SET 6, L', 0, set_, (6, 'l')),
     ('SET 6, (HL)', 0, nop, tuple()),
-    ('SET 6, A', 0, nop, tuple()),
-    ('SET 7, B', 0, nop, tuple()),
-    ('SET 7, C', 0, nop, tuple()),
-    ('SET 7, D', 0, nop, tuple()),
-    ('SET 7, E', 0, nop, tuple()),
-    ('SET 7, H', 0, nop, tuple()),
-    ('SET 7, L', 0, nop, tuple()),
+    ('SET 6, A', 0, set_, (6, 'a')),
+    ('SET 7, B', 0, set_, (7, 'b')),
+    ('SET 7, C', 0, set_, (7, 'c')),
+    ('SET 7, D', 0, set_, (7, 'd')),
+    ('SET 7, E', 0, set_, (7, 'e')),
+    ('SET 7, H', 0, set_, (7, 'h')),
+    ('SET 7, L', 0, set_, (7, 'l')),
     ('SET 7, (HL)', 0, nop, tuple()),
-    ('SET 7, A', 0, nop, tuple())
+    ('SET 7, A', 0, set_, (7, 'a'))
 )
