@@ -1,6 +1,7 @@
 # vsgb
 A simple Game Boy emulator writen in Python
 ## [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vitorsilverio/pygb)
+[![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6InZpdG9yc2lsdmVyaW8iLCJyZXBvMSI6InZzZ2IiLCJpbmNsdWRlTGludCI6ZmFsc2UsImF1dGhvcklkIjoxMjQ4MSwiaWF0IjoxNjEyOTE2NzA2fQ.3C83CcYSlgCYnWsN7VFulf2QMM0deE8LJTpU5-WaArk)](https://www.deepcode.ai/app/gh/vitorsilverio/vsgb/_/dashboard?utm_content=gh%2Fvitorsilverio%2Fvsgb)
 
 ## Requirements
 - Python >= 3.6 (pypy3 is recommended instead)
