@@ -5,7 +5,7 @@
 # - https://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
 
 #This custom boot rom dont check logo data
-boot_rom  = [
+boot_rom  = (
         # Bytes           # Instruction         ; ADDR   Comment
         0x31, 0xfe, 0xff, # LD SP,$fffe         ; $0000  Setup Stack
         0xaf,             # XOR A               ; $0003  Zero the memory from $8000-$9FFF (VRAM)
@@ -159,9 +159,9 @@ boot_rom  = [
         0x00,             # NOP                 ; $00fb  ; removed the check
         0x3e, 0x01,       # LD A,$01            ; $00fc
         0xe0, 0x50        # LD ($FF00+$50),A    ; $00fe	;turn off DMG rom
-        ]
+        )
 
-cgb_boot_rom = [
+cgb_boot_rom = (
         0x31, 0xfe, 0xff,  #	LD SP, fffe		; $0000
         0x3e, 0x02,  #	LD A, 02		; $0003
         0xc3, 0x7c, 0x00,  #	JP 007c		; $0005
@@ -1878,4 +1878,4 @@ cgb_boot_rom = [
         0x00,  #	NOP		; $08fd
         0x00,  #	NOP		; $08fe
         0x00   #	NOP		; $08ff
-]
+)

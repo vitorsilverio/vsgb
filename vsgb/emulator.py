@@ -43,8 +43,7 @@ class Emulator:
                     self.serialize_ok = True
                 if last_ppu_mode != PPU.mode:
                     last_ppu_mode = PPU.mode
-                    ly = self.mmu.read_byte(IO_Registers.LY)
-                    can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode and ly < 143
+                    can_exec_hdma = PPU.H_BLANK_STATE == last_ppu_mode and PPU.ly < 143
                 ticks = 0
                 if self.cgb_mode: 
                     if self.hdma.in_progress:

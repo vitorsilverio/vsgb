@@ -23,7 +23,7 @@ def inc_byte(operand: int) -> int:
     setattr(Registers, operand, result & 0xff)
     return 4
 
-def dec_byte(value: int) -> int:
+def dec_byte(operand: int) -> int:
     result = getattr(Registers, operand) - 1
     if result & 0xff == 0x0:
         Registers.set_z_flag()
@@ -70,7 +70,7 @@ def cp(operand: int):
         Registers.set_z_flag()
     else: 
         Registers.reset_z_flag()
-    if Registers.a < value:
+    if Registers.a < getattr(Registers, operand):
         Registers.set_c_flag()
     else: 
         Registers.reset_c_flag()
@@ -83,6 +83,62 @@ def cp(operand: int):
 def ld_op_op(op1: int, op2: int) -> int:
     setattr(Registers, int, getattr(Registers, op2))
     return 4
+
+def _and(operand: int) -> int:
+    result = Registers.a & getattr(Registers, operand)
+    if result & 0xff == 0x0:
+        Registers.set_z_flag()
+    else: 
+        Registers.reset_z_flag()
+    Registers.reset_c_flag()
+    Registers.reset_n_flag()
+    Registers.set_h_flag()
+    Registers.a = result & 0xff
+    return 4
+
+def _or(operand : int) -> int:
+    result = Registers.a | getattr(Registers, operand)
+    if result & 0xff == 0x0:
+        Registers.set_z_flag()
+    else: 
+        Registers.reset_z_flag()
+    Registers.reset_c_flag()
+    Registers.reset_n_flag()
+    Registers.reset_h_flag()
+    Registers.a = result & 0xff
+    return 4
+
+def xor(operand: int) -> int:
+    result = Registers.a ^ getattr(Registers, operand)
+    if result & 0xff == 0x0:
+        Registers.set_z_flag()
+    else: 
+        Registers.reset_z_flag()
+    Registers.reset_c_flag()
+    Registers.reset_n_flag()
+    Registers.reset_h_flag()
+    Registers.a = result & 0xff
+    return 4
+
+def adc(operand : int) -> int:
+    carry = 1 if Registers.is_c_flag() else 0
+    result = Registers.a + getattr(Registers, operand) + carry
+    if result & 0xff == 0x0: 
+        Registers.set_z_flag()
+    else: 
+        Registers.reset_z_flag()
+    if result > 0xff: 
+        Registers.set_c_flag()
+    else: 
+        Registers.reset_c_flag()
+    if (Registers.a & 0xf) + (getattr(Registers, operand) & 0xf) + carry > 0xf: 
+        Registers.set_h_flag()
+    else: 
+        Registers.reset_h_flag()
+    Registers.reset_n_flag()
+    Registers.a = result & 0xff
+    return 4
+
 
 # 1 - mnemonic
 # 2 - extra bytes
@@ -133,7 +189,7 @@ instructions = (
     ('ADD HL, HL', 0, nop, tuple()),
     ('LD A, (HL+)', 0, nop, tuple()),
     ('DEC HL', 0, nop, tuple()),
-    ('INC L', 0, inc_byte, ('l')),
+    ('INC L', 0, inc_byte, ('l',)),
     ('DEC L', 0, dec_byte, ('l',)),
     ('LD L, {:02x}', 1, nop, tuple()),
     ('CPL', 0, nop, tuple()),
@@ -149,7 +205,7 @@ instructions = (
     ('ADD HL, SP', 0, nop, tuple()),
     ('LD A, (HL-)', 0, nop, tuple()),
     ('DEC SP', 0, nop, tuple()),
-    ('INC A', 0, inc_byte, ('a')),
+    ('INC A', 0, inc_byte, ('a',)),
     ('DEC A', 0, dec_byte, ('a',)),
     ('LD A, {:02x}', 1, nop, tuple()),
     ('CCF', 0, ccf, tuple()),
@@ -225,14 +281,14 @@ instructions = (
     ('ADD A, L', 0, nop, tuple()),
     ('ADD A, (HL)', 0, nop, tuple()),
     ('ADD A, A', 0, nop, tuple()),
-    ('ADC A, B', 0, nop, tuple()),
-    ('ADC A, C', 0, nop, tuple()),
-    ('ADC A, D', 0, nop, tuple()),
-    ('ADC A, E', 0, nop, tuple()),
-    ('ADC A, H', 0, nop, tuple()),
-    ('ADC A, L', 0, nop, tuple()),
+    ('ADC A, B', 0, adc, ('b',)),
+    ('ADC A, C', 0, adc, ('c',)),
+    ('ADC A, D', 0, adc, ('d',)),
+    ('ADC A, E', 0, adc, ('e',)),
+    ('ADC A, H', 0, adc, ('h',)),
+    ('ADC A, L', 0, adc, ('l',)),
     ('ADC A, (HL)', 0, nop, tuple()),
-    ('ADC A, A', 0, nop, tuple()),
+    ('ADC A, A', 0, adc, ('a',)),
     ('SUB A, B', 0, nop, tuple()),
     ('SUB A, C', 0, nop, tuple()),
     ('SUB A, D', 0, nop, tuple()),
@@ -249,30 +305,30 @@ instructions = (
     ('SBC A, L', 0, nop, tuple()),
     ('SBC A, (HL)', 0, nop, tuple()),
     ('SBC A, A', 0, nop, tuple()),
-    ('AND B', 0, nop, tuple()),
-    ('AND C', 0, nop, tuple()),
-    ('AND D', 0, nop, tuple()),
-    ('AND E', 0, nop, tuple()),
-    ('AND H', 0, nop, tuple()),
-    ('AND L', 0, nop, tuple()),
+    ('AND B', 0, _and, ('b',)),
+    ('AND C', 0, _and, ('c',)),
+    ('AND D', 0, _and, ('d',)),
+    ('AND E', 0, _and, ('e',)),
+    ('AND H', 0, _and, ('h',)),
+    ('AND L', 0, _and, ('l',)),
     ('AND (HL)', 0, nop, tuple()),
-    ('AND A', 0, nop, tuple()),
-    ('XOR B', 0, nop, tuple()),
-    ('XOR C', 0, nop, tuple()),
-    ('XOR D', 0, nop, tuple()),
-    ('XOR E', 0, nop, tuple()),
-    ('XOR H', 0, nop, tuple()),
-    ('XOR L', 0, nop, tuple()),
+    ('AND A', 0, _and, ('a',)),
+    ('XOR B', 0, xor, ('b',)),
+    ('XOR C', 0, xor, ('c',)),
+    ('XOR D', 0, xor, ('d',)),
+    ('XOR E', 0, xor, ('e',)),
+    ('XOR H', 0, xor, ('h',)),
+    ('XOR L', 0, xor, ('l',)),
     ('XOR (HL)', 0, nop, tuple()),
-    ('XOR A', 0, nop, tuple()),
-    ('OR B', 0, nop, tuple()),
-    ('OR C', 0, nop, tuple()),
-    ('OR D', 0, nop, tuple()),
-    ('OR E', 0, nop, tuple()),
-    ('OR H', 0, nop, tuple()),
-    ('OR L', 0, nop, tuple()),
+    ('XOR A', 0, xor, ('a',)),
+    ('OR B', 0, _or, ('b',)),
+    ('OR C', 0, _or, ('c',)),
+    ('OR D', 0, _or, ('d',)),
+    ('OR E', 0, _or, ('e',)),
+    ('OR H', 0, _or, ('h',)),
+    ('OR L', 0, _or, ('l',)),
     ('OR (HL)', 0, nop, tuple()),
-    ('OR A', 0, nop, tuple()),
+    ('OR A', 0, _or, ('a',)),
     ('CP B', 0, cp, ('b')),
     ('CP C', 0, cp, ('c')),
     ('CP D', 0, cp, ('d')),
