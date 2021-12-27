@@ -13,6 +13,7 @@ class Timer(AddressSpace):
     TIMA: int = 0
     TMA: int = 0
     DIV: int = 0
+    TAC: int = 0
     div_cycles: int = 0
     tima_cycles: int = 0
 
@@ -22,7 +23,8 @@ class Timer(AddressSpace):
             IO_Registers.DIV,
             IO_Registers.KEY1,
             IO_Registers.TMA,
-            IO_Registers.TIMA
+            IO_Registers.TIMA,
+            IO_Registers.TAC
         ]
 
     @classmethod
@@ -35,6 +37,8 @@ class Timer(AddressSpace):
             return cls.TMA
         if address == IO_Registers.TIMA:
             return cls.TIMA
+        if address == IO_Registers.TAC:
+            return cls.TAC
 
     @classmethod
     def write(cls, address: int, value: int):
@@ -46,6 +50,8 @@ class Timer(AddressSpace):
             cls.TMA = value
         elif address == IO_Registers.TIMA:
             cls.TIMA = value
+        elif address == IO_Registers.TAC:
+            cls.TAC = value
 
     @classmethod
     def tick(cls, cycles : int = 0):
@@ -93,7 +99,7 @@ class Tima:
 
     @staticmethod
     def running() -> bool:
-        return Timer.TIMA & 0x4
+        return Timer.TAC & 0x4
 
     @staticmethod
     def frequency() -> int:
@@ -102,4 +108,4 @@ class Tima:
             0x1 : 16,
             0x2 : 64,
             0x3 : 256
-        }.get(Timer.TIMA & 0x3)
+        }.get(Timer.TAC & 0x3)
