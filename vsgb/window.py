@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import logging
 from threading import Thread
 import numpy as np
 import sdl2
@@ -32,10 +31,19 @@ class Window(Thread):
         self.renderer = sdl2.ext.renderer.Renderer(window, flags=sdl2.SDL_RENDERER_ACCELERATED)
 
         # Create a texture to hold the framebuffer data
-        self.texture = sdl2.ext.renderer.Texture(self.renderer, )
-        self.texture = sdl2.SDL_CreateTexture(self.renderer, sdl2.SDL_PIXELFORMAT_ARGB1555,
+        self.texture = sdl2.SDL_CreateTexture(self.renderer.sdlrenderer, sdl2.SDL_PIXELFORMAT_ARGB1555,
                                                 sdl2.SDL_TEXTUREACCESS_STREAMING, Window.WINDOW_WIDTH,
                                                 Window.SCREEN_HEIGHT)
+        
+        running = True
+        while running:
+            events = sdl2.ext.get_events()
+            for event in events:
+                if event.type == sdl2.SDL_QUIT:
+                    running = False
+                    break
+
+        sdl2.ext.quit()
 
     def draw(self):
         if Window.refresh:

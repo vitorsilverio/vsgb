@@ -4,7 +4,7 @@
 # Documentation source:
 # - https://gbdev.gg8.se/wiki/articles/Sound_Controller
 
-import simpleaudio as sa
+# import simpleaudio as sa
 import threading
 
 class SoundDriver():
@@ -56,10 +56,10 @@ class SoundDriver():
 
     def play_sound(self,wave):
         try:
-            wave_obj = sa.WaveObject(wave,1,1,self.sample_rate)
+            # wave_obj = sa.WaveObject(wave,1,1,self.sample_rate)
             while self.play_obj and self.play_obj.is_playing():
                 pass
-            self.play_obj = wave_obj.play()
+            # self.play_obj = wave_obj.play()
         except:
             pass
     

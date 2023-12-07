@@ -13,7 +13,6 @@ from vsgb.window import Window
 from vsgb.instructions import instructions
 from vsgb.registers import Registers
 from vsgb.save_state_manager import SaveStateManager
-import threading
 
 
 class Emulator:
